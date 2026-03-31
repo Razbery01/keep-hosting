@@ -25,15 +25,18 @@ export default function Navbar() {
   }, [])
 
   const isHome = location.pathname === '/'
+  const onDarkHero = isHome && !scrolled
+
   const navBg = scrolled
-    ? 'bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-sm'
+    ? 'bg-white border-b border-gray-200 shadow-sm'
     : isHome
       ? 'bg-transparent'
-      : 'bg-white/80 backdrop-blur-xl border-b border-gray-200/50'
+      : 'bg-white/95 backdrop-blur-xl border-b border-gray-200/50'
 
-  const textColor = scrolled || !isHome ? 'text-gray-600' : 'text-gray-300'
-  const logoColor = scrolled || !isHome ? 'text-primary' : 'text-white drop-shadow-md'
-  const accentColor = scrolled || !isHome ? 'text-accent' : 'text-accent'
+  const logoColor = onDarkHero ? 'text-white drop-shadow-md' : 'text-primary'
+  const authMuted = onDarkHero
+    ? 'text-white/95 hover:text-white'
+    : 'text-gray-800 hover:text-primary'
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navBg}`}>
@@ -53,8 +56,12 @@ export default function Navbar() {
                 to={to}
                 className={`relative px-3.5 py-2 rounded-lg text-sm font-medium transition-all ${
                   location.pathname === to
-                    ? `${accentColor} bg-accent/10`
-                    : `${textColor} hover:text-accent hover:bg-accent/5`
+                    ? onDarkHero
+                      ? 'text-white font-semibold bg-white/15'
+                      : 'text-primary font-semibold bg-primary/10'
+                    : onDarkHero
+                      ? 'text-white/90 hover:text-white hover:bg-white/10'
+                      : 'text-gray-800 hover:text-primary hover:bg-gray-50'
                 }`}
               >
                 {label}
@@ -66,23 +73,24 @@ export default function Navbar() {
             {user ? (
               <>
                 {isAdmin && (
-                  <Link to="/admin" className={`text-sm font-medium ${textColor} hover:text-accent transition-colors`}>
+                  <Link to="/admin" className={`text-sm font-medium transition-colors ${authMuted}`}>
                     Admin
                   </Link>
                 )}
-                <Link to="/dashboard" className={`text-sm font-medium ${textColor} hover:text-accent transition-colors`}>
+                <Link to="/dashboard" className={`text-sm font-medium transition-colors ${authMuted}`}>
                   Dashboard
                 </Link>
                 <button
+                  type="button"
                   onClick={signOut}
-                  className={`text-sm font-medium ${textColor} hover:text-accent transition-colors`}
+                  className={`text-sm font-medium transition-colors ${authMuted}`}
                 >
                   Sign Out
                 </button>
               </>
             ) : (
               <>
-                <Link to="/login" className={`text-sm font-semibold ${textColor} hover:text-accent transition-colors px-3 py-2`}>
+                <Link to="/login" className={`text-sm font-semibold transition-colors px-3 py-2 ${authMuted}`}>
                   Log In
                 </Link>
                 <Link
@@ -95,14 +103,14 @@ export default function Navbar() {
             )}
           </div>
 
-          <button onClick={() => setOpen(!open)} className={`md:hidden p-2 ${scrolled || !isHome ? 'text-gray-600' : 'text-white'}`}>
+          <button type="button" onClick={() => setOpen(!open)} className={`md:hidden p-2 ${onDarkHero ? 'text-white' : 'text-gray-800'}`}>
             {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
 
       {open && (
-        <div className="md:hidden bg-white/95 backdrop-blur-xl border-t border-gray-100 shadow-xl">
+        <div className="md:hidden bg-white border-t border-gray-200 shadow-xl text-gray-900">
           <div className="px-4 py-4 space-y-1">
             {NAV_LINKS.map(({ to, label }) => (
               <Link
@@ -110,7 +118,9 @@ export default function Navbar() {
                 to={to}
                 onClick={() => setOpen(false)}
                 className={`block py-3 px-4 rounded-xl text-sm font-medium transition-colors ${
-                  location.pathname === to ? 'text-accent bg-accent/10' : 'text-gray-600 hover:bg-gray-50'
+                  location.pathname === to
+                    ? 'text-primary font-semibold bg-primary/10'
+                    : 'text-gray-800 hover:bg-gray-50'
                 }`}
               >
                 {label}
@@ -119,16 +129,16 @@ export default function Navbar() {
             <div className="border-t border-gray-100 pt-3 mt-3 space-y-1">
               {user ? (
                 <>
-                  <Link to="/dashboard" onClick={() => setOpen(false)} className="block py-3 px-4 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">
+                  <Link to="/dashboard" onClick={() => setOpen(false)} className="block py-3 px-4 rounded-xl text-sm font-medium text-gray-800 hover:bg-gray-50">
                     Dashboard
                   </Link>
-                  <button onClick={() => { signOut(); setOpen(false) }} className="block w-full text-left py-3 px-4 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">
+                  <button type="button" onClick={() => { signOut(); setOpen(false) }} className="block w-full text-left py-3 px-4 rounded-xl text-sm font-medium text-gray-800 hover:bg-gray-50">
                     Sign Out
                   </button>
                 </>
               ) : (
                 <>
-                  <Link to="/login" onClick={() => setOpen(false)} className="block py-3 px-4 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">
+                  <Link to="/login" onClick={() => setOpen(false)} className="block py-3 px-4 rounded-xl text-sm font-medium text-gray-800 hover:bg-gray-50">
                     Log In
                   </Link>
                   <Link to="/signup" onClick={() => setOpen(false)} className="block py-3 px-4 rounded-xl text-sm font-bold text-white bg-accent text-center">
