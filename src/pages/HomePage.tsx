@@ -46,12 +46,12 @@ export default function HomePage() {
               <span className="inline-flex items-center gap-2 bg-accent/10 backdrop-blur-sm border border-accent/20 text-accent px-4 py-2 rounded-full text-sm font-medium mb-6">
                 <Sparkles className="w-4 h-4" /> AI-Powered Web Design
               </span>
-              <h1 className="text-5xl md:text-7xl font-extrabold leading-[1.05] mb-6 text-white tracking-tight">
-                Build Your<br />
-                <span className="text-accent">Dream Website</span><br />
-                <span className="text-white/60 text-4xl md:text-5xl font-bold">in Minutes</span>
+              <h1 className="text-5xl md:text-7xl font-extrabold leading-[1.05] mb-6 tracking-tight drop-shadow-lg">
+                <span className="text-white">Build Your</span><br />
+                <span className="text-accent drop-shadow-[0_0_30px_rgba(0,212,255,0.3)]">Dream Website</span><br />
+                <span className="text-white/80 text-4xl md:text-5xl font-bold">in Minutes</span>
               </h1>
-              <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-lg leading-relaxed">
+              <p className="text-lg md:text-xl text-gray-200 mb-10 max-w-lg leading-relaxed">
                 Choose a package. Tell us about your business. Our AI builds you a stunning, professional website — deployed and live instantly.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
