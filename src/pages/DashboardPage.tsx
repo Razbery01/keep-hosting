@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
-  Globe, ExternalLink, Clock, CheckCircle2, Loader2, AlertCircle, Plus
+  Globe, ExternalLink, Clock, CheckCircle2, Loader2, AlertCircle,
+  Plus, CreditCard, Eye
 } from 'lucide-react'
+import { toast } from 'sonner'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
 
@@ -23,20 +25,21 @@ interface Order {
   }[]
 }
 
-const statusStyles: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
-  pending: { bg: 'bg-yellow-50', text: 'text-yellow-700', icon: <Clock className="w-4 h-4" /> },
-  payment_pending: { bg: 'bg-yellow-50', text: 'text-yellow-700', icon: <Clock className="w-4 h-4" /> },
-  paid: { bg: 'bg-blue-50', text: 'text-blue-700', icon: <CheckCircle2 className="w-4 h-4" /> },
-  building: { bg: 'bg-purple-50', text: 'text-purple-700', icon: <Loader2 className="w-4 h-4 animate-spin" /> },
-  deployed: { bg: 'bg-green-50', text: 'text-green-700', icon: <CheckCircle2 className="w-4 h-4" /> },
-  live: { bg: 'bg-green-50', text: 'text-green-700', icon: <Globe className="w-4 h-4" /> },
-  failed: { bg: 'bg-red-50', text: 'text-red-700', icon: <AlertCircle className="w-4 h-4" /> },
+const statusConfig: Record<string, { bg: string; text: string; icon: React.ReactNode; label: string }> = {
+  pending: { bg: 'bg-yellow-50', text: 'text-yellow-700', icon: <Clock className="w-4 h-4" />, label: 'Building Preview' },
+  building: { bg: 'bg-purple-50', text: 'text-purple-700', icon: <Loader2 className="w-4 h-4 animate-spin" />, label: 'Building' },
+  preview_ready: { bg: 'bg-blue-50', text: 'text-blue-700', icon: <Eye className="w-4 h-4" />, label: 'Preview Ready' },
+  paid: { bg: 'bg-emerald-50', text: 'text-emerald-700', icon: <CheckCircle2 className="w-4 h-4" />, label: 'Paid' },
+  deployed: { bg: 'bg-green-50', text: 'text-green-700', icon: <CheckCircle2 className="w-4 h-4" />, label: 'Deployed' },
+  live: { bg: 'bg-green-50', text: 'text-green-700', icon: <Globe className="w-4 h-4" />, label: 'Live' },
+  failed: { bg: 'bg-red-50', text: 'text-red-700', icon: <AlertCircle className="w-4 h-4" />, label: 'Failed' },
 }
 
 export default function DashboardPage() {
   const { user } = useAuth()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
+  const [payingId, setPayingId] = useState<string | null>(null)
 
   useEffect(() => {
     if (!user) return
@@ -50,6 +53,25 @@ export default function DashboardPage() {
         setLoading(false)
       })
   }, [user])
+
+  async function handlePay(orderId: string) {
+    setPayingId(orderId)
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ status: 'paid' })
+        .eq('id', orderId)
+      if (error) throw error
+      setOrders((prev) =>
+        prev.map((o) => (o.id === orderId ? { ...o, status: 'paid' } : o))
+      )
+      toast.success('Payment received — your site will go live shortly!')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Payment failed')
+    } finally {
+      setPayingId(null)
+    }
+  }
 
   if (loading) {
     return (
@@ -88,48 +110,101 @@ export default function DashboardPage() {
             </Link>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {orders.map((order) => {
               const site = order.client_sites?.[0]
-              const style = statusStyles[order.status] || statusStyles.pending
+              const style = statusConfig[order.status] || statusConfig.pending
+              const previewUrl = site?.netlify_url || site?.live_url
+              const isPreviewReady = order.status === 'preview_ready' && previewUrl
+              const isPaid = order.status === 'paid' || order.status === 'live' || order.status === 'deployed'
+
               return (
                 <motion.div
                   key={order.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white rounded-xl border border-gray-200 p-6"
+                  className="bg-white rounded-xl border border-gray-200 overflow-hidden"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {site?.business_name || 'Untitled Website'}
-                      </h3>
-                      <div className="flex items-center gap-3 mt-2 text-sm text-gray-500">
-                        <span className="capitalize">{order.package} Package</span>
-                        <span>R{(order.amount_cents / 100).toLocaleString()}</span>
-                        {order.domain_name && (
-                          <span className="flex items-center gap-1">
-                            <Globe className="w-3.5 h-3.5" /> {order.domain_name}
-                          </span>
-                        )}
+                  <div className="p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {site?.business_name || 'Untitled Website'}
+                        </h3>
+                        <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-500">
+                          <span className="capitalize">{order.package} Package</span>
+                          <span>R{(order.amount_cents / 100).toLocaleString()}</span>
+                          {order.domain_name && (
+                            <span className="flex items-center gap-1">
+                              <Globe className="w-3.5 h-3.5" /> {order.domain_name}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${style.bg} ${style.text}`}>
+                      <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium shrink-0 ${style.bg} ${style.text}`}>
                         {style.icon}
-                        {order.status.replace('_', ' ')}
+                        {style.label}
                       </span>
-                      {(site?.live_url || site?.netlify_url) && (
+                    </div>
+
+                    {/* Pending: waiting for preview */}
+                    {order.status === 'pending' && !previewUrl && (
+                      <div className="mt-5 bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
+                        <strong>We're preparing your preview.</strong> You'll receive a link to review your website here shortly. No payment is required until you're happy with it.
+                      </div>
+                    )}
+
+                    {/* Preview ready: show preview + pay CTA */}
+                    {isPreviewReady && (
+                      <div className="mt-5 bg-blue-50 border border-blue-200 rounded-xl p-5">
+                        <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                          <Eye className="w-5 h-5" /> Your preview is ready!
+                        </h4>
+                        <p className="text-sm text-blue-800 mb-4">
+                          Review your website below. Once you're happy, approve and pay to take it live.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-3">
+                          <a
+                            href={previewUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-2 bg-white border border-blue-300 text-blue-700 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-50 transition-colors"
+                          >
+                            <ExternalLink className="w-4 h-4" /> View Preview
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => handlePay(order.id)}
+                            disabled={payingId === order.id}
+                            className="inline-flex items-center justify-center gap-2 bg-accent text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-accent-dark transition-colors disabled:opacity-50"
+                          >
+                            {payingId === order.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <CreditCard className="w-4 h-4" />
+                            )}
+                            Approve & Pay — R{(order.amount_cents / 100).toLocaleString()}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Paid / Live: show visit link */}
+                    {isPaid && previewUrl && (
+                      <div className="mt-5 bg-green-50 border border-green-200 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <p className="text-sm text-green-800">
+                          <strong>Payment received.</strong> {order.status === 'live' ? 'Your site is live!' : 'Your site will be live shortly.'}
+                        </p>
                         <a
-                          href={site.live_url || site.netlify_url!}
+                          href={previewUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-accent text-sm font-medium hover:underline"
+                          className="inline-flex items-center gap-1.5 text-green-700 text-sm font-semibold hover:underline shrink-0"
                         >
-                          Visit <ExternalLink className="w-3.5 h-3.5" />
+                          Visit Site <ExternalLink className="w-3.5 h-3.5" />
                         </a>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Package, Globe, CreditCard, Building2, Palette, FileText,
+  Package, Globe, Building2, Palette, FileText,
   CheckCircle2, ArrowRight, ArrowLeft, Loader2, Upload
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -15,7 +15,6 @@ import type { OnboardingData, Package as PackageType } from '../types'
 const STEPS = [
   { label: 'Package', icon: Package },
   { label: 'Domain', icon: Globe },
-  { label: 'Payment', icon: CreditCard },
   { label: 'Business Info', icon: Building2 },
   { label: 'Brand', icon: Palette },
   { label: 'Content', icon: FileText },
@@ -79,7 +78,7 @@ export default function OnboardingPage() {
         .insert({
           user_id: user.id,
           package: data.package,
-          status: 'payment_pending',
+          status: 'pending',
           amount_cents: pkg.price * 100,
           domain_name: data.domainName || null,
         })
@@ -244,26 +243,8 @@ export default function OnboardingPage() {
               </div>
             )}
 
-            {/* Step 2: Payment */}
+            {/* Step 2: Business Info */}
             {step === 2 && (
-              <div className="text-center py-10">
-                <CreditCard className="w-16 h-16 text-accent mx-auto mb-6" />
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Payment</h2>
-                <p className="text-gray-500 mb-4 max-w-md mx-auto">
-                  Payment integration (PayFast / Yoco) coming soon. For now, proceed to complete your order
-                  and we'll invoice you separately.
-                </p>
-                <div className="bg-accent/10 rounded-xl p-6 inline-block">
-                  <span className="text-sm text-gray-500">Package total</span>
-                  <div className="text-3xl font-bold text-gray-900 mt-1">
-                    R{PACKAGES.find((p) => p.id === data.package)?.price.toLocaleString()}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 3: Business Info */}
-            {step === 3 && (
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Business Information</h2>
                 <div className="space-y-4">
@@ -318,8 +299,8 @@ export default function OnboardingPage() {
               </div>
             )}
 
-            {/* Step 4: Brand */}
-            {step === 4 && (
+            {/* Step 3: Brand */}
+            {step === 3 && (
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Brand & Design</h2>
                 <div className="space-y-6">
@@ -376,8 +357,8 @@ export default function OnboardingPage() {
               </div>
             )}
 
-            {/* Step 5: Content */}
-            {step === 5 && (
+            {/* Step 4: Content */}
+            {step === 4 && (
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Content & Social</h2>
                 <div className="space-y-5">
@@ -412,10 +393,11 @@ export default function OnboardingPage() {
               </div>
             )}
 
-            {/* Step 6: Review */}
-            {step === 6 && (
+            {/* Step 5: Review */}
+            {step === 5 && (
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Review & Submit</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Review & Submit</h2>
+                <p className="text-gray-500 mb-6">We'll build a free preview of your site. You only pay once you're happy with it.</p>
                 <div className="space-y-4">
                   {[
                     ['Package', PACKAGES.find((p) => p.id === data.package)?.name],
@@ -462,7 +444,7 @@ export default function OnboardingPage() {
                   className="flex items-center gap-2 bg-accent text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-accent-dark transition-colors disabled:opacity-50"
                 >
                   {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                  Submit Order
+                  Submit
                 </button>
               )}
             </div>

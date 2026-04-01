@@ -2,9 +2,9 @@ export type Package = 'starter' | 'professional' | 'enterprise'
 
 export type OrderStatus =
   | 'pending'
-  | 'payment_pending'
-  | 'paid'
   | 'building'
+  | 'preview_ready'
+  | 'paid'
   | 'deployed'
   | 'live'
   | 'cancelled'

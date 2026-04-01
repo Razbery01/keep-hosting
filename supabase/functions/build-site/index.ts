@@ -187,7 +187,7 @@ Return the JSON object with the files array.`
       live_url: netlifyResult.url,
     }).eq('id', siteId)
 
-    await supabase.from('orders').update({ status: 'live' }).eq('id', site.order_id)
+    await supabase.from('orders').update({ status: 'preview_ready' }).eq('id', site.order_id)
 
     await logEvent(supabase, siteId, 'deploy_done', 'success', `Live at ${netlifyResult.url}`)
 

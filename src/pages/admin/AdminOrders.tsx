@@ -105,8 +105,9 @@ export default function AdminOrders() {
                       <td className="py-4 px-5">
                         <span className={`text-xs font-medium px-2.5 py-1 rounded-full capitalize ${
                           order.status === 'live' ? 'bg-green-100 text-green-700' :
+                          order.status === 'preview_ready' ? 'bg-blue-100 text-blue-700' :
                           order.status === 'building' ? 'bg-purple-100 text-purple-700' :
-                          order.status === 'paid' ? 'bg-blue-100 text-blue-700' :
+                          order.status === 'paid' ? 'bg-emerald-100 text-emerald-700' :
                           'bg-gray-100 text-gray-600'
                         }`}>
                           {order.status.replace('_', ' ')}
