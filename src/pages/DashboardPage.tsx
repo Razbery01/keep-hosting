@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   Globe, ExternalLink, Clock, CheckCircle2, Loader2, AlertCircle,
-  Plus, CreditCard, Eye
+  Plus, CreditCard, Eye, Sparkles, Code2, GitBranch, Rocket
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { supabase } from '../lib/supabase'
@@ -25,8 +25,17 @@ interface Order {
   }[]
 }
 
+const BUILD_STEPS = [
+  { key: 'pending', label: 'Queued', icon: Clock, pct: 5 },
+  { key: 'generating', label: 'Designing your site', icon: Sparkles, pct: 30 },
+  { key: 'generated', label: 'Code generated', icon: Code2, pct: 55 },
+  { key: 'pushing_github', label: 'Saving files', icon: GitBranch, pct: 70 },
+  { key: 'deploying_netlify', label: 'Deploying preview', icon: Rocket, pct: 85 },
+  { key: 'live', label: 'Preview ready!', icon: CheckCircle2, pct: 100 },
+]
+
 const statusConfig: Record<string, { bg: string; text: string; icon: React.ReactNode; label: string }> = {
-  pending: { bg: 'bg-yellow-50', text: 'text-yellow-700', icon: <Clock className="w-4 h-4" />, label: 'Building Preview' },
+  pending: { bg: 'bg-yellow-50', text: 'text-yellow-700', icon: <Clock className="w-4 h-4" />, label: 'In Progress' },
   building: { bg: 'bg-purple-50', text: 'text-purple-700', icon: <Loader2 className="w-4 h-4 animate-spin" />, label: 'Building' },
   preview_ready: { bg: 'bg-blue-50', text: 'text-blue-700', icon: <Eye className="w-4 h-4" />, label: 'Preview Ready' },
   paid: { bg: 'bg-emerald-50', text: 'text-emerald-700', icon: <CheckCircle2 className="w-4 h-4" />, label: 'Paid' },
@@ -35,24 +44,102 @@ const statusConfig: Record<string, { bg: string; text: string; icon: React.React
   failed: { bg: 'bg-red-50', text: 'text-red-700', icon: <AlertCircle className="w-4 h-4" />, label: 'Failed' },
 }
 
+function BuildProgress({ buildStatus }: { buildStatus: string }) {
+  const currentIdx = BUILD_STEPS.findIndex((s) => s.key === buildStatus)
+  const activeStep = currentIdx >= 0 ? BUILD_STEPS[currentIdx] : BUILD_STEPS[0]
+  const pct = activeStep.pct
+  const isFailed = buildStatus === 'failed'
+
+  return (
+    <div className="mt-5 bg-white border border-gray-200 rounded-xl p-5">
+      <div className="flex items-center justify-between mb-3">
+        <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+          {isFailed ? (
+            <><AlertCircle className="w-4 h-4 text-red-500" /> Build failed</>
+          ) : pct >= 100 ? (
+            <><CheckCircle2 className="w-4 h-4 text-green-500" /> Complete!</>
+          ) : (
+            <><Loader2 className="w-4 h-4 text-accent animate-spin" /> Building your website...</>
+          )}
+        </h4>
+        {!isFailed && <span className="text-xs font-bold text-accent">{pct}%</span>}
+      </div>
+
+      {/* Progress bar */}
+      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden mb-4">
+        <motion.div
+          className={`h-full rounded-full ${isFailed ? 'bg-red-400' : 'bg-gradient-to-r from-accent to-cyan-400'}`}
+          initial={{ width: 0 }}
+          animate={{ width: `${isFailed ? 100 : pct}%` }}
+          transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+        />
+      </div>
+
+      {/* Steps */}
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-1">
+        {BUILD_STEPS.map((step, i) => {
+          const Icon = step.icon
+          const done = currentIdx >= i
+          const active = currentIdx === i
+          return (
+            <div key={step.key} className="flex flex-col items-center text-center gap-1">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                isFailed && active ? 'bg-red-100 text-red-500' :
+                done ? 'bg-accent/10 text-accent' : 'bg-gray-50 text-gray-300'
+              }`}>
+                <Icon className="w-4 h-4" />
+              </div>
+              <span className={`text-[10px] leading-tight font-medium ${
+                done ? 'text-gray-700' : 'text-gray-400'
+              }`}>
+                {step.label}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+
+      {!isFailed && pct < 100 && (
+        <p className="text-xs text-gray-400 mt-3 text-center">This usually takes 1-3 minutes. This page updates automatically.</p>
+      )}
+      {isFailed && (
+        <p className="text-xs text-red-500 mt-3 text-center">Something went wrong. Our team has been notified and will retry shortly.</p>
+      )}
+    </div>
+  )
+}
+
 export default function DashboardPage() {
   const { user } = useAuth()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [payingId, setPayingId] = useState<string | null>(null)
 
-  useEffect(() => {
+  const fetchOrders = useCallback(async () => {
     if (!user) return
-    supabase
+    const { data } = await supabase
       .from('orders')
       .select('*, client_sites(id, business_name, build_status, netlify_url, live_url)')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
-      .then(({ data }) => {
-        setOrders((data as unknown as Order[]) ?? [])
-        setLoading(false)
-      })
+    setOrders((data as unknown as Order[]) ?? [])
+    setLoading(false)
   }, [user])
+
+  useEffect(() => { fetchOrders() }, [fetchOrders])
+
+  // Poll for updates when any order is actively building
+  useEffect(() => {
+    const hasActiveBuilds = orders.some((o) => {
+      const bs = o.client_sites?.[0]?.build_status
+      return (o.status === 'pending' || o.status === 'building') &&
+        bs && bs !== 'live' && bs !== 'failed'
+    })
+    if (!hasActiveBuilds) return
+
+    const interval = setInterval(fetchOrders, 4000)
+    return () => clearInterval(interval)
+  }, [orders, fetchOrders])
 
   async function handlePay(orderId: string) {
     setPayingId(orderId)
@@ -117,6 +204,8 @@ export default function DashboardPage() {
               const previewUrl = site?.netlify_url || site?.live_url
               const isPreviewReady = order.status === 'preview_ready' && previewUrl
               const isPaid = order.status === 'paid' || order.status === 'live' || order.status === 'deployed'
+              const isBuilding = (order.status === 'pending' || order.status === 'building') && site
+              const buildStatus = site?.build_status || 'pending'
 
               return (
                 <motion.div
@@ -147,11 +236,9 @@ export default function DashboardPage() {
                       </span>
                     </div>
 
-                    {/* Pending: waiting for preview */}
-                    {order.status === 'pending' && !previewUrl && (
-                      <div className="mt-5 bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
-                        <strong>We're preparing your preview.</strong> You'll receive a link to review your website here shortly. No payment is required until you're happy with it.
-                      </div>
+                    {/* Building: show progress tracker */}
+                    {isBuilding && !isPreviewReady && !isPaid && (
+                      <BuildProgress buildStatus={buildStatus} />
                     )}
 
                     {/* Preview ready: show preview + pay CTA */}
