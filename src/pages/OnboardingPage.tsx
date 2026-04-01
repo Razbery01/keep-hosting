@@ -5,7 +5,7 @@ import {
   ArrowRight, ArrowLeft, Loader2, Upload, CheckCircle2, Globe,
   Utensils, ShoppingBag, Briefcase, Heart, Home, HardHat,
   GraduationCap, Cpu, Sparkles, Car, HandHeart, MoreHorizontal,
-  ImageIcon, X, Search
+  ImageIcon, X, Search, LogIn
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { PACKAGES, FONT_OPTIONS } from '../lib/constants'
@@ -65,9 +65,15 @@ const initialData: OnboardingData = {
 export default function OnboardingPage() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, signUp, signIn } = useAuth()
   const [step, setStep] = useState(0)
   const [submitting, setSubmitting] = useState(false)
+  const [showAuth, setShowAuth] = useState(false)
+  const [authMode, setAuthMode] = useState<'signup' | 'login'>('signup')
+  const [authName, setAuthName] = useState('')
+  const [authEmail, setAuthEmail] = useState('')
+  const [authPassword, setAuthPassword] = useState('')
+  const [authLoading, setAuthLoading] = useState(false)
   const [data, setData] = useState<OnboardingData>({
     ...initialData,
     package: (searchParams.get('package') as PackageType) || 'professional',
@@ -94,15 +100,46 @@ export default function OnboardingPage() {
     ? !!(data.businessName && data.industry && data.contactEmail)
     : true
 
+  async function handleAuth(e: React.FormEvent) {
+    e.preventDefault()
+    setAuthLoading(true)
+    try {
+      if (authMode === 'signup') {
+        const { error } = await signUp(authEmail, authPassword, authName)
+        if (error) throw error
+        toast.success('Account created! Submitting your order...')
+      } else {
+        const { error } = await signIn(authEmail, authPassword)
+        if (error) throw error
+      }
+      setShowAuth(false)
+      setTimeout(() => handleSubmit(), 500)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Authentication failed')
+    } finally {
+      setAuthLoading(false)
+    }
+  }
+
+  function trySubmit() {
+    if (!user) {
+      setAuthEmail(data.contactEmail)
+      setShowAuth(true)
+      return
+    }
+    handleSubmit()
+  }
+
   async function handleSubmit() {
-    if (!user) { toast.error('Please sign in first'); return }
+    const currentUser = (await supabase.auth.getUser()).data.user
+    if (!currentUser) { toast.error('Please sign in first'); return }
     setSubmitting(true)
     try {
       const pkg = PACKAGES.find((p) => p.id === data.package)!
       const { data: order, error: orderErr } = await supabase
         .from('orders')
         .insert({
-          user_id: user.id,
+          user_id: currentUser.id,
           package: data.package,
           status: 'pending',
           amount_cents: pkg.price * 100,
@@ -116,7 +153,7 @@ export default function OnboardingPage() {
         .from('client_sites')
         .insert({
           order_id: order.id,
-          user_id: user.id,
+          user_id: currentUser.id,
           business_name: data.businessName,
           industry: data.industry,
           tagline: data.tagline,
@@ -137,19 +174,19 @@ export default function OnboardingPage() {
       if (siteErr) throw siteErr
 
       if (data.logoFile) {
-        const path = `${user.id}/${site.id}/logo-${data.logoFile.name}`
+        const path = `${currentUser.id}/${site.id}/logo-${data.logoFile.name}`
         await supabase.storage.from('client-assets').upload(path, data.logoFile)
         await supabase.from('file_uploads').insert({
-          site_id: site.id, user_id: user.id, file_type: 'logo',
+          site_id: site.id, user_id: currentUser.id, file_type: 'logo',
           file_name: data.logoFile.name, file_path: path,
           file_size: data.logoFile.size, mime_type: data.logoFile.type,
         })
       }
       if (data.heroFile) {
-        const path = `${user.id}/${site.id}/hero-${data.heroFile.name}`
+        const path = `${currentUser.id}/${site.id}/hero-${data.heroFile.name}`
         await supabase.storage.from('client-assets').upload(path, data.heroFile)
         await supabase.from('file_uploads').insert({
-          site_id: site.id, user_id: user.id, file_type: 'hero_image',
+          site_id: site.id, user_id: currentUser.id, file_type: 'hero_image',
           file_name: data.heroFile.name, file_path: path,
           file_size: data.heroFile.size, mime_type: data.heroFile.type,
         })
@@ -507,7 +544,7 @@ export default function OnboardingPage() {
                   ) : (
                     <button
                       type="button"
-                      onClick={handleSubmit}
+                      onClick={trySubmit}
                       disabled={submitting}
                       className="flex items-center gap-2 bg-accent text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-accent-dark disabled:opacity-50 transition-all"
                     >
@@ -529,6 +566,86 @@ export default function OnboardingPage() {
           </div>
         </div>
       </div>
+
+      {/* Inline auth overlay */}
+      <AnimatePresence>
+        {showAuth && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative"
+            >
+              <button type="button" onClick={() => setShowAuth(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <X className="w-5 h-5" />
+              </button>
+              <div className="text-center mb-6">
+                <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <LogIn className="w-6 h-6 text-accent" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900">
+                  {authMode === 'signup' ? 'Create your free account' : 'Welcome back'}
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  {authMode === 'signup'
+                    ? 'Quick sign-up to save your details and receive your preview.'
+                    : 'Sign in to submit your website request.'}
+                </p>
+              </div>
+              <form onSubmit={handleAuth} className="space-y-4">
+                {authMode === 'signup' && (
+                  <input
+                    type="text"
+                    required
+                    value={authName}
+                    onChange={(e) => setAuthName(e.target.value)}
+                    placeholder="Full name"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent"
+                  />
+                )}
+                <input
+                  type="email"
+                  required
+                  value={authEmail}
+                  onChange={(e) => setAuthEmail(e.target.value)}
+                  placeholder="Email"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent"
+                />
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  value={authPassword}
+                  onChange={(e) => setAuthPassword(e.target.value)}
+                  placeholder="Password (min 6 characters)"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent"
+                />
+                <button
+                  type="submit"
+                  disabled={authLoading}
+                  className="w-full bg-accent text-white py-3 rounded-xl font-bold hover:bg-accent-dark disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                >
+                  {authLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {authMode === 'signup' ? 'Create Account & Submit' : 'Sign In & Submit'}
+                </button>
+              </form>
+              <p className="text-center text-sm text-gray-500 mt-4">
+                {authMode === 'signup' ? (
+                  <>Already have an account? <button type="button" onClick={() => setAuthMode('login')} className="text-accent font-medium hover:underline">Sign in</button></>
+                ) : (
+                  <>Need an account? <button type="button" onClick={() => setAuthMode('signup')} className="text-accent font-medium hover:underline">Sign up</button></>
+                )}
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
