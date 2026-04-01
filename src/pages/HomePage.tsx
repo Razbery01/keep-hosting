@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   ArrowRight, Zap, Shield, Globe, Palette, Server, Search, Target,
-  ClipboardCheck, Mail, Code, CheckCircle2, Sparkles,
+  ClipboardCheck, Mail, Code, CheckCircle2,
   Monitor, Star, ChevronDown, X as XIcon,
   Utensils, ShoppingBag, Briefcase, Heart, HardHat, Scissors,
   Users, BadgeCheck, Clock, CreditCard, Eye, Rocket
@@ -82,69 +82,109 @@ export default function HomePage() {
   return (
     <>
       {/* ── Hero ── */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-dark">
+      <section className="relative min-h-screen flex items-center overflow-hidden bg-dark">
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-dark via-primary-dark/80 to-dark" />
-          <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.25, 0.15] }} transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-accent/20 rounded-full blur-[120px]" />
-          <motion.div animate={{ scale: [1.2, 1, 1.2], opacity: [0.1, 0.2, 0.1] }} transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-cyan-500/15 rounded-full blur-[140px]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary-light/10 rounded-full blur-[160px]" />
-          <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)', backgroundSize: '80px 80px' }} />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-dark to-dark" />
+          <div className="absolute top-0 right-0 w-[700px] h-[700px] bg-accent/[0.07] rounded-full blur-[200px] -translate-y-1/4 translate-x-1/4" />
+          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
         </div>
 
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-32 md:py-40 text-center">
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.25, 0.4, 0.25, 1] }}>
-            <motion.span initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3, duration: 0.5 }}
-              className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-xl border border-white/10 text-accent px-5 py-2.5 rounded-full text-sm font-medium mb-8">
-              <Sparkles className="w-4 h-4" /> Turnkey Websites for South African SMMEs
-            </motion.span>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 lg:py-0 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+              <div className="flex items-center gap-3 mb-8">
+                <div className="h-px w-12 bg-accent" />
+                <span className="text-accent text-sm font-semibold uppercase tracking-wider">Keep Hosting</span>
+              </div>
 
-            <h1 className="text-5xl md:text-7xl lg:text-[5.5rem] font-extrabold leading-[1.05] mb-8 tracking-tight">
-              <span className="text-white">Your Business</span><br />
-              <span className="text-white">Deserves a </span>
-              <span className="bg-gradient-to-r from-accent via-cyan-300 to-accent bg-clip-text text-transparent">Great Website</span>
-            </h1>
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-[1.05] mb-6 tracking-tight text-white">
+                We Build<br />
+                Websites That<br />
+                <span className="text-accent">Mean Business</span>
+              </h1>
 
-            <p className="text-lg md:text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-              We build, host, and manage your entire web presence — so you can focus on running your business.
-              <span className="text-gray-300"> Preview before you pay.</span>
-            </p>
+              <p className="text-lg text-gray-400 mb-10 max-w-lg leading-relaxed">
+                Professional design, hosting, and management for South African SMMEs. You fill in a form — we deliver a production-ready website. Preview it first, pay only if you love it.
+              </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Link to="/onboarding" className="group inline-flex items-center justify-center gap-2.5 bg-accent text-white px-10 py-4 rounded-2xl font-bold text-lg shadow-[0_0_30px_rgba(0,212,255,0.15)] hover:shadow-[0_0_50px_rgba(0,212,255,0.35)] hover:scale-[1.02] transition-all duration-300">
-                Build My Website <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link to="/pricing" className="inline-flex items-center justify-center gap-2 bg-white/5 backdrop-blur-sm text-white px-10 py-4 rounded-2xl font-semibold text-lg hover:bg-white/10 transition-all duration-300 border border-white/10">
-                View Pricing
-              </Link>
-            </div>
+              <div className="flex flex-col sm:flex-row gap-4 mb-12">
+                <Link to="/onboarding" className="group inline-flex items-center justify-center gap-2 bg-accent text-white px-8 py-4 rounded-xl font-bold text-lg hover:brightness-110 transition-all duration-200">
+                  Get Started Free <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+                <Link to="/pricing" className="inline-flex items-center justify-center gap-2 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white/5 transition-colors duration-200 border border-white/15">
+                  See Pricing
+                </Link>
+              </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-gray-500">
-              {['No coding needed', 'Preview before you pay', 'From R999 once-off'].map((item) => (
-                <span key={item} className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-accent/70" /> {item}
-                </span>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Floating glass cards */}
-          <div className="hidden lg:block">
-            <motion.div animate={{ y: [-8, 8, -8] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute top-36 right-4 xl:right-0 bg-white/5 backdrop-blur-2xl border border-white/10 text-white px-5 py-3 rounded-2xl text-sm font-medium shadow-2xl flex items-center gap-3">
-              <div className="w-9 h-9 bg-accent/15 rounded-xl flex items-center justify-center"><Zap className="w-5 h-5 text-accent" /></div>
-              Lightning Fast
+              <div className="flex items-center gap-6 text-sm">
+                <span className="flex items-center gap-2 text-gray-500"><span className="w-2 h-2 rounded-full bg-green-400" />99.9% uptime</span>
+                <span className="flex items-center gap-2 text-gray-500"><span className="w-2 h-2 rounded-full bg-accent" />From R999</span>
+                <span className="flex items-center gap-2 text-gray-500"><span className="w-2 h-2 rounded-full bg-amber-400" />48h delivery</span>
+              </div>
             </motion.div>
-            <motion.div animate={{ y: [6, -6, 6] }} transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute bottom-28 left-4 xl:left-0 bg-white/5 backdrop-blur-2xl border border-white/10 text-white px-5 py-3 rounded-2xl text-sm font-medium shadow-2xl flex items-center gap-3">
-              <div className="w-9 h-9 bg-green-500/15 rounded-xl flex items-center justify-center"><Monitor className="w-5 h-5 text-green-400" /></div>
-              Fully Responsive
-            </motion.div>
-            <motion.div animate={{ y: [-5, 5, -5] }} transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute top-56 left-8 xl:left-4 bg-white/5 backdrop-blur-2xl border border-white/10 text-white px-5 py-3 rounded-2xl text-sm font-medium shadow-2xl flex items-center gap-3">
-              <div className="w-9 h-9 bg-purple-500/15 rounded-xl flex items-center justify-center"><Shield className="w-5 h-5 text-purple-400" /></div>
-              SSL Included
+
+            {/* Browser mockup */}
+            <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.2 }} className="hidden lg:block">
+              <div className="relative">
+                <div className="bg-[#0d1a2d] rounded-2xl border border-white/[0.08] shadow-2xl overflow-hidden">
+                  <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06] bg-white/[0.02]">
+                    <div className="flex gap-1.5">
+                      <div className="w-3 h-3 rounded-full bg-[#ff5f57]" />
+                      <div className="w-3 h-3 rounded-full bg-[#febc2e]" />
+                      <div className="w-3 h-3 rounded-full bg-[#28c840]" />
+                    </div>
+                    <div className="flex-1 mx-8">
+                      <div className="bg-white/[0.06] rounded-lg px-4 py-1.5 text-xs text-gray-500 flex items-center gap-2 max-w-xs mx-auto">
+                        <Shield className="w-3 h-3 text-green-400" />
+                        yourbusiness.co.za
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-6">
+                    {/* Mockup nav */}
+                    <div className="flex items-center justify-between mb-8">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-lg bg-accent/30" />
+                        <div className="h-3 w-20 bg-white/15 rounded" />
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="h-2.5 w-12 bg-white/10 rounded" />
+                        <div className="h-2.5 w-12 bg-white/10 rounded" />
+                        <div className="h-2.5 w-12 bg-white/10 rounded" />
+                        <div className="h-7 w-16 bg-accent/40 rounded-md" />
+                      </div>
+                    </div>
+
+                    {/* Mockup hero */}
+                    <div className="mb-6">
+                      <div className="h-5 w-32 bg-accent/20 rounded mb-3" />
+                      <div className="h-8 w-72 bg-white/15 rounded-lg mb-2" />
+                      <div className="h-8 w-56 bg-white/12 rounded-lg mb-4" />
+                      <div className="h-3 w-64 bg-white/[0.06] rounded mb-1.5" />
+                      <div className="h-3 w-48 bg-white/[0.06] rounded mb-5" />
+                      <div className="flex gap-3">
+                        <div className="h-10 w-28 bg-accent/50 rounded-lg" />
+                        <div className="h-10 w-28 bg-white/[0.06] rounded-lg border border-white/10" />
+                      </div>
+                    </div>
+
+                    {/* Mockup cards */}
+                    <div className="grid grid-cols-3 gap-3">
+                      {[1, 2, 3].map((n) => (
+                        <div key={n} className="bg-white/[0.03] rounded-xl p-4 border border-white/[0.06]">
+                          <div className="w-8 h-8 rounded-lg bg-accent/15 mb-3" />
+                          <div className="h-3 w-full bg-white/10 rounded mb-2" />
+                          <div className="h-2.5 w-3/4 bg-white/[0.06] rounded" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="absolute -top-3 -right-3 w-24 h-24 bg-accent/10 rounded-full blur-2xl" />
+                <div className="absolute -bottom-3 -left-3 w-32 h-32 bg-accent/[0.06] rounded-full blur-2xl" />
+              </div>
             </motion.div>
           </div>
         </div>
@@ -440,16 +480,15 @@ export default function HomePage() {
 
       {/* ── Final CTA ── */}
       <section className="py-28 relative overflow-hidden">
-        <div className="absolute inset-0 bg-dark" />
-        <div className="absolute inset-0">
-          <motion.div animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.2, 0.1] }} transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-accent/20 rounded-full blur-[120px]" />
-          <motion.div animate={{ scale: [1.2, 1, 1.2], opacity: [0.08, 0.15, 0.08] }} transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-cyan-500/15 rounded-full blur-[140px]" />
-        </div>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-dark to-dark" />
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-accent/[0.07] rounded-full blur-[200px] -translate-y-1/4 translate-x-1/4" />
         <div className="max-w-4xl mx-auto px-4 text-center relative">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-            <BadgeCheck className="w-14 h-14 text-accent/30 mx-auto mb-8" />
+            <div className="flex items-center justify-center gap-3 mb-8">
+              <div className="h-px w-12 bg-accent/50" />
+              <BadgeCheck className="w-6 h-6 text-accent/50" />
+              <div className="h-px w-12 bg-accent/50" />
+            </div>
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 tracking-tight">
               Ready to Get Your<br />Business Online?
             </h2>
@@ -457,10 +496,10 @@ export default function HomePage() {
               Join hundreds of South African SMMEs who chose the easy way to get a professional website. Takes 5 minutes. Free preview. Zero risk.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/onboarding" className="group inline-flex items-center justify-center gap-2.5 bg-accent text-white px-10 py-4 rounded-2xl font-bold text-lg shadow-[0_0_30px_rgba(0,212,255,0.15)] hover:shadow-[0_0_50px_rgba(0,212,255,0.35)] hover:scale-[1.02] transition-all duration-300">
-                Build My Website <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <Link to="/onboarding" className="group inline-flex items-center justify-center gap-2 bg-accent text-white px-10 py-4 rounded-xl font-bold text-lg hover:brightness-110 transition-all duration-200">
+                Build My Website <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
               </Link>
-              <Link to="/contact" className="inline-flex items-center justify-center gap-2 bg-white/5 backdrop-blur-sm text-white px-10 py-4 rounded-2xl font-bold text-lg hover:bg-white/10 transition-all duration-300 border border-white/10">
+              <Link to="/contact" className="inline-flex items-center justify-center gap-2 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-white/5 transition-colors duration-200 border border-white/15">
                 Talk to Us
               </Link>
             </div>
