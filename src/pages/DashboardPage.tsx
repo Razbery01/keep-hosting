@@ -128,12 +128,11 @@ export default function DashboardPage() {
 
   useEffect(() => { fetchOrders() }, [fetchOrders])
 
-  // Poll for updates when any order is actively building
+  // Poll for updates when any order is actively building (not just queued)
   useEffect(() => {
     const hasActiveBuilds = orders.some((o) => {
       const bs = o.client_sites?.[0]?.build_status
-      return (o.status === 'pending' || o.status === 'building') &&
-        bs && bs !== 'live' && bs !== 'failed'
+      return (o.status === 'building' || (bs && bs !== 'pending' && bs !== 'live' && bs !== 'failed'))
     })
     if (!hasActiveBuilds) return
 
@@ -204,8 +203,10 @@ export default function DashboardPage() {
               const previewUrl = site?.netlify_url || site?.live_url
               const isPreviewReady = order.status === 'preview_ready' && previewUrl
               const isPaid = order.status === 'paid' || order.status === 'live' || order.status === 'deployed'
-              const isBuilding = (order.status === 'pending' || order.status === 'building') && site
               const buildStatus = site?.build_status || 'pending'
+              const buildStarted = buildStatus !== 'pending'
+              const isWaiting = (order.status === 'pending') && !buildStarted && !isPreviewReady && !isPaid
+              const isBuilding = (order.status === 'building' || buildStarted) && !isPreviewReady && !isPaid
 
               return (
                 <motion.div
@@ -236,8 +237,15 @@ export default function DashboardPage() {
                       </span>
                     </div>
 
+                    {/* Waiting: admin hasn't started the build yet */}
+                    {isWaiting && (
+                      <div className="mt-5 bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
+                        <strong>We've received your details!</strong> Our team is reviewing your submission and will start building your preview shortly. This page updates automatically — no need to refresh.
+                      </div>
+                    )}
+
                     {/* Building: show progress tracker */}
-                    {isBuilding && !isPreviewReady && !isPaid && (
+                    {isBuilding && (
                       <BuildProgress buildStatus={buildStatus} />
                     )}
 
