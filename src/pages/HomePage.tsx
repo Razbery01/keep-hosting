@@ -153,22 +153,25 @@ export default function HomePage() {
       </section>
 
       {/* ── Stats ── */}
-      <section className="py-12 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <section className="py-0 relative -mt-8 z-20">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/60 border border-gray-100 grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-100">
             {[
-              { value: '50+', label: 'Websites Delivered', icon: <Globe className="w-5 h-5" /> },
-              { value: '99.9%', label: 'Uptime Guaranteed', icon: <Shield className="w-5 h-5" /> },
-              { value: '<48h', label: 'Average Turnaround', icon: <Clock className="w-5 h-5" /> },
-              { value: 'R0', label: 'Upfront Cost', icon: <CreditCard className="w-5 h-5" /> },
+              { value: '50+', label: 'Sites Delivered', accent: 'text-accent' },
+              { value: '99.9%', label: 'Uptime SLA', accent: 'text-green-500' },
+              { value: '<48h', label: 'Turnaround', accent: 'text-purple-500' },
+              { value: 'R0', label: 'Upfront Cost', accent: 'text-amber-500' },
             ].map((stat, i) => (
-              <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                className="text-center">
-                <div className="inline-flex items-center justify-center w-10 h-10 bg-accent/10 rounded-xl text-accent mb-3">
-                  {stat.icon}
-                </div>
-                <div className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">{stat.value}</div>
-                <div className="text-sm text-gray-500 mt-1 font-medium">{stat.label}</div>
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.5 }}
+                className="py-8 px-4 text-center"
+              >
+                <div className={`text-3xl md:text-4xl font-extrabold tracking-tight ${stat.accent}`}>{stat.value}</div>
+                <div className="text-xs text-gray-500 mt-1.5 font-semibold uppercase tracking-wider">{stat.label}</div>
               </motion.div>
             ))}
           </div>
