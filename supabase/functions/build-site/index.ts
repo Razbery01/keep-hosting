@@ -7,55 +7,160 @@ const anthropic = new Anthropic({
   apiKey: Deno.env.get('ANTHROPIC_API_KEY')!,
 })
 
-Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') return corsResponse()
+// ─────────────────────────────────────────────
+// Agent 1: Image Agent — sources real photography
+// ─────────────────────────────────────────────
 
-  const supabase = getSupabaseAdmin()
+interface SiteImage {
+  url: string
+  alt: string
+  placement: string
+}
 
-  try {
-    const { siteId } = await req.json()
-    if (!siteId) return jsonResponse({ error: 'siteId is required' }, 400)
+async function runImageAgent(
+  site: any,
+  heroUrl: string,
+  supabase: any,
+  siteId: string,
+): Promise<SiteImage[]> {
+  const pexelsKey = Deno.env.get('PEXELS_API_KEY')
+  const images: SiteImage[] = []
 
-    // Fetch site data
-    const { data: site, error: siteErr } = await supabase
-      .from('client_sites')
-      .select('*, orders(*)')
-      .eq('id', siteId)
-      .single()
-    if (siteErr || !site) return jsonResponse({ error: 'Site not found' }, 404)
+  if (heroUrl) {
+    images.push({ url: heroUrl, alt: `${site.business_name} hero image`, placement: 'hero' })
+  }
 
-    // Update status to generating
-    await supabase.from('client_sites').update({ build_status: 'generating' }).eq('id', siteId)
-    await supabase.from('orders').update({ status: 'building' }).eq('id', site.order_id)
-    await logEvent(supabase, siteId, 'build_start', 'info', 'Website generation started')
+  if (!pexelsKey) {
+    await logEvent(supabase, siteId, 'image_agent', 'info', 'No PEXELS_API_KEY — using curated fallback images')
+    return [...images, ...getCuratedImages(site.industry)]
+  }
 
-    // Fetch uploaded files for logo URL
-    const { data: uploads } = await supabase
-      .from('file_uploads')
-      .select('*')
-      .eq('site_id', siteId)
+  await logEvent(supabase, siteId, 'image_agent', 'info', 'Image Agent: generating search queries...')
 
-    const logoUpload = uploads?.find((u: any) => u.file_type === 'logo')
-    const heroUpload = uploads?.find((u: any) => u.file_type === 'hero_image')
+  // Ask Claude to generate targeted image search queries
+  const queryResponse = await anthropic.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 1024,
+    messages: [{
+      role: 'user',
+      content: `You are an image researcher for a website project. Generate 6 short, specific Pexels search queries to find professional photos for this business website.
 
-    // Get public URLs for uploaded assets
-    let logoUrl = ''
-    let heroUrl = ''
-    if (logoUpload) {
-      const { data: logoData } = supabase.storage.from('client-assets').getPublicUrl(logoUpload.file_path)
-      logoUrl = logoData.publicUrl
-    }
-    if (heroUpload) {
-      const { data: heroData } = supabase.storage.from('client-assets').getPublicUrl(heroUpload.file_path)
-      heroUrl = heroData.publicUrl
-    }
+Business: ${site.business_name}
+Industry: ${site.industry}
+Description: ${site.description || 'N/A'}
+Services: ${site.services_text || 'N/A'}
 
-    // Determine site complexity based on package
-    const pkg = site.orders?.package || 'starter'
-    const isMultiPage = pkg === 'professional' || pkg === 'enterprise'
+Return ONLY a JSON array of objects, each with:
+- "query": the Pexels search term (2-4 words, specific and visual)
+- "placement": where it goes ("hero", "about", "service-1", "service-2", "service-3", "gallery", "team", "cta-background")
+- "alt": descriptive alt text for the image
 
-    // Build the prompt for Claude
-    const systemPrompt = `You are a world-class web designer and front-end developer who builds websites that rival those from top agencies. Every site you create looks like it cost R50,000+ to build. You have deep expertise in visual design, typography, layout, color theory, motion design, and conversion-focused UX.
+${heroUrl ? 'Skip the hero — one is already provided. Generate 5 queries for other sections.' : 'Include a hero image query.'}
+
+Example: [{"query": "chef cooking restaurant", "placement": "hero", "alt": "Professional chef preparing gourmet dishes"}]
+Return ONLY the JSON array, no markdown.`,
+    }],
+  })
+
+  let queries: { query: string; placement: string; alt: string }[] = []
+  const textBlock = queryResponse.content.find((b: any) => b.type === 'text')
+  if (textBlock && textBlock.type === 'text') {
+    try {
+      const match = textBlock.text.match(/\[[\s\S]*\]/)
+      if (match) queries = JSON.parse(match[0])
+    } catch { /* use fallback */ }
+  }
+
+  if (queries.length === 0) {
+    await logEvent(supabase, siteId, 'image_agent', 'info', 'Query generation failed — using curated fallback')
+    return [...images, ...getCuratedImages(site.industry)]
+  }
+
+  await logEvent(supabase, siteId, 'image_agent', 'info', `Image Agent: fetching ${queries.length} images from Pexels...`)
+
+  // Fetch images from Pexels API in parallel
+  const fetched = await Promise.all(
+    queries.map(async (q) => {
+      try {
+        const res = await fetch(
+          `https://api.pexels.com/v1/search?query=${encodeURIComponent(q.query)}&per_page=1&orientation=landscape`,
+          { headers: { Authorization: pexelsKey } },
+        )
+        if (!res.ok) return null
+        const data = await res.json()
+        const photo = data.photos?.[0]
+        if (!photo) return null
+        return {
+          url: photo.src.large2x || photo.src.large || photo.src.original,
+          alt: q.alt,
+          placement: q.placement,
+        } as SiteImage
+      } catch {
+        return null
+      }
+    }),
+  )
+
+  const validImages = fetched.filter((img): img is SiteImage => img !== null)
+  await logEvent(supabase, siteId, 'image_agent', 'success', `Sourced ${validImages.length} images`)
+
+  return [...images, ...validImages]
+}
+
+function getCuratedImages(industry: string): SiteImage[] {
+  const curated: Record<string, SiteImage[]> = {
+    'Restaurant / Food': [
+      { url: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80', alt: 'Beautifully plated gourmet dish', placement: 'hero' },
+      { url: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80', alt: 'Elegant restaurant interior with warm lighting', placement: 'about' },
+      { url: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=600&q=80', alt: 'Chef preparing food in professional kitchen', placement: 'service-1' },
+      { url: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=600&q=80', alt: 'Fresh ingredients and produce', placement: 'service-2' },
+    ],
+    'Professional Services': [
+      { url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80', alt: 'Modern professional office space', placement: 'hero' },
+      { url: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=800&q=80', alt: 'Business professionals collaborating', placement: 'about' },
+      { url: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&q=80', alt: 'Professional consulting meeting', placement: 'service-1' },
+    ],
+    'Healthcare': [
+      { url: 'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?auto=format&fit=crop&w=1200&q=80', alt: 'Modern medical facility', placement: 'hero' },
+      { url: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=800&q=80', alt: 'Healthcare professional with patient', placement: 'about' },
+      { url: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=600&q=80', alt: 'Medical equipment and technology', placement: 'service-1' },
+    ],
+    'Construction': [
+      { url: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=80', alt: 'Construction site with modern building', placement: 'hero' },
+      { url: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=800&q=80', alt: 'Construction team at work', placement: 'about' },
+      { url: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=600&q=80', alt: 'Architectural blueprints and planning', placement: 'service-1' },
+    ],
+    'Beauty / Wellness': [
+      { url: 'https://images.unsplash.com/photo-1560750588-73b555e41656?auto=format&fit=crop&w=1200&q=80', alt: 'Elegant beauty salon interior', placement: 'hero' },
+      { url: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80', alt: 'Professional beauty treatment', placement: 'about' },
+      { url: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?auto=format&fit=crop&w=600&q=80', alt: 'Skincare and beauty products', placement: 'service-1' },
+    ],
+    'Real Estate': [
+      { url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80', alt: 'Beautiful modern home exterior', placement: 'hero' },
+      { url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80', alt: 'Luxury home interior design', placement: 'about' },
+      { url: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&q=80', alt: 'Real estate agent with keys', placement: 'service-1' },
+    ],
+    'Retail / E-commerce': [
+      { url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80', alt: 'Stylish retail store interior', placement: 'hero' },
+      { url: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80', alt: 'Shopping experience', placement: 'about' },
+      { url: 'https://images.unsplash.com/photo-1607082349566-187342175e2f?auto=format&fit=crop&w=600&q=80', alt: 'Product display and packaging', placement: 'service-1' },
+    ],
+  }
+
+  const fallback: SiteImage[] = [
+    { url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80', alt: 'Professional workspace', placement: 'hero' },
+    { url: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80', alt: 'Team collaboration', placement: 'about' },
+    { url: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=600&q=80', alt: 'Professional at work', placement: 'service-1' },
+  ]
+
+  return curated[industry] || fallback
+}
+
+// ─────────────────────────────────────────────
+// Agent 2: Code Agent — builds the website
+// ─────────────────────────────────────────────
+
+const CODE_AGENT_SYSTEM = `You are a world-class web designer and front-end developer who builds websites that rival those from top agencies. Every site you create looks like it cost R50,000+ to build. You have deep expertise in visual design, typography, layout, color theory, motion design, and conversion-focused UX.
 
 DESIGN PHILOSOPHY:
 - Design like an award-winning agency. Every pixel matters.
@@ -67,58 +172,56 @@ DESIGN PHILOSOPHY:
 - Max content width ~1200px, max paragraph width ~65ch for comfortable reading.
 
 LAYOUT & COMPONENTS:
-- Hero section: Full-viewport or near-full, with a strong headline, a supporting sentence, and one clear CTA button. If no hero image, use a gradient using the brand colors with a subtle mesh, grain, or geometric pattern overlay — never a flat solid color.
+- Hero section: Full-viewport or near-full, with a strong headline, a supporting sentence, and one clear CTA button. USE THE PROVIDED HERO IMAGE with a dark overlay for text readability.
 - Navigation: Clean, sticky/fixed, with the business name/logo left-aligned and links right-aligned. Mobile: hamburger menu with smooth slide-in panel.
-- Services/features: Use a card grid (2-3 columns) with icons, short titles, and one-line descriptions. Cards should have subtle borders or shadows, and lift on hover.
-- About section: Split layout — text on one side, image or decorative element on the other. Tell a compelling story.
-- Testimonials: If appropriate for the industry, generate 2-3 realistic testimonials with names and roles.
-- Contact section: Clean form (Name, Email, Phone, Message) with a submit button. Show contact details (email, phone, address) alongside the form. Use the secondary color for the submit button.
+- Services/features: Use a card grid (2-3 columns) with provided images, short titles, and one-line descriptions. Cards should have subtle borders or shadows, and lift on hover.
+- About section: Split layout — text on one side, provided about image on the other. Tell a compelling story.
+- Testimonials: Generate 2-3 realistic testimonials with South African names and roles.
+- Contact section: Clean form (Name, Email, Phone, Message) with a submit button. Show contact details (email, phone, address) alongside the form.
 - Footer: Dark background (primary color or near-black), organized in 3-4 columns: brand + description, quick links, contact info, social icons. Copyright at bottom.
-- CTA sections: Between content sections, add banner-style CTAs with a compelling headline and button, using the secondary color as background.
+- CTA sections: Between content sections, add banner-style CTAs with compelling headlines.
+
+IMAGE HANDLING (CRITICAL):
+- You will receive a list of images with URLs, alt text, and placement hints.
+- USE EVERY PROVIDED IMAGE in the website. Do not ignore them.
+- Apply object-fit: cover to all images. Use proper aspect ratios (hero: 16:9, cards: 4:3, about: 3:4 or 1:1).
+- Add a semi-transparent dark overlay on hero images for text readability: background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.6)), url(IMAGE_URL).
+- All images must have the provided descriptive alt text.
+- Lazy-load below-the-fold images with loading="lazy".
 
 VISUAL EFFECTS & MOTION:
 - Smooth scroll behavior on all anchor links.
 - Scroll-triggered fade-in-up animations on sections using IntersectionObserver (stagger children by 100ms). Keep animations subtle — 0.6s ease, 30px translateY.
 - Hover states on ALL interactive elements: buttons scale 1.02-1.05 with shadow lift, cards translate-y -4px with shadow increase, links get color transitions.
 - Buttons: Rounded corners (8-12px), generous padding (14px 32px), bold font weight, smooth color/shadow transitions.
-- Add a subtle gradient or pattern to at least one section background to break visual monotony.
 
 TECHNICAL REQUIREMENTS:
 - Valid HTML5, semantic elements (<header>, <main>, <section>, <footer>, <nav>, <article>).
 - Mobile-first responsive design using CSS Grid and Flexbox. Breakpoints: 768px (tablet), 1024px (desktop).
 - CSS custom properties for all brand colors and fonts at :root level.
-- Load Google Fonts for the specified font family (weights 400, 500, 600, 700).
+- Load Google Fonts for the specified font family (weights 400, 500, 600, 700) with font-display: swap.
 - Use Lucide icons via CDN (https://unpkg.com/lucide@latest) for a clean, modern icon set. Initialize with lucide.createIcons() at end of body.
-- Image handling: Use object-fit: cover on all images. Lazy-load below-the-fold images.
-- Meta tags: title, description, viewport, charset, Open Graph (og:title, og:description, og:type).
+- Meta tags: title, description, viewport, charset, Open Graph.
 - All CSS embedded in <style> in the <head>. All JS embedded in <script> before </body>.
-- Clean, indented, production-quality code. No placeholder "lorem ipsum" text — write real, industry-appropriate copy.
+- Clean, indented, production-quality code. No placeholder "lorem ipsum" text.
 
 COPYWRITING (THIS IS CRITICAL — COPY SELLS):
 - NEVER use generic filler. Every word should feel hand-written for this specific business.
-- When client content is sparse, research-grade copy is expected. Write as if you are a professional copywriter hired specifically for this brand.
-- Headlines must be benefit-driven and emotionally compelling. "Your Dream Home Starts Here" not "Real Estate Services". "Meals Worth Coming Back For" not "Restaurant Menu".
-- Opening paragraph should hook the reader in 1-2 sentences: address their pain point or aspiration, then position the business as the solution.
-- Each service/product card should have: a compelling title, a one-sentence benefit statement, and optionally a bullet list of specifics.
-- About section should tell a STORY: who founded it, why, what drives the team, and why customers trust them. Even if the client didn't provide this — infer and write something authentic to their industry and South African context.
-- Generate 2-3 realistic testimonials with full names, roles/companies, and specific praise that references the business's actual services.
-- CTAs should be action-oriented and varied across the page: "Get a Free Quote", "Book Your Consultation", "See Our Work", "Call Us Today", "Start Your Project". Never repeat the same CTA text twice.
-- Write a compelling footer tagline/description (1-2 sentences about the business).
-- Keep paragraphs to 2-3 sentences max. Use bullet points and short phrases for scannability.
-- Tone should match the industry: warm and inviting for food/wellness, authoritative and trustworthy for professional services/healthcare, energetic for tech/construction.
+- When client content is sparse, write compelling, realistic copy appropriate to their industry and South African context.
+- Headlines must be benefit-driven and emotionally compelling.
+- About section should tell a STORY: who founded it, why, what drives the team.
+- Generate 2-3 realistic testimonials with South African names, roles, and specific praise.
+- CTAs should be action-oriented and varied across the page. Never repeat the same CTA text.
+- Tone should match the industry: warm for food/wellness, authoritative for professional services, energetic for tech/construction.
 
-SEO OPTIMIZATION (EVERY PAGE MUST BE SEARCH-ENGINE READY):
-- <title> tag: "[Business Name] — [Primary Service/Benefit] | [City/Region if available]". Example: "ProFix Plumbing — Reliable Plumbing Services in Cape Town". Max 60 characters.
-- <meta name="description">: Compelling 150-160 character summary with primary keyword, location, and CTA. Example: "Cape Town's trusted plumber for emergencies, installations & repairs. Fast response, fair pricing. Call for a free quote today."
-- Use ONE <h1> per page — the main headline. Use <h2> for section headings, <h3> for sub-headings. Never skip heading levels.
-- Include the business name and primary service keyword naturally in the first 100 words of page content.
-- All images must have descriptive alt text: "Team of ProFix plumbers working on a residential installation" not "image1" or "photo".
-- Add Open Graph tags: og:title, og:description, og:type (website), og:image (use hero or logo URL if available).
-- Add canonical URL meta tag if domain is known.
-- Use semantic HTML elements for all content: <article>, <section>, <aside>, <nav>, <header>, <footer>, <main>.
-- Internal anchor links should use descriptive text: "View our services" not "Click here".
-- Generate a JSON-LD structured data block (LocalBusiness schema) in the <head> with: business name, description, address, phone, email, and industry type.
-- Ensure fast perceived load: critical CSS inline, defer non-essential JS, use font-display: swap on Google Fonts.
+SEO OPTIMIZATION:
+- <title> tag: "[Business Name] — [Primary Service/Benefit] | [City/Region if available]". Max 60 characters.
+- <meta name="description">: 150-160 character summary with primary keyword, location, and CTA.
+- ONE <h1> per page. Use <h2> for section headings, <h3> for sub-headings.
+- All images must have descriptive alt text (provided with each image).
+- Add Open Graph tags: og:title, og:description, og:type, og:image.
+- Use semantic HTML for all content.
+- Generate a JSON-LD LocalBusiness structured data block in the <head>.
 
 OUTPUT FORMAT:
 Return ONLY a JSON object (no markdown, no explanation) with this exact structure:
@@ -128,11 +231,65 @@ Return ONLY a JSON object (no markdown, no explanation) with this exact structur
   ]
 }
 
-For starter package: Single index.html with all sections (Home, About, Services, Contact) as scroll sections.
-For professional package: index.html, about.html, services.html, contact.html — each a full page with consistent navigation, shared CSS via a <style> block duplicated in each file, and active nav state per page.
-For enterprise package: Full multi-page site with additional pages as appropriate (portfolio/gallery, FAQ, team, etc.) and advanced interactive features.
+For starter package: Single index.html with all sections as smooth-scroll sections.
+For professional package: index.html, about.html, services.html, contact.html with consistent navigation and active nav state per page.
+For enterprise package: Full multi-page site (6+ pages) with portfolio/gallery, FAQ/testimonials, and advanced interactive features.
 
 CRITICAL: The JSON must be parseable. Escape all quotes inside HTML content strings. Do not wrap the JSON in markdown code fences.`
+
+// ─────────────────────────────────────────────
+// Orchestrator
+// ─────────────────────────────────────────────
+
+Deno.serve(async (req: Request) => {
+  if (req.method === 'OPTIONS') return corsResponse()
+
+  const supabase = getSupabaseAdmin()
+
+  try {
+    const { siteId } = await req.json()
+    if (!siteId) return jsonResponse({ error: 'siteId is required' }, 400)
+
+    const { data: site, error: siteErr } = await supabase
+      .from('client_sites')
+      .select('*, orders(*)')
+      .eq('id', siteId)
+      .single()
+    if (siteErr || !site) return jsonResponse({ error: 'Site not found' }, 404)
+
+    // Update status
+    await supabase.from('client_sites').update({ build_status: 'generating' }).eq('id', siteId)
+    await supabase.from('orders').update({ status: 'building' }).eq('id', site.order_id)
+    await logEvent(supabase, siteId, 'build_start', 'info', 'Build pipeline started')
+
+    // Fetch uploaded assets
+    const { data: uploads } = await supabase.from('file_uploads').select('*').eq('site_id', siteId)
+    const logoUpload = uploads?.find((u: any) => u.file_type === 'logo')
+    const heroUpload = uploads?.find((u: any) => u.file_type === 'hero_image')
+
+    let logoUrl = ''
+    let heroUrl = ''
+    if (logoUpload) {
+      logoUrl = supabase.storage.from('client-assets').getPublicUrl(logoUpload.file_path).data.publicUrl
+    }
+    if (heroUpload) {
+      heroUrl = supabase.storage.from('client-assets').getPublicUrl(heroUpload.file_path).data.publicUrl
+    }
+
+    const pkg = site.orders?.package || 'starter'
+    const isMultiPage = pkg === 'professional' || pkg === 'enterprise'
+
+    // ── AGENT 1: Image Agent ──
+    await logEvent(supabase, siteId, 'image_agent_start', 'info', 'Image Agent: sourcing photography...')
+    const siteImages = await runImageAgent(site, heroUrl, supabase, siteId)
+    await logEvent(supabase, siteId, 'image_agent_done', 'success', `Image Agent: ${siteImages.length} images ready`)
+
+    const imageBlock = siteImages.length > 0
+      ? `═══ IMAGES (USE ALL OF THESE) ═══\n${siteImages.map((img, i) => `${i + 1}. [${img.placement}] ${img.url}\n   Alt: ${img.alt}`).join('\n')}`
+      : 'No images provided — use gradient backgrounds and CSS patterns instead.'
+
+    // ── AGENT 2: Code Agent ──
+    await logEvent(supabase, siteId, 'code_agent_start', 'info', 'Code Agent: generating website...')
 
     const socialEntries = Object.entries(site.social_links || {}).filter(([, v]) => v)
     const socialSummary = socialEntries.length > 0
@@ -158,7 +315,8 @@ Primary Color: ${site.primary_color}
 Secondary Color: ${site.secondary_color}
 Font: ${site.font_preference}
 ${logoUrl ? `Logo: ${logoUrl}` : 'Logo: None — create a clean text-based wordmark using the business name in the brand font with the secondary color as an accent.'}
-${heroUrl ? `Hero Image: ${heroUrl}` : 'Hero Image: None — design an eye-catching gradient hero using the primary and secondary colors with a subtle geometric pattern or mesh gradient overlay.'}
+
+${imageBlock}
 
 ═══ CONTENT ═══
 About: ${site.about_text || site.description || ''}
@@ -171,41 +329,34 @@ ${socialSummary}
 
 ═══ PACKAGE ═══
 ${pkg.toUpperCase()}
-${pkg === 'starter' ? 'Build a single-page site with smooth-scroll sections: Hero, About, Services (3-4 cards), Contact form, Footer.' : ''}
-${pkg === 'professional' ? 'Build 4 pages with consistent navigation: Home (hero + highlights + CTA), About (story + values/team), Services (detailed cards), Contact (form + map placeholder + details). Each page should feel complete and polished.' : ''}
-${pkg === 'enterprise' ? 'Build a comprehensive multi-page site (6+ pages) with: Home, About, Services, Portfolio/Gallery, FAQ or Testimonials, Contact. Include advanced interactions, parallax effects, animated counters, and a premium feel throughout.' : ''}
+${pkg === 'starter' ? 'Build a single-page site with smooth-scroll sections: Hero (with provided hero image), About (with about image), Services (3-4 cards with service images), Contact form, Footer.' : ''}
+${pkg === 'professional' ? 'Build 4 pages: Home (hero image + highlights + CTA), About (story + about image + values), Services (detailed cards with images), Contact (form + details). Consistent navigation with active state per page.' : ''}
+${pkg === 'enterprise' ? 'Build a comprehensive multi-page site (6+ pages): Home, About, Services, Portfolio/Gallery (with all gallery images), FAQ/Testimonials, Contact. Advanced interactions, parallax effects, animated counters.' : ''}
 
 Return the JSON object now.`
 
-    await logEvent(supabase, siteId, 'claude_request', 'info', 'Sending request to Claude API')
-
-    // Call Claude API to generate the website
     const stream = anthropic.messages.stream({
       model: 'claude-sonnet-4-6',
       max_tokens: 64000,
       thinking: { type: 'adaptive' },
-      system: systemPrompt,
+      system: CODE_AGENT_SYSTEM,
       messages: [{ role: 'user', content: userPrompt }],
     })
 
     const response = await stream.finalMessage()
 
-    // Extract the text response
     const textBlock = response.content.find((b: any) => b.type === 'text')
     if (!textBlock || textBlock.type !== 'text') {
-      throw new Error('No text response from Claude')
+      throw new Error('No text response from Code Agent')
     }
 
-    // Parse the JSON from Claude's response
     let files: { path: string; content: string }[]
     try {
-      // Try to extract JSON from the response (Claude may wrap it in markdown)
       const jsonMatch = textBlock.text.match(/\{[\s\S]*"files"[\s\S]*\}/)
       if (!jsonMatch) throw new Error('No JSON found in response')
       const parsed = JSON.parse(jsonMatch[0])
       files = parsed.files
-    } catch (parseErr) {
-      // Fallback: treat entire response as a single HTML file
+    } catch {
       files = [{ path: 'index.html', content: textBlock.text }]
     }
 
@@ -213,17 +364,15 @@ Return the JSON object now.`
       throw new Error('No files generated')
     }
 
-    await logEvent(supabase, siteId, 'claude_response', 'success', `Generated ${files.length} file(s)`)
+    await logEvent(supabase, siteId, 'code_agent_done', 'success', `Code Agent: ${files.length} file(s) generated`)
 
-    // Update site status
     await supabase.from('client_sites').update({
       build_status: 'generated',
-      build_log: `Generated ${files.length} file(s) using Claude API`,
+      build_log: `Generated ${files.length} file(s) with ${siteImages.length} images`,
     }).eq('id', siteId)
 
-    // Now deploy to GitHub
+    // ── Deploy to GitHub ──
     await logEvent(supabase, siteId, 'github_start', 'info', 'Pushing to GitHub...')
-
     const githubResult = await deployToGitHub(site, files)
 
     await supabase.from('client_sites').update({
@@ -234,9 +383,8 @@ Return the JSON object now.`
 
     await logEvent(supabase, siteId, 'github_done', 'success', `Pushed to ${githubResult.repo}`)
 
-    // Deploy to Netlify
+    // ── Deploy to Netlify ──
     await logEvent(supabase, siteId, 'netlify_start', 'info', 'Deploying to Netlify...')
-
     const netlifyResult = await deployToNetlify(githubResult.repo, site.business_name)
 
     await supabase.from('client_sites').update({
@@ -247,7 +395,6 @@ Return the JSON object now.`
     }).eq('id', siteId)
 
     await supabase.from('orders').update({ status: 'preview_ready' }).eq('id', site.order_id)
-
     await logEvent(supabase, siteId, 'deploy_done', 'success', `Live at ${netlifyResult.url}`)
 
     return jsonResponse({
@@ -255,12 +402,12 @@ Return the JSON object now.`
       github_url: githubResult.url,
       netlify_url: netlifyResult.url,
       files_count: files.length,
+      images_count: siteImages.length,
     })
   } catch (err) {
     const errorMessage = (err as Error).message
     console.error('Build error:', errorMessage)
 
-    // Try to update status to failed
     try {
       const { siteId } = await req.clone().json()
       if (siteId) {
@@ -273,6 +420,10 @@ Return the JSON object now.`
     return jsonResponse({ error: errorMessage }, 500)
   }
 })
+
+// ─────────────────────────────────────────────
+// Utilities
+// ─────────────────────────────────────────────
 
 async function logEvent(supabase: any, siteId: string, eventType: string, status: string, message: string) {
   await supabase.from('build_events').insert({
@@ -288,7 +439,6 @@ async function deployToGitHub(site: any, files: { path: string; content: string 
   const org = Deno.env.get('GITHUB_ORG') || 'Razbery01'
   const repoName = site.business_name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 
-  // Create repository
   const createRepoRes = await fetch('https://api.github.com/user/repos', {
     method: 'POST',
     headers: {
@@ -306,10 +456,7 @@ async function deployToGitHub(site: any, files: { path: string; content: string 
 
   if (!createRepoRes.ok) {
     const err = await createRepoRes.json()
-    // If repo already exists, continue
-    if (err.message?.includes('already exists')) {
-      // repo exists, we'll push to it
-    } else {
+    if (!err.message?.includes('already exists')) {
       throw new Error(`GitHub repo creation failed: ${err.message}`)
     }
   }
@@ -317,10 +464,8 @@ async function deployToGitHub(site: any, files: { path: string; content: string 
   const owner = org
   const repo = repoName
 
-  // Wait for repo initialization
   await new Promise(r => setTimeout(r, 2000))
 
-  // Get the default branch's latest commit SHA
   const refRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/ref/heads/main`, {
     headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
   })
@@ -331,7 +476,6 @@ async function deployToGitHub(site: any, files: { path: string; content: string 
     throw new Error('Could not get latest commit SHA')
   }
 
-  // Create blobs for each file
   const blobs = await Promise.all(
     files.map(async (file) => {
       const blobRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/blobs`, {
@@ -341,10 +485,9 @@ async function deployToGitHub(site: any, files: { path: string; content: string 
       })
       const blobData = await blobRes.json()
       return { path: file.path, sha: blobData.sha, mode: '100644' as const, type: 'blob' as const }
-    })
+    }),
   )
 
-  // Create tree
   const treeRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees`, {
     method: 'POST',
     headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
@@ -352,7 +495,6 @@ async function deployToGitHub(site: any, files: { path: string; content: string 
   })
   const treeData = await treeRes.json()
 
-  // Create commit
   const commitRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/commits`, {
     method: 'POST',
     headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
@@ -364,7 +506,6 @@ async function deployToGitHub(site: any, files: { path: string; content: string 
   })
   const commitData = await commitRes.json()
 
-  // Update ref
   await fetch(`https://api.github.com/repos/${owner}/${repo}/git/refs/heads/main`, {
     method: 'PATCH',
     headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
@@ -381,7 +522,6 @@ async function deployToNetlify(githubRepo: string, siteName: string) {
   const token = Deno.env.get('NETLIFY_PAT')!
   const slug = siteName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 
-  // Create Netlify site linked to GitHub repo
   const createRes = await fetch('https://api.netlify.com/api/v1/sites', {
     method: 'POST',
     headers: {
