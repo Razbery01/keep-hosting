@@ -55,68 +55,107 @@ Deno.serve(async (req: Request) => {
     const isMultiPage = pkg === 'professional' || pkg === 'enterprise'
 
     // Build the prompt for Claude
-    const systemPrompt = `You are an expert web developer. You generate complete, production-ready websites based on client business details.
+    const systemPrompt = `You are a world-class web designer and front-end developer who builds websites that rival those from top agencies. Every site you create looks like it cost R50,000+ to build. You have deep expertise in visual design, typography, layout, color theory, motion design, and conversion-focused UX.
 
-RULES:
-- Output ONLY valid HTML, CSS, and JavaScript code
-- Use modern, responsive design with CSS Grid and Flexbox
-- Include smooth scroll, hover effects, and subtle animations
-- Make the site mobile-first and fully responsive
-- Use the client's brand colors and font throughout
-- Include proper meta tags for SEO
-- Use Font Awesome for icons (CDN link included)
-- Use Google Fonts for the specified font
-- All code must be in a single HTML file with embedded CSS and JS
-- The design should be professional, modern, and visually impressive
-- Include a contact form (frontend only)
-- Include social media links if provided
+DESIGN PHILOSOPHY:
+- Design like an award-winning agency. Every pixel matters.
+- Create visual hierarchy through size contrast, weight, color, and spacing — not just bold text.
+- Use generous whitespace. Let the design breathe. Cramped layouts look cheap.
+- Follow the 60-30-10 color rule: 60% neutral/white, 30% primary brand color, 10% secondary/accent for CTAs and highlights.
+- Typography sets the tone. Use a clear scale: hero headings 3-5rem, section headings 2-2.5rem, body 1-1.125rem, small text 0.875rem.
+- Line height: headings 1.1-1.2, body text 1.6-1.8 for readability.
+- Max content width ~1200px, max paragraph width ~65ch for comfortable reading.
+
+LAYOUT & COMPONENTS:
+- Hero section: Full-viewport or near-full, with a strong headline, a supporting sentence, and one clear CTA button. If no hero image, use a gradient using the brand colors with a subtle mesh, grain, or geometric pattern overlay — never a flat solid color.
+- Navigation: Clean, sticky/fixed, with the business name/logo left-aligned and links right-aligned. Mobile: hamburger menu with smooth slide-in panel.
+- Services/features: Use a card grid (2-3 columns) with icons, short titles, and one-line descriptions. Cards should have subtle borders or shadows, and lift on hover.
+- About section: Split layout — text on one side, image or decorative element on the other. Tell a compelling story.
+- Testimonials: If appropriate for the industry, generate 2-3 realistic testimonials with names and roles.
+- Contact section: Clean form (Name, Email, Phone, Message) with a submit button. Show contact details (email, phone, address) alongside the form. Use the secondary color for the submit button.
+- Footer: Dark background (primary color or near-black), organized in 3-4 columns: brand + description, quick links, contact info, social icons. Copyright at bottom.
+- CTA sections: Between content sections, add banner-style CTAs with a compelling headline and button, using the secondary color as background.
+
+VISUAL EFFECTS & MOTION:
+- Smooth scroll behavior on all anchor links.
+- Scroll-triggered fade-in-up animations on sections using IntersectionObserver (stagger children by 100ms). Keep animations subtle — 0.6s ease, 30px translateY.
+- Hover states on ALL interactive elements: buttons scale 1.02-1.05 with shadow lift, cards translate-y -4px with shadow increase, links get color transitions.
+- Buttons: Rounded corners (8-12px), generous padding (14px 32px), bold font weight, smooth color/shadow transitions.
+- Add a subtle gradient or pattern to at least one section background to break visual monotony.
+
+TECHNICAL REQUIREMENTS:
+- Valid HTML5, semantic elements (<header>, <main>, <section>, <footer>, <nav>, <article>).
+- Mobile-first responsive design using CSS Grid and Flexbox. Breakpoints: 768px (tablet), 1024px (desktop).
+- CSS custom properties for all brand colors and fonts at :root level.
+- Load Google Fonts for the specified font family (weights 400, 500, 600, 700).
+- Use Lucide icons via CDN (https://unpkg.com/lucide@latest) for a clean, modern icon set. Initialize with lucide.createIcons() at end of body.
+- Image handling: Use object-fit: cover on all images. Lazy-load below-the-fold images.
+- Meta tags: title, description, viewport, charset, Open Graph (og:title, og:description, og:type).
+- All CSS embedded in <style> in the <head>. All JS embedded in <script> before </body>.
+- Clean, indented, production-quality code. No placeholder "lorem ipsum" text — write real, industry-appropriate copy.
+
+CONTENT WRITING:
+- When client content is sparse, generate compelling, realistic copy appropriate to their industry.
+- Write headlines that are benefit-driven, not feature-driven. Example: "Your Dream Home Starts Here" not "Real Estate Services".
+- CTAs should be action-oriented: "Get a Free Quote", "Book a Consultation", "Start Your Project".
+- Keep paragraphs short (2-3 sentences max). Use bullet points for lists.
 
 OUTPUT FORMAT:
-Return a JSON object with this exact structure:
+Return ONLY a JSON object (no markdown, no explanation) with this exact structure:
 {
   "files": [
-    { "path": "index.html", "content": "<!DOCTYPE html>..." },
-    { "path": "about.html", "content": "..." },
-    ...
+    { "path": "index.html", "content": "<!DOCTYPE html>..." }
   ]
 }
 
-For starter package: Generate only index.html (single page with sections)
-For professional package: Generate index.html, about.html, services.html, contact.html with shared navigation
-For enterprise package: Generate a full multi-page site with advanced features`
+For starter package: Single index.html with all sections (Home, About, Services, Contact) as scroll sections.
+For professional package: index.html, about.html, services.html, contact.html — each a full page with consistent navigation, shared CSS via a <style> block duplicated in each file, and active nav state per page.
+For enterprise package: Full multi-page site with additional pages as appropriate (portfolio/gallery, FAQ, team, etc.) and advanced interactive features.
 
-    const userPrompt = `Generate a ${isMultiPage ? 'multi-page' : 'single-page'} website for:
+CRITICAL: The JSON must be parseable. Escape all quotes inside HTML content strings. Do not wrap the JSON in markdown code fences.`
 
-BUSINESS DETAILS:
-- Business Name: ${site.business_name}
-- Industry: ${site.industry}
-- Tagline: ${site.tagline || 'Professional ' + site.industry + ' Services'}
-- Description: ${site.description || 'A trusted ' + site.industry.toLowerCase() + ' business.'}
-- Goals: ${site.goals || 'Attract new customers and establish online presence'}
+    const socialEntries = Object.entries(site.social_links || {}).filter(([, v]) => v)
+    const socialSummary = socialEntries.length > 0
+      ? socialEntries.map(([k, v]) => `${k}: ${v}`).join('\n')
+      : 'None provided'
 
-CONTACT INFO:
-- Email: ${site.contact_email}
-- Phone: ${site.contact_phone || ''}
-- Address: ${site.contact_address || ''}
+    const userPrompt = `Build a ${isMultiPage ? 'multi-page' : 'single-page'} website for the following business.
 
-BRAND:
-- Primary Color: ${site.primary_color}
-- Secondary Color: ${site.secondary_color}
-- Font: ${site.font_preference}
-${logoUrl ? `- Logo URL: ${logoUrl}` : '- No logo provided, use a text-based logo with the business name'}
-${heroUrl ? `- Hero Image URL: ${heroUrl}` : '- Use a gradient or pattern background for the hero section'}
+═══ BUSINESS ═══
+Name: ${site.business_name}
+Industry: ${site.industry}
+Tagline: ${site.tagline || ''}
+Description: ${site.description || ''}
+Goals: ${site.goals || ''}
 
-CONTENT:
-- About: ${site.about_text || site.description || 'We are a professional ' + site.industry.toLowerCase() + ' business committed to excellence.'}
-- Services: ${site.services_text || 'We offer a range of professional services tailored to your needs.'}
+═══ CONTACT ═══
+Email: ${site.contact_email}
+Phone: ${site.contact_phone || 'Not provided'}
+Address: ${site.contact_address || 'Not provided'}
 
-SOCIAL MEDIA:
-${JSON.stringify(site.social_links || {}, null, 2)}
+═══ BRAND ═══
+Primary Color: ${site.primary_color}
+Secondary Color: ${site.secondary_color}
+Font: ${site.font_preference}
+${logoUrl ? `Logo: ${logoUrl}` : 'Logo: None — create a clean text-based wordmark using the business name in the brand font with the secondary color as an accent.'}
+${heroUrl ? `Hero Image: ${heroUrl}` : 'Hero Image: None — design an eye-catching gradient hero using the primary and secondary colors with a subtle geometric pattern or mesh gradient overlay.'}
 
-PACKAGE: ${pkg}
-${isMultiPage ? 'Generate multiple pages: Home, About, Services, Contact with consistent navigation.' : 'Generate a single-page website with sections for Home, About, Services, and Contact.'}
+═══ CONTENT ═══
+About: ${site.about_text || site.description || ''}
+Services/Products: ${site.services_text || ''}
 
-Return the JSON object with the files array.`
+If the about or services content above is empty or very brief, write compelling, realistic copy for a ${site.industry.toLowerCase()} business called "${site.business_name}". Make it sound authentic and professional — not generic.
+
+═══ SOCIAL ═══
+${socialSummary}
+
+═══ PACKAGE ═══
+${pkg.toUpperCase()}
+${pkg === 'starter' ? 'Build a single-page site with smooth-scroll sections: Hero, About, Services (3-4 cards), Contact form, Footer.' : ''}
+${pkg === 'professional' ? 'Build 4 pages with consistent navigation: Home (hero + highlights + CTA), About (story + values/team), Services (detailed cards), Contact (form + map placeholder + details). Each page should feel complete and polished.' : ''}
+${pkg === 'enterprise' ? 'Build a comprehensive multi-page site (6+ pages) with: Home, About, Services, Portfolio/Gallery, FAQ or Testimonials, Contact. Include advanced interactions, parallax effects, animated counters, and a premium feel throughout.' : ''}
+
+Return the JSON object now.`
 
     await logEvent(supabase, siteId, 'claude_request', 'info', 'Sending request to Claude API')
 
@@ -298,7 +337,7 @@ async function deployToGitHub(site: any, files: { path: string; content: string 
     method: 'POST',
     headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      message: `Deploy website for ${site.business_name} - Built by Keep Hosting with Claude AI`,
+      message: `Deploy website for ${site.business_name} - Built by Keep Hosting`,
       tree: treeData.sha,
       parents: [latestCommitSha],
     }),
