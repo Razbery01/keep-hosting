@@ -9,7 +9,6 @@ export default function ContactPage() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setSending(true)
-    // Simulate send — replace with Supabase function or email API
     await new Promise((r) => setTimeout(r, 1000))
     setSending(false)
     toast.success('Message sent! We\'ll get back to you shortly.')
@@ -18,101 +17,80 @@ export default function ContactPage() {
 
   return (
     <>
-      <section className="bg-gradient-to-br from-primary to-primary-dark text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden bg-dark pt-32 pb-16">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-dark to-dark" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-accent/[0.07] rounded-full blur-[200px] -translate-y-1/4 translate-x-1/4" />
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Contact Us</h1>
-            <p className="text-lg text-gray-300 max-w-2xl">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="h-px w-12 bg-accent" />
+              <span className="text-accent text-sm font-semibold uppercase tracking-wider">Contact</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-4">
+              Get in Touch
+            </h1>
+            <p className="text-lg text-gray-400 max-w-2xl">
               Have a question or ready to get started? We'd love to hear from you.
             </p>
           </motion.div>
         </div>
       </section>
 
-      <section className="py-20 bg-white">
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Get in Touch</h2>
-              <div className="space-y-6 mb-10">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center text-accent shrink-0">
-                    <Mail className="w-5 h-5" />
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-16">
+            <div className="lg:col-span-2">
+              <h2 className="text-2xl font-extrabold text-gray-900 mb-8 tracking-tight">Contact Info</h2>
+              <div className="space-y-6">
+                {[
+                  { icon: <Mail className="w-5 h-5" />, label: 'Email', value: 'hello@keephosting.co.za' },
+                  { icon: <Phone className="w-5 h-5" />, label: 'Phone', value: '+27 XX XXX XXXX' },
+                  { icon: <MapPin className="w-5 h-5" />, label: 'Location', value: 'Durban, South Africa' },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-start gap-4 group">
+                    <div className="w-11 h-11 bg-gray-50 rounded-xl flex items-center justify-center text-accent shrink-0 group-hover:bg-accent group-hover:text-white transition-all duration-300">
+                      {item.icon}
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-900 text-sm">{item.label}</h4>
+                      <p className="text-gray-500">{item.value}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Email</h4>
-                    <p className="text-gray-500">hello@keephosting.co.za</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center text-accent shrink-0">
-                    <Phone className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Phone</h4>
-                    <p className="text-gray-500">+27 XX XXX XXXX</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center text-accent shrink-0">
-                    <MapPin className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Location</h4>
-                    <p className="text-gray-500">South Africa</p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <motion.form onSubmit={handleSubmit} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+              className="lg:col-span-3 bg-gray-50 rounded-2xl p-8 border border-gray-100 space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                  <input
-                    type="text"
-                    required
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-                    placeholder="Your name"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Name</label>
+                  <input type="text" required placeholder="Your name"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none transition-all" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                  <input
-                    type="email"
-                    required
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-                    placeholder="your@email.com"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+                  <input type="email" required placeholder="your@email.com"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none transition-all" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
-                <input
-                  type="text"
-                  required
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-                  placeholder="What's this about?"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Subject</label>
+                <input type="text" required placeholder="What's this about?"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none transition-all" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
-                <textarea
-                  required
-                  rows={5}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent resize-none"
-                  placeholder="Tell us how we can help..."
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Message</label>
+                <textarea required rows={5} placeholder="Tell us how we can help..."
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none transition-all resize-none" />
               </div>
-              <button
-                type="submit"
-                disabled={sending}
-                className="flex items-center gap-2 bg-accent text-white px-6 py-3 rounded-lg font-semibold hover:bg-accent-dark transition-colors disabled:opacity-50"
-              >
+              <button type="submit" disabled={sending}
+                className="inline-flex items-center gap-2 bg-accent text-white px-8 py-3 rounded-xl font-bold hover:brightness-110 transition-all disabled:opacity-50">
                 {sending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                 Send Message
               </button>
-            </form>
+            </motion.form>
           </div>
         </div>
       </section>

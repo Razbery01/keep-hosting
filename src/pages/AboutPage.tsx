@@ -1,61 +1,83 @@
 import { motion } from 'framer-motion'
 import { Zap, Heart, Users, TrendingUp } from 'lucide-react'
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1, y: 0,
+    transition: { delay: i * 0.1, duration: 0.4 },
+  }),
+}
+
 export default function AboutPage() {
   return (
     <>
-      <section className="bg-gradient-to-br from-primary to-primary-dark text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden bg-dark pt-32 pb-16">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-dark to-dark" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-accent/[0.07] rounded-full blur-[200px] -translate-y-1/4 translate-x-1/4" />
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">About Keep Hosting</h1>
-            <p className="text-lg text-gray-300 max-w-2xl">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="h-px w-12 bg-accent" />
+              <span className="text-accent text-sm font-semibold uppercase tracking-wider">About</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-4">
+              About Keep Hosting
+            </h1>
+            <p className="text-lg text-gray-400 max-w-2xl">
               We're on a mission to make professional web presence accessible to every South African business.
             </p>
           </motion.div>
         </div>
       </section>
 
-      <section className="py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="prose prose-lg max-w-none">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Story</h2>
-            <p className="text-gray-600 leading-relaxed mb-6">
-              Keep Hosting was born from a simple observation: too many small businesses in South Africa
-              are paying too much for basic web services, or going without a web presence entirely.
-              We believe every business deserves a professional website, reliable hosting, and the tools
-              to grow online — without breaking the bank.
-            </p>
-            <p className="text-gray-600 leading-relaxed mb-6">
-              By leveraging modern development tools and cloud infrastructure, we've dramatically
-              reduced the cost and time needed to deliver high-quality websites. What used to take weeks
-              and cost tens of thousands now takes days at a fraction of the price.
-            </p>
-          </div>
+      <section className="py-24 bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <h2 className="text-3xl font-extrabold text-gray-900 mb-8 tracking-tight">Our Story</h2>
+            <div className="space-y-6 text-gray-600 text-[17px] leading-relaxed">
+              <p>
+                Keep Hosting was born from a simple observation: too many small businesses in South Africa
+                are paying too much for basic web services, or going without a web presence entirely.
+                We believe every business deserves a professional website, reliable hosting, and the tools
+                to grow online — without breaking the bank.
+              </p>
+              <div className="border-l-2 border-accent pl-6 py-2">
+                <p className="text-gray-900 font-medium text-lg leading-relaxed">
+                  What used to take weeks and cost tens of thousands now takes days at a fraction of the price.
+                </p>
+              </div>
+              <p>
+                By leveraging modern development tools and cloud infrastructure, we've dramatically
+                reduced the cost and time needed to deliver high-quality websites. Our approach is simple:
+                you tell us about your business, we build you a professional website, and you only pay
+                if you love it.
+              </p>
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      <section className="py-20 bg-surface">
+      <section className="py-24 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Our Values</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Our Values</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             {[
               { icon: <Zap className="w-7 h-7" />, title: 'Speed', desc: 'We move fast and deliver results. Your time is valuable.' },
               { icon: <Heart className="w-7 h-7" />, title: 'Affordability', desc: 'Premium quality at marginal cost. No business left behind.' },
               { icon: <Users className="w-7 h-7" />, title: 'Partnership', desc: "We're not just a vendor — we're your digital growth partner." },
               { icon: <TrendingUp className="w-7 h-7" />, title: 'Growth', desc: 'Everything we build is designed to help your business grow.' },
-            ].map((v) => (
-              <motion.div
-                key={v.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="text-center"
-              >
-                <div className="w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center text-accent mx-auto mb-4">
+            ].map((v, i) => (
+              <motion.div key={v.title} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
+                className="group bg-white rounded-2xl p-8 text-center border border-gray-100 hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300">
+                <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-accent mx-auto mb-5 group-hover:bg-accent group-hover:text-white group-hover:shadow-lg group-hover:shadow-accent/20 transition-all duration-300">
                   {v.icon}
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{v.title}</h3>
-                <p className="text-sm text-gray-500">{v.desc}</p>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">{v.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{v.desc}</p>
               </motion.div>
             ))}
           </div>
