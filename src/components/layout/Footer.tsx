@@ -15,7 +15,7 @@ export default function Footer() {
               Keep Hosting
             </div>
             <p className="text-sm leading-relaxed mb-6">
-              Professional web design and hosting at marginal cost. We build, host, and grow your online presence with AI-powered technology.
+              Professional web design and hosting at marginal cost. We build, host, and grow your online presence.
             </p>
             <div className="flex gap-3">
               {['facebook', 'instagram', 'linkedin', 'twitter'].map((social) => (
@@ -86,7 +86,7 @@ export default function Footer() {
         <div className="border-t border-white/5 mt-16 pt-8 flex flex-col md:flex-row items-center justify-between text-sm text-gray-600">
           <span>&copy; {new Date().getFullYear()} Keep Hosting. All rights reserved.</span>
           <span className="mt-2 md:mt-0 flex items-center gap-1">
-            Built with <span className="text-accent">AI</span> in South Africa
+            Made with <span className="text-accent">&hearts;</span> in South Africa
           </span>
         </div>
       </div>

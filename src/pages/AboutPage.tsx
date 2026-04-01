@@ -26,7 +26,7 @@ export default function AboutPage() {
               to grow online — without breaking the bank.
             </p>
             <p className="text-gray-600 leading-relaxed mb-6">
-              By leveraging AI-powered development and modern cloud infrastructure, we've dramatically
+              By leveraging modern development tools and cloud infrastructure, we've dramatically
               reduced the cost and time needed to deliver high-quality websites. What used to take weeks
               and cost tens of thousands now takes days at a fraction of the price.
             </p>

@@ -20,7 +20,7 @@ export const SERVICES = [
   {
     id: 'geo',
     title: 'GEO',
-    description: 'Generative Engine Optimization to ensure visibility in AI-powered search.',
+    description: 'Generative Engine Optimization to ensure visibility in modern search engines.',
     icon: 'Globe',
   },
   {

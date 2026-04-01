@@ -27,8 +27,8 @@ const services = [
   {
     icon: <Globe className="w-8 h-8" />,
     title: 'GEO (Generative Engine Optimization)',
-    desc: 'Optimize your content for AI-powered search engines like ChatGPT and Perplexity.',
-    features: ['AI search optimization', 'Structured data', 'Content strategy', 'Visibility monitoring'],
+    desc: 'Optimize your content for generative search engines like ChatGPT and Perplexity.',
+    features: ['Generative search optimization', 'Structured data', 'Content strategy', 'Visibility monitoring'],
   },
   {
     icon: <Target className="w-8 h-8" />,

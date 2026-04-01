@@ -44,7 +44,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
               <span className="inline-flex items-center gap-2 bg-accent/10 backdrop-blur-sm border border-accent/20 text-accent px-4 py-2 rounded-full text-sm font-medium mb-6">
-                <Sparkles className="w-4 h-4" /> AI-Powered Web Design
+                <Sparkles className="w-4 h-4" /> Professional Web Design
               </span>
               <h1 className="text-5xl md:text-7xl font-extrabold leading-[1.05] mb-6 tracking-tight drop-shadow-lg">
                 <span className="text-white">Build Your</span><br />
@@ -52,7 +52,7 @@ export default function HomePage() {
                 <span className="text-white/80 text-4xl md:text-5xl font-bold">in Minutes</span>
               </h1>
               <p className="text-lg md:text-xl text-gray-200 mb-10 max-w-lg leading-relaxed">
-                Choose a package. Tell us about your business. Our AI builds you a stunning, professional website — deployed and live instantly.
+                Choose a package. Tell us about your business. We build you a stunning, professional website — deployed and live.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/pricing" className="group inline-flex items-center justify-center gap-2 bg-accent text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-[0_0_30px_rgba(0,212,255,0.4)] hover:scale-105 transition-all duration-300">
@@ -102,7 +102,7 @@ export default function HomePage() {
                   </div>
                 </div>
                 <motion.div animate={{ y: [-8, 8, -8] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }} className="absolute -top-6 -right-6 bg-accent/90 backdrop-blur-sm text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-accent/30 flex items-center gap-2">
-                  <Zap className="w-4 h-4" /> Built with AI
+                  <Zap className="w-4 h-4" /> Lightning Fast
                 </motion.div>
                 <motion.div animate={{ y: [6, -6, 6] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }} className="absolute -bottom-4 -left-4 bg-white/90 backdrop-blur-sm text-gray-900 px-4 py-2 rounded-xl text-sm font-bold shadow-lg flex items-center gap-2">
                   <Monitor className="w-4 h-4 text-accent" /> Responsive
@@ -149,7 +149,7 @@ export default function HomePage() {
             {[
               { step: '01', title: 'Choose a Package', desc: 'Pick the plan that fits your needs and budget.', icon: <Sparkles className="w-6 h-6" />, color: 'from-accent/20 to-accent/5' },
               { step: '02', title: 'Tell Us About You', desc: 'Fill in your business details, upload your logo and brand assets.', icon: <Palette className="w-6 h-6" />, color: 'from-blue-500/20 to-blue-500/5' },
-              { step: '03', title: 'AI Builds Your Site', desc: 'Claude AI generates a professional, custom website for you.', icon: <Zap className="w-6 h-6" />, color: 'from-purple-500/20 to-purple-500/5' },
+              { step: '03', title: 'We Build Your Site', desc: 'We craft a professional, custom website tailored to your brand.', icon: <Zap className="w-6 h-6" />, color: 'from-purple-500/20 to-purple-500/5' },
               { step: '04', title: 'Go Live!', desc: 'Your site is deployed, domain connected, and ready for visitors.', icon: <Globe className="w-6 h-6" />, color: 'from-green-500/20 to-green-500/5' },
             ].map((item, i) => (
               <motion.div key={item.step} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="relative text-center px-6 py-8">
@@ -248,11 +248,11 @@ export default function HomePage() {
           <div className="text-center mb-16">
             <span className="inline-block bg-accent/10 border border-accent/20 text-accent px-4 py-1.5 rounded-full text-sm font-semibold mb-4">Why Choose Us</span>
             <h2 className="text-3xl md:text-5xl font-extrabold mb-4">Why Keep Hosting?</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto text-lg">AI-powered development meets human expertise — exceptional results at marginal cost.</p>
+            <p className="text-gray-400 max-w-2xl mx-auto text-lg">Modern development meets human expertise — exceptional results at marginal cost.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { icon: <Zap className="w-7 h-7" />, title: 'Lightning Fast', desc: 'AI builds your site in minutes, not weeks. Go live faster than ever before.', stat: '<5 min', statLabel: 'Build time' },
+              { icon: <Zap className="w-7 h-7" />, title: 'Lightning Fast', desc: 'Our streamlined process gets your site live in days, not weeks.', stat: '<48h', statLabel: 'Turnaround' },
               { icon: <Shield className="w-7 h-7" />, title: 'Reliable & Secure', desc: 'Free SSL, 99.9% uptime, and enterprise-grade hosting infrastructure.', stat: '99.9%', statLabel: 'Uptime' },
               { icon: <Globe className="w-7 h-7" />, title: 'Full Service', desc: 'Design, hosting, SEO, domains, email — everything under one roof.', stat: '8+', statLabel: 'Services' },
             ].map((item, i) => (
