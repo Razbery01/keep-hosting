@@ -192,7 +192,12 @@ export default function OnboardingPage() {
         })
       }
 
-      toast.success('Submitted! We\'ll start building your preview.')
+      // Auto-trigger the build — no admin approval needed
+      supabase.functions.invoke('build-site', { body: { siteId: site.id } }).catch(() => {
+        // Build runs in background; errors are logged in build_events
+      })
+
+      toast.success('Building your preview now!')
       navigate('/dashboard')
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Something went wrong')

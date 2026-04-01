@@ -128,15 +128,14 @@ export default function DashboardPage() {
 
   useEffect(() => { fetchOrders() }, [fetchOrders])
 
-  // Poll for updates when any order is actively building (not just queued)
+  // Poll for updates when any order is pending or actively building
   useEffect(() => {
-    const hasActiveBuilds = orders.some((o) => {
-      const bs = o.client_sites?.[0]?.build_status
-      return (o.status === 'building' || (bs && bs !== 'pending' && bs !== 'live' && bs !== 'failed'))
+    const needsPolling = orders.some((o) => {
+      return o.status === 'pending' || o.status === 'building'
     })
-    if (!hasActiveBuilds) return
+    if (!needsPolling) return
 
-    const interval = setInterval(fetchOrders, 4000)
+    const interval = setInterval(fetchOrders, 3000)
     return () => clearInterval(interval)
   }, [orders, fetchOrders])
 
@@ -237,10 +236,11 @@ export default function DashboardPage() {
                       </span>
                     </div>
 
-                    {/* Waiting: admin hasn't started the build yet */}
+                    {/* Waiting: build is starting up */}
                     {isWaiting && (
-                      <div className="mt-5 bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
-                        <strong>We've received your details!</strong> Our team is reviewing your submission and will start building your preview shortly. This page updates automatically — no need to refresh.
+                      <div className="mt-5 bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800 flex items-center gap-3">
+                        <Loader2 className="w-4 h-4 animate-spin text-yellow-600 shrink-0" />
+                        <span><strong>Starting your build...</strong> Your website is being queued. The progress tracker will appear in a moment.</span>
                       </div>
                     )}
 
