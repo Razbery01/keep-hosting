@@ -77,6 +77,7 @@ export default function OnboardingPage() {
   const [data, setData] = useState<OnboardingData>({
     ...initialData,
     package: (searchParams.get('package') as PackageType) || 'professional',
+    domainName: searchParams.get('domain') || '',
   })
   const { results: domainResults, loading: domainLoading, searchDomain } = useDomainSearch()
 

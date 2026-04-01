@@ -1,11 +1,13 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Search, Globe, CheckCircle2, XCircle, Loader2, ShoppingCart } from 'lucide-react'
+import { Search, Globe, CheckCircle2, XCircle, Loader2, ArrowRight } from 'lucide-react'
 import { useDomainSearch } from '../hooks/useDomainSearch'
 
 export default function DomainSearchPage() {
   const [query, setQuery] = useState('')
   const { results, loading, error, searchDomain } = useDomainSearch()
+  const navigate = useNavigate()
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
@@ -85,9 +87,12 @@ export default function DomainSearchPage() {
                     </div>
                   </div>
                   {r.available && (
-                    <button className="flex items-center gap-2 bg-accent text-white px-5 py-2.5 rounded-lg font-medium text-sm hover:bg-accent-dark transition-colors">
-                      <ShoppingCart className="w-4 h-4" />
-                      Register
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/onboarding?domain=${encodeURIComponent(r.domain)}`)}
+                      className="flex items-center gap-2 bg-accent text-white px-5 py-2.5 rounded-lg font-medium text-sm hover:bg-accent-dark transition-colors"
+                    >
+                      Get Started <ArrowRight className="w-4 h-4" />
                     </button>
                   )}
                 </motion.div>
