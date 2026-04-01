@@ -1,25 +1,44 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Package, Globe, Building2, Palette, FileText,
-  CheckCircle2, ArrowRight, ArrowLeft, Loader2, Upload
+  ArrowRight, ArrowLeft, Loader2, Upload, CheckCircle2, Globe,
+  Utensils, ShoppingBag, Briefcase, Heart, Home, HardHat,
+  GraduationCap, Cpu, Sparkles, Car, HandHeart, MoreHorizontal,
+  ImageIcon, X, Search
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { PACKAGES, INDUSTRIES, FONT_OPTIONS } from '../lib/constants'
+import { PACKAGES, FONT_OPTIONS } from '../lib/constants'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
 import { useDomainSearch } from '../hooks/useDomainSearch'
 import type { OnboardingData, Package as PackageType } from '../types'
 
-const STEPS = [
-  { label: 'Package', icon: Package },
-  { label: 'Domain', icon: Globe },
-  { label: 'Business Info', icon: Building2 },
-  { label: 'Brand', icon: Palette },
-  { label: 'Content', icon: FileText },
-  { label: 'Review', icon: CheckCircle2 },
+const INDUSTRY_TILES = [
+  { value: 'Restaurant / Food', label: 'Food & Drink', icon: Utensils },
+  { value: 'Retail / E-commerce', label: 'Retail', icon: ShoppingBag },
+  { value: 'Professional Services', label: 'Services', icon: Briefcase },
+  { value: 'Healthcare', label: 'Healthcare', icon: Heart },
+  { value: 'Real Estate', label: 'Real Estate', icon: Home },
+  { value: 'Construction', label: 'Construction', icon: HardHat },
+  { value: 'Education', label: 'Education', icon: GraduationCap },
+  { value: 'Technology', label: 'Tech', icon: Cpu },
+  { value: 'Beauty / Wellness', label: 'Beauty', icon: Sparkles },
+  { value: 'Automotive', label: 'Automotive', icon: Car },
+  { value: 'Non-profit', label: 'Non-profit', icon: HandHeart },
+  { value: 'Other', label: 'Other', icon: MoreHorizontal },
 ]
+
+const COLOR_PRESETS = [
+  { name: 'Ocean', primary: '#1E3A5F', secondary: '#00D4FF' },
+  { name: 'Forest', primary: '#1B4332', secondary: '#52B788' },
+  { name: 'Sunset', primary: '#7C2D12', secondary: '#FB923C' },
+  { name: 'Royal', primary: '#3B0764', secondary: '#A855F7' },
+  { name: 'Slate', primary: '#1E293B', secondary: '#64748B' },
+  { name: 'Rose', primary: '#881337', secondary: '#FB7185' },
+]
+
+const STEP_LABELS = ['Your Business', 'Your Style', 'Final Details']
 
 const initialData: OnboardingData = {
   package: 'professional',
@@ -55,24 +74,31 @@ export default function OnboardingPage() {
   })
   const { results: domainResults, loading: domainLoading, searchDomain } = useDomainSearch()
 
+  const logoPreview = useMemo(
+    () => (data.logoFile ? URL.createObjectURL(data.logoFile) : null),
+    [data.logoFile],
+  )
+  const heroPreview = useMemo(
+    () => (data.heroFile ? URL.createObjectURL(data.heroFile) : null),
+    [data.heroFile],
+  )
+
   function update(partial: Partial<OnboardingData>) {
     setData((prev) => ({ ...prev, ...partial }))
   }
 
-  function next() {
-    setStep((s) => Math.min(s + 1, STEPS.length - 1))
-  }
-  function prev() {
-    setStep((s) => Math.max(s - 1, 0))
-  }
+  function next() { setStep((s) => Math.min(s + 1, 2)) }
+  function prev() { setStep((s) => Math.max(s - 1, 0)) }
+
+  const canProceed = step === 0
+    ? !!(data.businessName && data.industry && data.contactEmail)
+    : true
 
   async function handleSubmit() {
     if (!user) { toast.error('Please sign in first'); return }
     setSubmitting(true)
-
     try {
       const pkg = PACKAGES.find((p) => p.id === data.package)!
-      // Create order
       const { data: order, error: orderErr } = await supabase
         .from('orders')
         .insert({
@@ -86,7 +112,6 @@ export default function OnboardingPage() {
         .single()
       if (orderErr) throw orderErr
 
-      // Create client site
       const { data: site, error: siteErr } = await supabase
         .from('client_sites')
         .insert({
@@ -111,35 +136,26 @@ export default function OnboardingPage() {
         .single()
       if (siteErr) throw siteErr
 
-      // Upload files
       if (data.logoFile) {
         const path = `${user.id}/${site.id}/logo-${data.logoFile.name}`
         await supabase.storage.from('client-assets').upload(path, data.logoFile)
         await supabase.from('file_uploads').insert({
-          site_id: site.id,
-          user_id: user.id,
-          file_type: 'logo',
-          file_name: data.logoFile.name,
-          file_path: path,
-          file_size: data.logoFile.size,
-          mime_type: data.logoFile.type,
+          site_id: site.id, user_id: user.id, file_type: 'logo',
+          file_name: data.logoFile.name, file_path: path,
+          file_size: data.logoFile.size, mime_type: data.logoFile.type,
         })
       }
       if (data.heroFile) {
         const path = `${user.id}/${site.id}/hero-${data.heroFile.name}`
         await supabase.storage.from('client-assets').upload(path, data.heroFile)
         await supabase.from('file_uploads').insert({
-          site_id: site.id,
-          user_id: user.id,
-          file_type: 'hero_image',
-          file_name: data.heroFile.name,
-          file_path: path,
-          file_size: data.heroFile.size,
-          mime_type: data.heroFile.type,
+          site_id: site.id, user_id: user.id, file_type: 'hero_image',
+          file_name: data.heroFile.name, file_path: path,
+          file_size: data.heroFile.size, mime_type: data.heroFile.type,
         })
       }
 
-      toast.success('Order submitted successfully!')
+      toast.success('Submitted! We\'ll start building your preview.')
       navigate('/dashboard')
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Something went wrong')
@@ -148,309 +164,504 @@ export default function OnboardingPage() {
     }
   }
 
+  const input = 'w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-all bg-white'
+
   return (
-    <div className="min-h-screen bg-surface py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        {/* Steps indicator */}
-        <div className="flex items-center justify-between mb-10 overflow-x-auto pb-2">
-          {STEPS.map((s, i) => {
-            const Icon = s.icon
-            return (
-              <div key={s.label} className="flex items-center">
-                <button
-                  onClick={() => i < step && setStep(i)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
-                    i === step ? 'bg-accent text-white' : i < step ? 'bg-accent/10 text-accent' : 'text-gray-400'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span className="hidden sm:inline">{s.label}</span>
-                </button>
-                {i < STEPS.length - 1 && <div className="w-4 sm:w-8 h-px bg-gray-300 mx-1" />}
-              </div>
-            )
-          })}
+    <div className="min-h-screen bg-gradient-to-br from-surface to-white py-8 md:py-12">
+      <div className="max-w-5xl mx-auto px-4">
+
+        {/* Progress bar */}
+        <div className="mb-10">
+          <div className="flex items-center justify-between mb-3">
+            {STEP_LABELS.map((label, i) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => i < step && setStep(i)}
+                className={`text-sm font-semibold transition-colors ${
+                  i === step ? 'text-accent' : i < step ? 'text-primary cursor-pointer' : 'text-gray-400'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-gradient-to-r from-accent to-cyan-400 rounded-full"
+              animate={{ width: `${((step + 1) / 3) * 100}%` }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            />
+          </div>
         </div>
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8"
-          >
-            {/* Step 0: Package */}
-            {step === 0 && (
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Choose Your Package</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {PACKAGES.map((pkg) => (
-                    <button
-                      key={pkg.id}
-                      onClick={() => update({ package: pkg.id as PackageType })}
-                      className={`text-left p-5 rounded-xl border-2 transition-all ${
-                        data.package === pkg.id
-                          ? 'border-accent bg-accent/5'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <h3 className="font-bold text-gray-900">{pkg.name}</h3>
-                      <p className="text-2xl font-bold text-gray-900 my-2">R{pkg.price.toLocaleString()}</p>
-                      <p className="text-sm text-gray-500">{pkg.description}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
 
-            {/* Step 1: Domain */}
-            {step === 1 && (
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Domain Name</h2>
-                <p className="text-gray-500 mb-6">Search for and register a domain, or skip if you already have one.</p>
-                <div className="flex gap-3 mb-6">
-                  <input
-                    type="text"
-                    value={data.domainName}
-                    onChange={(e) => update({ domainName: e.target.value })}
-                    placeholder="mybusiness.co.za"
-                    className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
-                  />
-                  <button
-                    onClick={() => data.domainName && searchDomain(data.domainName)}
-                    disabled={domainLoading}
-                    className="bg-accent text-white px-6 py-3 rounded-lg font-medium hover:bg-accent-dark disabled:opacity-50"
-                  >
-                    {domainLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Check'}
-                  </button>
-                </div>
-                {domainResults.map((r) => (
-                  <div
-                    key={r.domain}
-                    onClick={() => r.available && update({ domainName: r.domain })}
-                    className={`flex items-center justify-between p-4 rounded-lg border mb-2 cursor-pointer ${
-                      r.available ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'
-                    } ${data.domainName === r.domain ? 'ring-2 ring-accent' : ''}`}
-                  >
-                    <span className="font-medium">{r.domain}</span>
-                    <span className={`text-sm font-medium ${r.available ? 'text-green-600' : 'text-red-500'}`}>
-                      {r.available ? 'Available' : 'Taken'}
-                    </span>
-                  </div>
-                ))}
-                <p className="text-sm text-gray-400 mt-4">Leave blank to skip domain registration for now.</p>
-              </div>
-            )}
+          {/* Form area — 3 columns */}
+          <div className="lg:col-span-3">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={step}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -16 }}
+                transition={{ duration: 0.3 }}
+                className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 sm:p-8"
+              >
+                {/* ─── Step 1: Your Business ─── */}
+                {step === 0 && (
+                  <div className="space-y-6">
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900">Tell us about your business</h2>
+                      <p className="text-gray-500 mt-1">Just the basics — we'll handle the rest.</p>
+                    </div>
 
-            {/* Step 2: Business Info */}
-            {step === 2 && (
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Business Information</h2>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Business Name *</label>
-                      <input type="text" required value={data.businessName} onChange={(e) => update({ businessName: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent" placeholder="Your Business Name" />
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Business Name *</label>
+                      <input type="text" value={data.businessName} onChange={(e) => update({ businessName: e.target.value })}
+                        className={input} placeholder="e.g. Cape Town Bakery" />
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Industry *</label>
-                      <select value={data.industry} onChange={(e) => update({ industry: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent bg-white">
-                        <option value="">Select industry</option>
-                        {INDUSTRIES.map((i) => <option key={i} value={i}>{i}</option>)}
-                      </select>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tagline</label>
-                    <input type="text" value={data.tagline} onChange={(e) => update({ tagline: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent" placeholder="A short catchy phrase for your business" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Business Description *</label>
-                    <textarea rows={3} value={data.description} onChange={(e) => update({ description: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent resize-none" placeholder="What does your business do?" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Goals for Your Website</label>
-                    <textarea rows={2} value={data.goals} onChange={(e) => update({ goals: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent resize-none" placeholder="What do you want your website to achieve?" />
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                      <input type="email" required value={data.contactEmail} onChange={(e) => update({ contactEmail: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent" placeholder="info@business.co.za" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                      <input type="tel" value={data.contactPhone} onChange={(e) => update({ contactPhone: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent" placeholder="+27 XX XXX XXXX" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                      <input type="text" value={data.contactAddress} onChange={(e) => update({ contactAddress: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent" placeholder="Business address" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
 
-            {/* Step 3: Brand */}
-            {step === 3 && (
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Brand & Design</h2>
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Logo</label>
-                      <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-gray-300 rounded-xl hover:border-accent cursor-pointer transition-colors">
-                        <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                        <span className="text-sm text-gray-500">
-                          {data.logoFile ? data.logoFile.name : 'Upload logo'}
-                        </span>
-                        <input type="file" accept="image/*" className="hidden" onChange={(e) => update({ logoFile: e.target.files?.[0] || null })} />
-                      </label>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Hero Image</label>
-                      <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-gray-300 rounded-xl hover:border-accent cursor-pointer transition-colors">
-                        <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                        <span className="text-sm text-gray-500">
-                          {data.heroFile ? data.heroFile.name : 'Upload hero image'}
-                        </span>
-                        <input type="file" accept="image/*" className="hidden" onChange={(e) => update({ heroFile: e.target.files?.[0] || null })} />
-                      </label>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Primary Color</label>
-                      <div className="flex items-center gap-3">
-                        <input type="color" value={data.primaryColor} onChange={(e) => update({ primaryColor: e.target.value })}
-                          className="w-12 h-12 rounded-lg border border-gray-200 cursor-pointer" />
-                        <input type="text" value={data.primaryColor} onChange={(e) => update({ primaryColor: e.target.value })}
-                          className="flex-1 px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent" />
+                      <label className="block text-sm font-medium text-gray-700 mb-2">What industry are you in? *</label>
+                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                        {INDUSTRY_TILES.map(({ value, label, icon: Icon }) => (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => update({ industry: value })}
+                            className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all text-center ${
+                              data.industry === value
+                                ? 'border-accent bg-accent/5 text-accent'
+                                : 'border-gray-100 hover:border-gray-300 text-gray-600'
+                            }`}
+                          >
+                            <Icon className="w-5 h-5" />
+                            <span className="text-xs font-medium leading-tight">{label}</span>
+                          </button>
+                        ))}
                       </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Secondary Color</label>
-                      <div className="flex items-center gap-3">
-                        <input type="color" value={data.secondaryColor} onChange={(e) => update({ secondaryColor: e.target.value })}
-                          className="w-12 h-12 rounded-lg border border-gray-200 cursor-pointer" />
-                        <input type="text" value={data.secondaryColor} onChange={(e) => update({ secondaryColor: e.target.value })}
-                          className="flex-1 px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent" />
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Email *</label>
+                        <input type="email" value={data.contactEmail} onChange={(e) => update({ contactEmail: e.target.value })}
+                          className={input} placeholder="info@mybusiness.co.za" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Phone <span className="text-gray-400">(optional)</span></label>
+                        <input type="tel" value={data.contactPhone} onChange={(e) => update({ contactPhone: e.target.value })}
+                          className={input} placeholder="+27 XX XXX XXXX" />
                       </div>
                     </div>
+
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Font</label>
-                      <select value={data.fontPreference} onChange={(e) => update({ fontPreference: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent bg-white">
-                        {FONT_OPTIONS.map((f) => <option key={f} value={f}>{f}</option>)}
-                      </select>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Describe your business in a sentence or two *</label>
+                      <textarea rows={3} value={data.description} onChange={(e) => update({ description: e.target.value })}
+                        className={`${input} resize-none`} placeholder="We bake artisan sourdough bread and pastries in the heart of Cape Town..." />
                     </div>
                   </div>
-                </div>
-              </div>
-            )}
+                )}
 
-            {/* Step 4: Content */}
-            {step === 4 && (
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Content & Social</h2>
-                <div className="space-y-5">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">About Your Business</label>
-                    <textarea rows={4} value={data.aboutText} onChange={(e) => update({ aboutText: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent resize-none"
-                      placeholder="Tell visitors about your business story, team, and what makes you unique..." />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Services / Products</label>
-                    <textarea rows={3} value={data.servicesText} onChange={(e) => update({ servicesText: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent resize-none"
-                      placeholder="List your main services or products..." />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">Social Media Links</label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {(['facebook', 'instagram', 'twitter', 'linkedin', 'tiktok', 'youtube'] as const).map((platform) => (
-                        <input
-                          key={platform}
-                          type="url"
-                          placeholder={`${platform.charAt(0).toUpperCase() + platform.slice(1)} URL`}
-                          value={(data.socialLinks as Record<string, string>)[platform] || ''}
-                          onChange={(e) => update({ socialLinks: { ...data.socialLinks, [platform]: e.target.value } })}
-                          className="px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-sm"
-                        />
+                {/* ─── Step 2: Your Style ─── */}
+                {step === 1 && (
+                  <div className="space-y-6">
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900">Choose your style</h2>
+                      <p className="text-gray-500 mt-1">Pick a package and set the look and feel.</p>
+                    </div>
+
+                    {/* Package cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {PACKAGES.map((pkg) => (
+                        <button
+                          key={pkg.id}
+                          type="button"
+                          onClick={() => update({ package: pkg.id as PackageType })}
+                          className={`relative text-left p-4 rounded-xl border-2 transition-all ${
+                            data.package === pkg.id
+                              ? 'border-accent bg-accent/5 shadow-md shadow-accent/10'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          {data.package === pkg.id && (
+                            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-2 -right-2">
+                              <CheckCircle2 className="w-6 h-6 text-accent fill-accent/20" />
+                            </motion.div>
+                          )}
+                          {pkg.highlighted && (
+                            <span className="inline-block bg-accent/10 text-accent text-[10px] font-bold px-2 py-0.5 rounded-full mb-2 uppercase tracking-wide">Popular</span>
+                          )}
+                          <h3 className="font-bold text-gray-900">{pkg.name}</h3>
+                          <p className="text-xl font-extrabold text-gray-900 mt-1">R{pkg.price.toLocaleString()}</p>
+                          <p className="text-xs text-gray-500 mt-1">{pkg.description}</p>
+                          <ul className="mt-3 space-y-1">
+                            {pkg.features.slice(0, 3).map((f) => (
+                              <li key={f} className="flex items-start gap-1.5 text-xs text-gray-600">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-accent shrink-0 mt-0.5" /> {f}
+                              </li>
+                            ))}
+                          </ul>
+                        </button>
                       ))}
                     </div>
-                  </div>
-                </div>
-              </div>
-            )}
 
-            {/* Step 5: Review */}
-            {step === 5 && (
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Review & Submit</h2>
-                <p className="text-gray-500 mb-6">We'll build a free preview of your site. You only pay once you're happy with it.</p>
-                <div className="space-y-4">
-                  {[
-                    ['Package', PACKAGES.find((p) => p.id === data.package)?.name],
-                    ['Price', `R${PACKAGES.find((p) => p.id === data.package)?.price.toLocaleString()}`],
-                    ['Domain', data.domainName || 'None selected'],
-                    ['Business', data.businessName],
-                    ['Industry', data.industry],
-                    ['Tagline', data.tagline || '—'],
-                    ['Email', data.contactEmail],
-                    ['Phone', data.contactPhone || '—'],
-                    ['Primary Color', data.primaryColor],
-                    ['Font', data.fontPreference],
-                    ['Logo', data.logoFile?.name || 'Not uploaded'],
-                  ].map(([label, value]) => (
-                    <div key={label} className="flex justify-between py-2 border-b border-gray-100">
-                      <span className="text-gray-500 text-sm">{label}</span>
-                      <span className="text-gray-900 text-sm font-medium">{value}</span>
+                    {/* Color palette presets */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Color palette</label>
+                      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                        {COLOR_PRESETS.map((preset) => (
+                          <button
+                            key={preset.name}
+                            type="button"
+                            onClick={() => update({ primaryColor: preset.primary, secondaryColor: preset.secondary })}
+                            className={`flex flex-col items-center gap-1.5 p-2 rounded-xl border-2 transition-all ${
+                              data.primaryColor === preset.primary && data.secondaryColor === preset.secondary
+                                ? 'border-accent shadow-sm'
+                                : 'border-gray-100 hover:border-gray-300'
+                            }`}
+                          >
+                            <div className="flex w-full h-8 rounded-lg overflow-hidden">
+                              <div className="flex-1" style={{ backgroundColor: preset.primary }} />
+                              <div className="flex-1" style={{ backgroundColor: preset.secondary }} />
+                            </div>
+                            <span className="text-[10px] font-medium text-gray-600">{preset.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-4 mt-3">
+                        <div className="flex items-center gap-2 flex-1">
+                          <input type="color" value={data.primaryColor} onChange={(e) => update({ primaryColor: e.target.value })}
+                            className="w-8 h-8 rounded-lg border border-gray-200 cursor-pointer shrink-0" />
+                          <input type="text" value={data.primaryColor} onChange={(e) => update({ primaryColor: e.target.value })}
+                            className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-accent/40" />
+                        </div>
+                        <div className="flex items-center gap-2 flex-1">
+                          <input type="color" value={data.secondaryColor} onChange={(e) => update({ secondaryColor: e.target.value })}
+                            className="w-8 h-8 rounded-lg border border-gray-200 cursor-pointer shrink-0" />
+                          <input type="text" value={data.secondaryColor} onChange={(e) => update({ secondaryColor: e.target.value })}
+                            className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-accent/40" />
+                        </div>
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
-            {/* Navigation */}
-            <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
-              <button
-                onClick={prev}
-                disabled={step === 0}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 disabled:opacity-30 transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" /> Back
-              </button>
-              {step < STEPS.length - 1 ? (
-                <button
-                  onClick={next}
-                  className="flex items-center gap-2 bg-accent text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-accent-dark transition-colors"
-                >
-                  Next <ArrowRight className="w-4 h-4" />
-                </button>
-              ) : (
-                <button
-                  onClick={handleSubmit}
-                  disabled={submitting}
-                  className="flex items-center gap-2 bg-accent text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-accent-dark transition-colors disabled:opacity-50"
-                >
-                  {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                  Submit
-                </button>
-              )}
+                    {/* Font */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Font style</label>
+                      <div className="grid grid-cols-4 gap-2">
+                        {FONT_OPTIONS.map((f) => (
+                          <button
+                            key={f}
+                            type="button"
+                            onClick={() => update({ fontPreference: f })}
+                            className={`py-2.5 rounded-xl border-2 text-sm transition-all ${
+                              data.fontPreference === f
+                                ? 'border-accent bg-accent/5 font-semibold text-accent'
+                                : 'border-gray-100 hover:border-gray-300 text-gray-700'
+                            }`}
+                            style={{ fontFamily: f }}
+                          >
+                            {f}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* File uploads */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <FileUploadBox
+                        label="Logo"
+                        hint="optional"
+                        preview={logoPreview}
+                        fileName={data.logoFile?.name}
+                        onFile={(f) => update({ logoFile: f })}
+                        onClear={() => update({ logoFile: null })}
+                      />
+                      <FileUploadBox
+                        label="Hero Image"
+                        hint="optional"
+                        preview={heroPreview}
+                        fileName={data.heroFile?.name}
+                        onFile={(f) => update({ heroFile: f })}
+                        onClear={() => update({ heroFile: null })}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* ─── Step 3: Final Details ─── */}
+                {step === 2 && (
+                  <div className="space-y-6">
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900">Final details</h2>
+                      <p className="text-gray-500 mt-1">Everything here is optional — add what you can, we'll fill in the gaps.</p>
+                    </div>
+
+                    {/* Domain search */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Domain name <span className="text-gray-400">(optional)</span></label>
+                      <div className="flex gap-2">
+                        <div className="relative flex-1">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                          <input
+                            type="text"
+                            value={data.domainName}
+                            onChange={(e) => update({ domainName: e.target.value })}
+                            onKeyDown={(e) => e.key === 'Enter' && data.domainName && searchDomain(data.domainName)}
+                            placeholder="mybusiness.co.za"
+                            className={`${input} pl-10`}
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => data.domainName && searchDomain(data.domainName)}
+                          disabled={domainLoading || !data.domainName}
+                          className="bg-accent text-white px-5 rounded-xl font-medium hover:bg-accent-dark disabled:opacity-40 transition-colors shrink-0"
+                        >
+                          {domainLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Check'}
+                        </button>
+                      </div>
+                      <AnimatePresence>
+                        {domainResults.length > 0 && (
+                          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mt-2 space-y-1.5 overflow-hidden">
+                            {domainResults.map((r) => (
+                              <button
+                                key={r.domain}
+                                type="button"
+                                onClick={() => r.available && update({ domainName: r.domain })}
+                                disabled={!r.available}
+                                className={`flex items-center justify-between w-full p-3 rounded-xl border text-sm transition-all ${
+                                  r.available
+                                    ? data.domainName === r.domain
+                                      ? 'border-accent bg-accent/5'
+                                      : 'border-green-200 bg-green-50 hover:border-green-300'
+                                    : 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
+                                }`}
+                              >
+                                <span className="font-medium">{r.domain}</span>
+                                <span className={r.available ? 'text-green-600 font-medium' : 'text-red-500'}>
+                                  {r.available ? 'Available' : 'Taken'}
+                                </span>
+                              </button>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Tagline <span className="text-gray-400">(optional)</span></label>
+                      <input type="text" value={data.tagline} onChange={(e) => update({ tagline: e.target.value })}
+                        className={input} placeholder="A short catchy phrase for your business" />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Your services or products <span className="text-gray-400">(optional)</span></label>
+                      <textarea rows={3} value={data.servicesText} onChange={(e) => update({ servicesText: e.target.value })}
+                        className={`${input} resize-none`} placeholder="List what you offer — we'll feature them on your site..." />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Social media <span className="text-gray-400">(optional)</span></label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {(['facebook', 'instagram', 'linkedin', 'tiktok'] as const).map((platform) => (
+                          <input
+                            key={platform}
+                            type="url"
+                            placeholder={`${platform.charAt(0).toUpperCase() + platform.slice(1)} URL`}
+                            value={(data.socialLinks as Record<string, string>)[platform] || ''}
+                            onChange={(e) => update({ socialLinks: { ...data.socialLinks, [platform]: e.target.value } })}
+                            className={`${input} text-sm`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Submission note */}
+                    <div className="bg-accent/5 border border-accent/20 rounded-xl p-4 text-sm text-gray-700">
+                      <strong className="text-accent">No payment required.</strong> We'll build a free preview of your site. You only pay once you're happy with it.
+                    </div>
+                  </div>
+                )}
+
+                {/* Navigation */}
+                <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={prev}
+                    disabled={step === 0}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100 disabled:opacity-0 transition-all"
+                  >
+                    <ArrowLeft className="w-4 h-4" /> Back
+                  </button>
+                  {step < 2 ? (
+                    <button
+                      type="button"
+                      onClick={next}
+                      disabled={!canProceed}
+                      className="flex items-center gap-2 bg-accent text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-accent-dark disabled:opacity-40 transition-all"
+                    >
+                      Continue <ArrowRight className="w-4 h-4" />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleSubmit}
+                      disabled={submitting}
+                      className="flex items-center gap-2 bg-accent text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-accent-dark disabled:opacity-50 transition-all"
+                    >
+                      {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                      Build My Preview
+                    </button>
+                  )}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Live preview — 2 columns */}
+          <div className="lg:col-span-2 hidden lg:block">
+            <div className="sticky top-24">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Live Preview</p>
+              <LivePreview data={data} logoPreview={logoPreview} heroPreview={heroPreview} />
             </div>
-          </motion.div>
-        </AnimatePresence>
+          </div>
+        </div>
       </div>
     </div>
+  )
+}
+
+
+function FileUploadBox({ label, hint, preview, fileName, onFile, onClear }: {
+  label: string; hint?: string; preview: string | null; fileName?: string
+  onFile: (f: File) => void; onClear: () => void
+}) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+        {label} {hint && <span className="text-gray-400">({hint})</span>}
+      </label>
+      {preview ? (
+        <div className="relative h-32 rounded-xl border border-gray-200 overflow-hidden group">
+          <img src={preview} alt={label} className="w-full h-full object-cover" />
+          <button type="button" onClick={onClear}
+            className="absolute top-2 right-2 w-7 h-7 bg-black/60 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <X className="w-4 h-4" />
+          </button>
+          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/50 to-transparent p-2">
+            <span className="text-xs text-white truncate block">{fileName}</span>
+          </div>
+        </div>
+      ) : (
+        <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-gray-200 rounded-xl hover:border-accent hover:bg-accent/5 cursor-pointer transition-all">
+          <div className="flex flex-col items-center gap-1.5 text-gray-400">
+            {label === 'Logo' ? <Upload className="w-6 h-6" /> : <ImageIcon className="w-6 h-6" />}
+            <span className="text-xs font-medium">Click to upload</span>
+          </div>
+          <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])} />
+        </label>
+      )}
+    </div>
+  )
+}
+
+
+function LivePreview({ data, logoPreview, heroPreview }: {
+  data: OnboardingData; logoPreview: string | null; heroPreview: string | null
+}) {
+  const name = data.businessName || 'Your Business'
+  const tagline = data.tagline || data.description?.slice(0, 60) || 'Your tagline here'
+
+  return (
+    <motion.div
+      layout
+      className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden"
+    >
+      {/* Browser chrome */}
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-100 bg-gray-50">
+        <div className="flex gap-1">
+          <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
+          <div className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
+          <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
+        </div>
+        <div className="flex-1 mx-2">
+          <div className="bg-white border border-gray-200 rounded-md px-3 py-1 text-[10px] text-gray-400 flex items-center gap-1.5 truncate">
+            <Globe className="w-2.5 h-2.5 shrink-0" />
+            {data.domainName || 'yourbusiness.co.za'}
+          </div>
+        </div>
+      </div>
+
+      {/* Nav */}
+      <div className="px-4 py-2.5 flex items-center justify-between" style={{ backgroundColor: data.primaryColor }}>
+        <div className="flex items-center gap-2">
+          {logoPreview ? (
+            <img src={logoPreview} alt="Logo" className="w-5 h-5 rounded object-cover" />
+          ) : (
+            <div className="w-5 h-5 rounded" style={{ backgroundColor: data.secondaryColor, opacity: 0.6 }} />
+          )}
+          <span className="text-white text-[11px] font-bold truncate max-w-[100px]" style={{ fontFamily: data.fontPreference }}>
+            {name}
+          </span>
+        </div>
+        <div className="flex gap-3">
+          {['Home', 'About', 'Contact'].map((l) => (
+            <span key={l} className="text-white/60 text-[9px]">{l}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* Hero */}
+      <div
+        className="relative px-4 py-8 flex flex-col items-center text-center"
+        style={{
+          background: heroPreview
+            ? `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${heroPreview}) center/cover`
+            : `linear-gradient(135deg, ${data.primaryColor}, ${data.secondaryColor})`,
+        }}
+      >
+        <motion.h3
+          key={name}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-white text-sm font-bold leading-tight"
+          style={{ fontFamily: data.fontPreference }}
+        >
+          {name}
+        </motion.h3>
+        <p className="text-white/70 text-[10px] mt-1 max-w-[160px] leading-snug truncate">
+          {tagline}
+        </p>
+        <div className="mt-3 px-3 py-1 rounded text-[9px] font-bold text-white" style={{ backgroundColor: data.secondaryColor }}>
+          Get Started
+        </div>
+      </div>
+
+      {/* Content blocks */}
+      <div className="p-4 space-y-3">
+        <div className="flex gap-2">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex-1 rounded-lg p-2 bg-gray-50 border border-gray-100">
+              <div className="w-full h-1.5 rounded-full mb-1.5" style={{ backgroundColor: data.secondaryColor, opacity: 0.3 }} />
+              <div className="w-3/4 h-1 bg-gray-200 rounded-full" />
+              <div className="w-1/2 h-1 bg-gray-200 rounded-full mt-1" />
+            </div>
+          ))}
+        </div>
+        <div className="h-1.5 w-1/3 rounded-full mx-auto" style={{ backgroundColor: data.primaryColor, opacity: 0.15 }} />
+        <div className="space-y-1">
+          <div className="h-1 bg-gray-100 rounded-full w-full" />
+          <div className="h-1 bg-gray-100 rounded-full w-5/6" />
+          <div className="h-1 bg-gray-100 rounded-full w-4/6" />
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="px-4 py-2 text-center border-t border-gray-100" style={{ backgroundColor: data.primaryColor }}>
+        <span className="text-white/40 text-[8px]">&copy; {new Date().getFullYear()} {name}</span>
+      </div>
+    </motion.div>
   )
 }
