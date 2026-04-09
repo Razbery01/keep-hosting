@@ -9,14 +9,7 @@ import {
 import { toast } from 'sonner'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
-
-interface BuildEvent {
-  id: string
-  event_type: string
-  status: string
-  message: string
-  created_at: string
-}
+import { useBuildStatus } from '../hooks/useBuildStatus'
 
 interface Order {
   id: string
@@ -58,23 +51,8 @@ function BuildProgress({ buildStatus, siteId }: { buildStatus: string; siteId: s
   const activeStep = currentIdx >= 0 ? BUILD_STEPS[currentIdx] : BUILD_STEPS[0]
   const pct = activeStep.pct
   const isFailed = buildStatus === 'failed'
-  const [logs, setLogs] = useState<BuildEvent[]>([])
+  const { events: logs } = useBuildStatus(siteId)
   const [showLogs, setShowLogs] = useState(true)
-
-  useEffect(() => {
-    if (!siteId) return
-    const fetchLogs = async () => {
-      const { data } = await supabase
-        .from('build_events')
-        .select('*')
-        .eq('site_id', siteId)
-        .order('created_at', { ascending: true })
-      if (data) setLogs(data as BuildEvent[])
-    }
-    fetchLogs()
-    const interval = setInterval(fetchLogs, 3000)
-    return () => clearInterval(interval)
-  }, [siteId])
 
   // Auto-scroll log container
   useEffect(() => {
