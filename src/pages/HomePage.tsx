@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import {
   ArrowRight, Zap, Shield, Globe, Palette, Server, Search, Target,
   ClipboardCheck, Mail, Code, CheckCircle2,
-  Star, ChevronDown, X as XIcon,
+  Star, ChevronDown, X as XIcon, Quote,
   Utensils, ShoppingBag, Briefcase, Heart, HardHat, Scissors,
   Users, BadgeCheck, Clock, CreditCard, Eye, Rocket
 } from 'lucide-react'
@@ -149,7 +149,7 @@ export default function HomePage() {
                 </div>
                 <div>
                   <div className="flex gap-0.5 mb-0.5">
-                    {[1,2,3,4,5].map((s) => <Star key={s} className="w-3.5 h-3.5 text-gray-500 fill-gray-400" />)}
+                    {[1,2,3,4,5].map((s) => <Star key={s} className="w-3.5 h-3.5 text-gray-500" fill="none" strokeWidth={2} />)}
                   </div>
                   <span className="text-xs text-gray-500">Trusted by <strong className="text-gray-400">50+ businesses</strong> across SA</span>
                 </div>
@@ -514,7 +514,7 @@ export default function HomePage() {
                     </div>
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                       <span className="bg-white/15 text-white text-xs font-bold px-5 py-2 rounded-full border border-white/20 flex items-center gap-1.5 whitespace-nowrap">
-                        <Star className="w-3.5 h-3.5 fill-current" /> Most Popular
+                        <Star className="w-3.5 h-3.5" fill="none" strokeWidth={2} aria-hidden /> Most Popular
                       </span>
                     </div>
                   </>
@@ -560,13 +560,13 @@ export default function HomePage() {
             {TESTIMONIALS.map((t, i) => (
               <motion.div key={t.name} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
                 className="bg-white rounded-3xl p-8 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 border border-gray-100 hover:-translate-y-1 relative">
-                <div className="absolute top-6 right-6 text-6xl font-serif text-gray-100 leading-none select-none">"</div>
+                <Quote className="absolute top-6 right-6 w-10 h-10 text-gray-200" strokeWidth={1.25} aria-hidden />
                 <div className="flex gap-1 mb-5">
                   {Array.from({ length: t.rating }).map((_, j) => (
-                    <Star key={j} className="w-5 h-5 text-gray-400 fill-gray-300" />
+                    <Star key={j} className="w-5 h-5 text-gray-400" fill="none" strokeWidth={1.75} />
                   ))}
                 </div>
-                <p className="text-gray-600 leading-relaxed mb-8 text-[15px] relative">"{t.text}"</p>
+                <p className="text-gray-600 leading-relaxed mb-8 text-[15px] relative">{t.text}</p>
                 <div className="flex items-center gap-3 pt-5 border-t border-gray-100">
                   <div className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-sm"
                     style={{ backgroundColor: ['#1E3A5F', '#2A4F7F', '#3d5a73'][i] }}>

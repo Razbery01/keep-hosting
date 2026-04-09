@@ -330,7 +330,7 @@ export default function OnboardingPage() {
                         >
                           {data.package === pkg.id && (
                             <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-2 -right-2">
-                              <CheckCircle2 className="w-6 h-6 text-accent fill-accent/20" />
+                              <CheckCircle2 className="w-6 h-6 text-accent" />
                             </motion.div>
                           )}
                           {pkg.highlighted && (

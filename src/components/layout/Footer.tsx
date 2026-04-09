@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
-import { Globe, Mail, Phone, MapPin, ArrowUpRight } from 'lucide-react'
+import { Globe, Mail, Phone, MapPin, ArrowUpRight, Heart } from 'lucide-react'
 
 export default function Footer() {
   return (
     <footer className="bg-dark text-gray-400 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_rgba(0,212,255,0.05),transparent_60%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_rgba(95,115,137,0.08),transparent_60%)]" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           <div>
@@ -19,14 +19,49 @@ export default function Footer() {
             </p>
             <div className="flex gap-3">
               {[
-                { label: 'Facebook', href: '#', path: 'M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z' },
-                { label: 'Instagram', href: '#', path: 'M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 01-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 017.8 2m-.2 2A3.6 3.6 0 004 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 003.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 110 2.5 1.25 1.25 0 010-2.5M12 7a5 5 0 110 10 5 5 0 010-10m0 2a3 3 0 100 6 3 3 0 000-6z' },
-                { label: 'LinkedIn', href: '#', path: 'M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2zM4 2a2 2 0 110 4 2 2 0 010-4z' },
-                { label: 'X', href: '#', path: 'M4 4l6.5 8L4 20h2l5.5-6.8L16 20h4l-6.8-8.4L19.5 4h-2l-5 6.2L8 4H4z' },
+                {
+                  label: 'Facebook',
+                  href: '#',
+                  svg: (
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" fill="none" />
+                    </svg>
+                  ),
+                },
+                {
+                  label: 'Instagram',
+                  href: '#',
+                  svg: (
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" />
+                      <circle cx="12" cy="12" r="4" fill="none" />
+                    </svg>
+                  ),
+                },
+                {
+                  label: 'LinkedIn',
+                  href: '#',
+                  svg: (
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z" fill="none" />
+                      <rect x="2" y="9" width="4" height="12" fill="none" />
+                      <circle cx="4" cy="4" r="2" fill="none" />
+                    </svg>
+                  ),
+                },
+                {
+                  label: 'X',
+                  href: '#',
+                  svg: (
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden>
+                      <path d="M4 4l16 16M20 4L4 20" />
+                    </svg>
+                  ),
+                },
               ].map((social) => (
                 <a key={social.label} href={social.href} aria-label={social.label}
                   className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-gray-400 hover:bg-accent hover:border-accent hover:text-white transition-all duration-300">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d={social.path} /></svg>
+                  {social.svg}
                 </a>
               ))}
             </div>
@@ -91,8 +126,8 @@ export default function Footer() {
 
         <div className="border-t border-white/5 mt-16 pt-8 flex flex-col md:flex-row items-center justify-between text-sm text-gray-600">
           <span>&copy; {new Date().getFullYear()} Keep Hosting. All rights reserved.</span>
-          <span className="mt-2 md:mt-0 flex items-center gap-1">
-            Made with <span className="text-accent">&hearts;</span> in South Africa
+          <span className="mt-2 md:mt-0 inline-flex items-center gap-1.5">
+            Made with <Heart className="w-3.5 h-3.5 text-accent shrink-0" strokeWidth={2} aria-hidden /> in South Africa
           </span>
         </div>
       </div>

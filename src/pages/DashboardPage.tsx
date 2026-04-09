@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   Globe, ExternalLink, Clock, CheckCircle2, Loader2, AlertCircle,
-  Plus, CreditCard, Eye, Sparkles, Code2, GitBranch, Rocket
+  Plus, CreditCard, Eye, Sparkles, Code2, GitBranch, Rocket,
+  Check, X, AlertTriangle, ArrowRight,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { supabase } from '../lib/supabase'
@@ -81,10 +82,13 @@ function BuildProgress({ buildStatus, siteId }: { buildStatus: string; siteId: s
     if (el) el.scrollTop = el.scrollHeight
   }, [logs, siteId])
 
-  const statusIcon = (s: string) =>
-    s === 'success' ? '✓' : s === 'error' ? '✕' : s === 'warning' ? '⚠' : '→'
-  const statusColor = (s: string) =>
-    s === 'success' ? 'text-emerald-600' : s === 'error' ? 'text-red-500' : s === 'warning' ? 'text-amber-700' : 'text-slate-600'
+  function LogStatusIcon({ status }: { status: string }) {
+    const cls = 'w-3 h-3'
+    if (status === 'success') return <Check className={`${cls} text-emerald-500`} strokeWidth={2.5} aria-hidden />
+    if (status === 'error') return <X className={`${cls} text-red-400`} strokeWidth={2.5} aria-hidden />
+    if (status === 'warning') return <AlertTriangle className={`${cls} text-amber-500`} strokeWidth={2.5} aria-hidden />
+    return <ArrowRight className={`${cls} text-slate-500`} strokeWidth={2.5} aria-hidden />
+  }
 
   return (
     <div className="mt-5 bg-white border border-gray-200 rounded-xl overflow-hidden">
@@ -170,7 +174,9 @@ function BuildProgress({ buildStatus, siteId }: { buildStatus: string; siteId: s
                     className="flex gap-2 py-0.5"
                   >
                     <span className="text-gray-600 shrink-0">{time}</span>
-                    <span className={`shrink-0 ${statusColor(log.status)}`}>{statusIcon(log.status)}</span>
+                    <span className="shrink-0 flex items-center justify-center w-4" aria-hidden>
+                      <LogStatusIcon status={log.status} />
+                    </span>
                     <span className={log.status === 'error' ? 'text-red-400' : 'text-gray-300'}>{log.message}</span>
                   </motion.div>
                 )

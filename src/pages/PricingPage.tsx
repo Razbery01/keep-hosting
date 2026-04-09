@@ -51,7 +51,7 @@ export default function PricingPage() {
                     </div>
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                       <span className="bg-accent text-white text-xs font-bold px-5 py-2 rounded-full shadow-lg shadow-accent/30 flex items-center gap-1.5 whitespace-nowrap">
-                        <Star className="w-3.5 h-3.5 fill-current" /> Most Popular
+                        <Star className="w-3.5 h-3.5" fill="none" strokeWidth={2} aria-hidden /> Most Popular
                       </span>
                     </div>
                   </>
