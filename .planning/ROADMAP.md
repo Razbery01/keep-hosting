@@ -25,7 +25,12 @@ keep-hosting is a brownfield brownfield project that needs six phases to go from
   3. The Supabase anon key and URL are read exclusively from environment variables — no plaintext fallback exists anywhere in source
   4. The `subscriptions` table exists with all columns required for billing lifecycle (status, yoco_token_id, next_charge_at, grace_until, suspended_at); the `build_events` table records pipeline state transitions; the `generation_cost` column captures Claude token counts per build
   5. RLS policies on every table containing customer PII pass an integration test using a non-admin user (non-admin reads only their own rows, admin reads all)
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 01-01-PLAN.md — Wave 0 test infrastructure: install Vitest, wire vite.config.ts test block, create stub test files matching 01-VALIDATION.md paths
+- [ ] 01-02-PLAN.md — Migration 003: subscriptions table + RLS, generated_files/generation_cost, POPIA consent columns, suspended status, yoco_payment_id; update src/types/database.ts
+- [ ] 01-03-PLAN.md — Security code fixes: remove plaintext Supabase credential (SEC-04), RequireAdmin route guard (SEC-01/02), upload validator + UUID path (SEC-03), prompt sanitizer (SEC-06), HTML scanner (SEC-07) wired into build-site Edge Function
+- [ ] 01-04-PLAN.md — RLS integration test (SEC-05): dedicated test Supabase project, real non-admin + admin integration tests covering profiles, orders, client_sites, file_uploads, subscriptions
 
 ### Phase 2: Generation Hardening
 **Goal**: Claude site generation is reliable, server-side-only, cost-controlled, and produces mobile-responsive output — and the onboarding race condition that breaks submission is fixed
