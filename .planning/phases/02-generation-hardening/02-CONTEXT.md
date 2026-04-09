@@ -31,7 +31,7 @@ Make the Claude-powered site generation pipeline reliable, server-side-only, cos
   - `deliver_site_files`: input is `{ files: Array<{ path: string, content: string }> }` where `path` matches `^(index\.html|pages/[a-z0-9-]+\.html|assets/[a-z0-9./-]+)$`
   - `deliver_search_queries`: input is `{ queries: Array<{ query: string, placement: string, alt: string }> }`
 - Keep `messages.stream()` + `stream.finalMessage()` — streaming IS compatible with `tool_choice`. Live progress logging still works; only the parse step changes.
-- Current `thinking: { type: 'adaptive' }` → change to `thinking: { type: 'enabled', budget_tokens: 8000 }` for predictable cost (research STACK.md recommendation)
+- **Remove `thinking` entirely.** The Anthropic API rejects `thinking: { enabled }` combined with forced `tool_choice: { type: 'tool' }` (HTTP 400: "Thinking may not be enabled when tool_choice forces tool use"). Delete the current `thinking: { type: 'adaptive' }` setting. GEN-01 (structured output) is the locked requirement; `thinking` was a discretionary cost-control add-on that cannot coexist with it. Resolved in favor of `tool_choice` on 2026-04-09 after research surfaced the conflict.
 
 ### Token budget (GEN-03 reconciliation)
 
