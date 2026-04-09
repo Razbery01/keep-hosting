@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-security-data-foundation 01-03-PLAN.md (security code fixes)
-last_updated: "2026-04-09T20:38:55.512Z"
+stopped_at: Completed 01-security-data-foundation 01-02-PLAN.md (schema migration + TypeScript types)
+last_updated: "2026-04-09T21:16:14.648Z"
 last_activity: 2026-04-09 — Completed 01-01 test infrastructure (vitest harness + 7 stub test files)
 progress:
   total_phases: 6
@@ -51,6 +51,7 @@ Progress: [███░░░░░░░] 25%
 
 *Updated after each plan completion*
 | Phase 01-security-data-foundation P03 | 7min | 5 tasks | 14 files |
+| Phase 01-security-data-foundation P02 | 10min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,8 @@ Recent decisions affecting current work:
 - [Phase 01-security-data-foundation]: SEC-02 is structural: existing is_admin() RLS is the trust boundary; RequireAdmin guard is the UI layer
 - [Phase 01-security-data-foundation]: sanitize.ts and html-scanner.ts use no Deno.* imports — pure TS testable in Node Vitest AND importable from Deno Edge Functions
 - [Phase 01-security-data-foundation]: scanGeneratedHtml is intentionally strict: <script> tag detection fires even for allowlisted hosts — conservative by design
+- [Phase 01-security-data-foundation]: Storage bucket MIME config deliberately excluded from migration 003 — handled via Supabase Dashboard (research marked SQL bucket config LOW confidence for managed projects)
+- [Phase 01-security-data-foundation]: Migration 003 applied via supabase db push from freshly linked local project (ref wozonryvuvbxxfdykzne); local .env created with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 
 ### Pending Todos
 
@@ -81,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T20:38:55.510Z
-Stopped at: Completed 01-security-data-foundation 01-03-PLAN.md (security code fixes)
+Last session: 2026-04-09T21:16:14.646Z
+Stopped at: Completed 01-security-data-foundation 01-02-PLAN.md (schema migration + TypeScript types)
 Resume file: None

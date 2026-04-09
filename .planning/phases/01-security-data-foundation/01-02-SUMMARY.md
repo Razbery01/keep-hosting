@@ -12,6 +12,7 @@ requires:
 provides:
   - supabase/migrations/003_security_data_phase1.sql — idempotent migration adding subscriptions table, POPIA consent columns, yoco_payment_id, generated_files, generation_cost, and suspended order status
   - src/types/database.ts — extended with Subscription interface and all new column types
+  - client-assets storage bucket — MIME restricted to jpeg/png/webp, max 5 MB
 
 affects:
   - 01-03 (file upload security — references client-assets bucket config verified in Task 3)
@@ -41,6 +42,7 @@ key-decisions:
   - "generation_cost placed on client_sites (not orders) — a single order can have multiple build attempts; cost belongs on the build record"
   - "Subscription status uses TEXT + CHECK not ENUM — matches existing orders.status pattern in the codebase"
   - "Subscriptions RLS admin policies use public.is_admin() — never inline subselects on profiles (avoids infinite recursion)"
+  - "Migration applied via supabase db push from a freshly linked local project (ref wozonryvuvbxxfdykzne) after creating local .env with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY"
 
 patterns-established:
   - "RLS admin helper: All admin policies must call public.is_admin() from migration 002, never subselect on profiles"
@@ -49,20 +51,20 @@ patterns-established:
 requirements-completed: [DATA-01, DATA-02, DATA-03, DATA-04, DATA-05, DATA-06]
 
 # Metrics
-duration: 2min
+duration: 10min
 completed: 2026-04-09
 ---
 
 # Phase 1 Plan 02: Schema Migration & TypeScript Types Summary
 
-**Single idempotent SQL migration (003) adding subscriptions table with RLS, POPIA consent columns, yoco_payment_id, generated_files/generation_cost JSONB, and suspended order status — with matching TypeScript types**
+**Single idempotent SQL migration (003) adding subscriptions table with RLS, POPIA consent columns, yoco_payment_id, generated_files/generation_cost JSONB, and suspended order status — applied to Supabase (ref wozonryvuvbxxfdykzne) and verified via Dashboard SQL editor; client-assets bucket hardened to jpeg/png/webp + 5 MB limit**
 
 ## Performance
 
-- **Duration:** ~2 min
+- **Duration:** ~10 min (including human-verify checkpoint)
 - **Started:** 2026-04-09T20:30:34Z
-- **Completed:** 2026-04-09T20:32:09Z
-- **Tasks completed:** 2 of 3 (Task 3 is a human-verify checkpoint — awaiting user action)
+- **Completed:** 2026-04-09
+- **Tasks completed:** 3 of 3
 - **Files modified:** 3
 
 ## Accomplishments
@@ -72,12 +74,36 @@ completed: 2026-04-09
 - `src/types/database.ts` extended with `Subscription` interface and all new columns on existing tables
 - `tsc -b` passes with zero errors after type additions
 - `OrderStatus` in `index.ts` now includes `'suspended'` and `'payment_pending'`
+- Migration applied to linked Supabase project via `supabase db push` with local .env created
+- Schema verified: all 6 DATA-xx column sets confirmed present in `information_schema.columns`
+- `client-assets` bucket configured: MIME restricted to jpeg/png/webp, max file size 5 MB (5242880 bytes)
 
 ## Task Commits
 
 1. **Task 1: Write migration 003 SQL file** - `5299e3e` (feat)
 2. **Task 2: Update TypeScript types** - `23129e2` (feat)
-3. **Task 3: Apply migration + verify** - PENDING (checkpoint:human-verify)
+3. **Task 3: Apply migration + verify** - No code commit (human-verify checkpoint; verification outcomes documented below)
+
+**Plan metadata:** See final docs commit (docs(01-02): complete plan after schema verification and bucket config)
+
+## Schema Verification Results (Task 3)
+
+Human verified via Supabase Dashboard SQL Editor against project ref `wozonryvuvbxxfdykzne`:
+
+| Query | Expected | Actual |
+|-------|----------|--------|
+| `subscriptions` column count | 12 | 12 (subscription_cols = 12) |
+| `client_sites` new columns | 2 | 2 (generated_files + generation_cost) |
+| `profiles` new columns | 2 | 2 (popia_consent_at + popia_consent_ip) |
+| `orders` new column | 1 | 1 (yoco_payment_id) |
+
+All six DATA-xx schema changes confirmed present.
+
+## Storage Bucket Configuration (Task 3)
+
+`client-assets` bucket configured via Supabase Dashboard:
+- Allowed MIME types: `image/jpeg`, `image/png`, `image/webp`
+- Max file size: 5 MB (5242880 bytes)
 
 ## Files Created/Modified
 
@@ -91,6 +117,7 @@ completed: 2026-04-09
 - `generation_cost` placed on `client_sites`, not `orders`. A single order may trigger multiple build attempts; the cost belongs on the build record, not the order.
 - Subscription status as `TEXT + CHECK` (not ENUM). Matches the existing `orders.status` pattern — easier to extend without `ALTER TYPE`.
 - Admin RLS on subscriptions calls `public.is_admin()`. Never inline `SELECT role FROM profiles WHERE id = auth.uid()` — that would trigger RLS on profiles recursively.
+- Migration applied via `supabase db push` after freshly linking the local project (ref wozonryvuvbxxfdykzne). A local `.env` was created with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` matching previously-hardcoded credentials.
 
 ## Deviations from Plan
 
@@ -100,71 +127,24 @@ None — plan executed exactly as written. The SQL in the plan's `<action>` bloc
 
 None.
 
-## User Setup Required (Task 3 Checkpoint)
+## User Setup Required
 
-**Schema application and bucket configuration require manual steps.**
+The migration has been applied. All external configuration is complete:
+- Supabase project linked and `.env` created with correct credentials
+- Migration 003 applied via `supabase db push`
+- `client-assets` bucket MIME types and size limit configured in Dashboard
 
-### Step 1 — Apply migration
-
-```bash
-supabase db push
-```
-
-If "No migrations to push" appears:
-```bash
-supabase migration list
-supabase db push --include-all
-```
-
-### Step 2 — Verify schema via Supabase SQL Editor
-
-```sql
--- Confirm subscriptions columns
-SELECT column_name, data_type FROM information_schema.columns
-WHERE table_schema = 'public' AND table_name = 'subscriptions'
-ORDER BY ordinal_position;
-
--- Confirm new columns on existing tables
-SELECT column_name FROM information_schema.columns
-WHERE table_schema = 'public' AND table_name = 'client_sites'
-  AND column_name IN ('generated_files', 'generation_cost');
-
-SELECT column_name FROM information_schema.columns
-WHERE table_schema = 'public' AND table_name = 'profiles'
-  AND column_name IN ('popia_consent_at', 'popia_consent_ip');
-
-SELECT column_name FROM information_schema.columns
-WHERE table_schema = 'public' AND table_name = 'orders'
-  AND column_name = 'yoco_payment_id';
-
--- Confirm suspended status accepted
-BEGIN;
-INSERT INTO public.orders (user_id, status, plan)
-  SELECT id, 'suspended', 'professional' FROM public.profiles LIMIT 1;
-ROLLBACK;
-
--- Confirm RLS policies
-SELECT policyname FROM pg_policies
-WHERE schemaname = 'public' AND tablename = 'subscriptions';
-```
-
-### Step 3 — Configure Storage bucket via Supabase Dashboard
-
-Storage → `client-assets` → Edit bucket:
-- Allowed MIME types: `image/jpeg, image/png, image/webp`
-- Max file size: `5 MB` (5242880 bytes)
-
-### Step 4 — Report back
-
-Paste query output in chat and confirm bucket config to resume.
+No further setup required for Phase 1 Plan 02.
 
 ## Next Phase Readiness
 
-- Migration 003 SQL is committed and ready to push
-- TypeScript types are complete and passing
-- Task 3 (human-verify checkpoint) must complete before this plan is fully done
-- Once schema is applied: Phase 2 (generation) can write to `generation_cost` and `generated_files`; Phase 4 (payment) can insert subscription rows
+- Migration 003 is applied and verified on the production-linked Supabase project (ref wozonryvuvbxxfdykzne)
+- All 6 DATA-xx requirements confirmed via Dashboard query output
+- TypeScript types are complete and `tsc -b` passes
+- Phase 2 (generation) can write to `generation_cost` and `generated_files` columns
+- Phase 4 (payment) can insert subscription rows and use `yoco_payment_id` on orders
+- Phase 5 (domain/lifecycle) can read `subscription.status` for suspension logic
 
 ---
 *Phase: 01-security-data-foundation*
-*Completed: 2026-04-09 (Tasks 1-2; Task 3 awaiting checkpoint)*
+*Completed: 2026-04-09*

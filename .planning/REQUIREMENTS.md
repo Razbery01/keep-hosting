@@ -19,12 +19,12 @@ Requirements for the first real, paid, end-to-end launch milestone. Each maps to
 
 ### Data Model
 
-- [ ] **DATA-01**: `subscriptions` table added (user_id, plan, status, yoco_token_id, next_charge_at, grace_until, suspended_at)
-- [ ] **DATA-02**: `client_sites.generated_files` JSONB column added; generation pipeline persists files to Supabase Storage before any deploy attempt
-- [ ] **DATA-03**: `profiles.popia_consent_at` and `profiles.popia_consent_ip` columns added; recorded at signup and at payment
-- [ ] **DATA-04**: `orders.status` enum extended to include `suspended`; state-machine transitions documented
-- [ ] **DATA-05**: `yoco_payment_id` column on `orders`; `build_events` table for pipeline observability
-- [ ] **DATA-06**: `generation_cost` column captures Claude input/output tokens per build (cost monitoring from day one)
+- [x] **DATA-01**: `subscriptions` table added (user_id, plan, status, yoco_token_id, next_charge_at, grace_until, suspended_at)
+- [x] **DATA-02**: `client_sites.generated_files` JSONB column added; generation pipeline persists files to Supabase Storage before any deploy attempt
+- [x] **DATA-03**: `profiles.popia_consent_at` and `profiles.popia_consent_ip` columns added; recorded at signup and at payment
+- [x] **DATA-04**: `orders.status` enum extended to include `suspended`; state-machine transitions documented
+- [x] **DATA-05**: `yoco_payment_id` column on `orders`; `build_events` table for pipeline observability
+- [x] **DATA-06**: `generation_cost` column captures Claude input/output tokens per build (cost monitoring from day one)
 
 ### Generation Pipeline
 
@@ -161,12 +161,12 @@ Populated during roadmap creation. Each requirement maps to exactly one phase.
 | SEC-05 | Phase 1 | Pending |
 | SEC-06 | Phase 1 | Complete |
 | SEC-07 | Phase 1 | Complete |
-| DATA-01 | Phase 1 | Pending |
-| DATA-02 | Phase 1 | Pending |
-| DATA-03 | Phase 1 | Pending |
-| DATA-04 | Phase 1 | Pending |
-| DATA-05 | Phase 1 | Pending |
-| DATA-06 | Phase 1 | Pending |
+| DATA-01 | Phase 1 | Complete |
+| DATA-02 | Phase 1 | Complete |
+| DATA-03 | Phase 1 | Complete |
+| DATA-04 | Phase 1 | Complete |
+| DATA-05 | Phase 1 | Complete |
+| DATA-06 | Phase 1 | Complete |
 | GEN-01 | Phase 2 | Pending |
 | GEN-02 | Phase 2 | Pending |
 | GEN-03 | Phase 2 | Pending |
