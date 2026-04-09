@@ -115,7 +115,7 @@ export default function OnboardingPage() {
         if (error) throw error
       }
       setShowAuth(false)
-      setTimeout(() => handleSubmit(), 500)
+      await handleSubmit()
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Authentication failed')
     } finally {
