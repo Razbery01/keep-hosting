@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom'
 import Layout from './components/layout/Layout'
+import RequireAdmin from './components/auth/RequireAdmin'
 import HomePage from './pages/HomePage'
 import ServicesPage from './pages/ServicesPage'
 import PricingPage from './pages/PricingPage'
@@ -27,8 +28,13 @@ export const router = createBrowserRouter([
       { path: '/signup', element: <SignUpPage /> },
       { path: '/onboarding', element: <OnboardingPage /> },
       { path: '/dashboard', element: <DashboardPage /> },
-      { path: '/admin', element: <AdminDashboard /> },
-      { path: '/admin/orders', element: <AdminOrders /> },
+      {
+        element: <RequireAdmin />,
+        children: [
+          { path: '/admin', element: <AdminDashboard /> },
+          { path: '/admin/orders', element: <AdminOrders /> },
+        ],
+      },
     ],
   },
 ])
