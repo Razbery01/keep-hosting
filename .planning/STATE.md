@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-generation-hardening 02-01-PLAN.md (11 Vitest stub files)
-last_updated: "2026-04-09T22:24:52.081Z"
+stopped_at: Completed 02-generation-hardening 02-03-PLAN.md (CUST-05 fix, useBuildStatus hook, GEN-02 bundle scan)
+last_updated: "2026-04-09T22:30:07.199Z"
 last_activity: 2026-04-09 — Completed 01-01 test infrastructure (vitest harness + 7 stub test files)
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 7
-  completed_plans: 4
+  completed_plans: 5
   percent: 25
 ---
 
@@ -53,6 +53,7 @@ Progress: [███░░░░░░░] 25%
 | Phase 01-security-data-foundation P03 | 7min | 5 tasks | 14 files |
 | Phase 01-security-data-foundation P02 | 10min | 3 tasks | 3 files |
 | Phase 02-generation-hardening P01 | 2min | 3 tasks | 11 files |
+| Phase 02-generation-hardening P03 | 2min | 4 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,9 @@ Recent decisions affecting current work:
 - [Phase 01-security-data-foundation]: Migration 003 applied via supabase db push from freshly linked local project (ref wozonryvuvbxxfdykzne); local .env created with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 - [Phase 02-generation-hardening]: it.todo() stubs only — no production imports in Phase 2 scaffolding to prevent import-resolution failures on not-yet-created modules
 - [Phase 02-generation-hardening]: Nyquist stub pattern: create it.todo() stubs before Wave 1 tasks to satisfy automated verify requirements across all Phase 2 plans
+- [Phase 02-generation-hardening]: CUST-05: await handleSubmit() replaces setTimeout — safe because handleSubmit re-fetches user via supabase.auth.getUser() at its first line
+- [Phase 02-generation-hardening]: GEN-09: useBuildStatus hook uses 10s polling fallback only on CHANNEL_ERROR/TIMED_OUT — Realtime is primary; admin setInterval(fetchOrders,3000) preserved as out-of-scope
+- [Phase 02-generation-hardening]: GEN-02: bundle scan test excludes src/test/ directory to prevent self-referential false positives
 
 ### Pending Todos
 
@@ -87,6 +91,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T22:24:52.078Z
-Stopped at: Completed 02-generation-hardening 02-01-PLAN.md (11 Vitest stub files)
+Last session: 2026-04-09T22:30:07.197Z
+Stopped at: Completed 02-generation-hardening 02-03-PLAN.md (CUST-05 fix, useBuildStatus hook, GEN-02 bundle scan)
 Resume file: None

@@ -28,14 +28,14 @@ Requirements for the first real, paid, end-to-end launch milestone. Each maps to
 ### Generation Pipeline
 
 - [ ] **GEN-01**: Claude output parsing uses `tool_choice: { type: 'tool', name: 'deliver_site_files' }` — no regex parsing
-- [ ] **GEN-02**: Claude calls run inside a Supabase Edge Function with `ANTHROPIC_API_KEY` server-side only (never client-exposed)
+- [x] **GEN-02**: Claude calls run inside a Supabase Edge Function with `ANTHROPIC_API_KEY` server-side only (never client-exposed)
 - [ ] **GEN-03**: Token budget enforced: max 4,096 output tokens per generation; hard cap on retries (max 2); never retry 4xx errors
 - [ ] **GEN-04**: Generated HTML is mobile-responsive (prompt enforces responsive layout + breakpoints; output scan checks for viewport meta)
 - [ ] **GEN-05**: Generation queue with rate limiting — distinguishes 429/529 (retry with backoff) from 400 (fail loudly)
 - [ ] **GEN-06**: Industry-contextual prompting — business industry + SA location shape the generated copy and imagery choices
 - [ ] **GEN-07**: Per-build Claude cost logged (input tokens + output tokens + ZAR cost); visible in admin dashboard
 - [ ] **GEN-08**: Build pipeline split across Edge Functions to stay under 150s wall-clock limits; state transitions recorded in `build_events`
-- [ ] **GEN-09**: Supabase Realtime replaces `setInterval` polling for build status updates on customer dashboard
+- [x] **GEN-09**: Supabase Realtime replaces `setInterval` polling for build status updates on customer dashboard
 
 ### Deployment (Netlify)
 
@@ -74,7 +74,7 @@ Requirements for the first real, paid, end-to-end launch milestone. Each maps to
 - [ ] **CUST-02**: Customer can trigger an AI regeneration by describing the change in natural language; regeneration respects the same token/cost caps
 - [ ] **CUST-03**: Customer can view subscription status, next charge date, and cancel subscription (with confirmation + grace period explanation)
 - [ ] **CUST-04**: Customer receives transactional email on: welcome/signup, payment received, build complete (site live), payment failed, subscription suspended, subscription reactivated
-- [ ] **CUST-05**: Auth/submit race condition in `OnboardingPage.tsx` fixed — awaits real session state instead of `setTimeout`
+- [x] **CUST-05**: Auth/submit race condition in `OnboardingPage.tsx` fixed — awaits real session state instead of `setTimeout`
 
 ### Legal / POPIA Compliance
 
@@ -170,15 +170,15 @@ Populated during roadmap creation. Each requirement maps to exactly one phase.
 | DATA-05 | Phase 1 | Complete |
 | DATA-06 | Phase 1 | Complete |
 | GEN-01 | Phase 2 | Pending |
-| GEN-02 | Phase 2 | Pending |
+| GEN-02 | Phase 2 | Complete |
 | GEN-03 | Phase 2 | Pending |
 | GEN-04 | Phase 2 | Pending |
 | GEN-05 | Phase 2 | Pending |
 | GEN-06 | Phase 2 | Pending |
 | GEN-07 | Phase 2 | Pending |
 | GEN-08 | Phase 2 | Pending |
-| GEN-09 | Phase 2 | Pending |
-| CUST-05 | Phase 2 | Pending |
+| GEN-09 | Phase 2 | Complete |
+| CUST-05 | Phase 2 | Complete |
 | DEPLOY-01 | Phase 3 | Pending |
 | DEPLOY-02 | Phase 3 | Pending |
 | DEPLOY-03 | Phase 3 | Pending |
