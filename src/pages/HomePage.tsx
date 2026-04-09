@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import {
   ArrowRight, Zap, Shield, Globe, Palette, Server, Search, Target,
   ClipboardCheck, Mail, Code, CheckCircle2,
-  Monitor, Star, ChevronDown, X as XIcon,
+  Star, ChevronDown, X as XIcon,
   Utensils, ShoppingBag, Briefcase, Heart, HardHat, Scissors,
   Users, BadgeCheck, Clock, CreditCard, Eye, Rocket
 } from 'lucide-react'
@@ -82,108 +82,168 @@ export default function HomePage() {
   return (
     <>
       {/* ── Hero ── */}
-      <section className="relative min-h-screen flex items-center overflow-hidden bg-dark">
+      <section className="relative min-h-[100dvh] flex items-center overflow-hidden bg-dark">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-dark to-dark" />
-          <div className="absolute top-0 right-0 w-[700px] h-[700px] bg-accent/[0.07] rounded-full blur-[200px] -translate-y-1/4 translate-x-1/4" />
-          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-accent/[0.07] rounded-full blur-[200px] -translate-y-1/4 translate-x-1/4" />
+          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accent/[0.04] rounded-full blur-[150px] translate-y-1/3 -translate-x-1/4" />
+          <div className="absolute inset-0 opacity-[0.025]" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,.15) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 lg:py-0 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-              <div className="flex items-center gap-3 mb-8">
-                <div className="h-px w-12 bg-accent" />
-                <span className="text-accent text-sm font-semibold uppercase tracking-wider">Keep Hosting</span>
-              </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-28 lg:py-0 w-full">
+          <div className="max-w-3xl lg:max-w-none lg:grid lg:grid-cols-2 gap-16 items-center">
 
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-[1.05] mb-6 tracking-tight text-white">
-                We Build<br />
-                Websites That<br />
-                <span className="text-accent">Mean Business</span>
+            {/* Left — copy */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+              <motion.div
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: 'auto' }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                className="inline-flex items-center gap-2.5 bg-white/[0.06] backdrop-blur-sm border border-white/[0.08] text-accent px-4 py-2 rounded-full text-sm font-medium mb-8 overflow-hidden"
+              >
+                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                Now serving South African SMMEs
+              </motion.div>
+
+              <h1 className="text-[2.75rem] leading-[1.08] md:text-6xl lg:text-[4.25rem] font-extrabold tracking-tight text-white mb-6">
+                Your business<br className="hidden sm:block" /> deserves a website<br className="hidden sm:block" />
+                {' '}<span className="relative inline-block">
+                  <span className="text-accent">that works.</span>
+                  <motion.span
+                    className="absolute -bottom-1.5 left-0 h-[3px] bg-accent/40 rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: '100%' }}
+                    transition={{ delay: 0.8, duration: 0.6, ease: [0.25, 0.4, 0.25, 1] as [number, number, number, number] }}
+                  />
+                </span>
               </h1>
 
               <p className="text-lg text-gray-400 mb-10 max-w-lg leading-relaxed">
-                Professional design, hosting, and management for South African SMMEs. You fill in a form — we deliver a production-ready website. Preview it first, pay only if you love it.
+                Tell us about your business. We design, build, and host a professional website — ready in under 48 hours. You preview it first and only pay if you love it.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                <Link to="/onboarding" className="group inline-flex items-center justify-center gap-2 bg-accent text-white px-8 py-4 rounded-xl font-bold text-lg hover:brightness-110 transition-all duration-200">
-                  Get Started Free <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+              <div className="flex flex-col sm:flex-row gap-3 mb-10">
+                <Link to="/onboarding" className="group relative inline-flex items-center justify-center gap-2.5 bg-accent text-white pl-7 pr-5 py-4 rounded-2xl font-bold text-[17px] overflow-hidden transition-all duration-200 hover:shadow-[0_0_40px_rgba(0,212,255,0.25)]">
+                  <span className="relative z-10 flex items-center gap-2.5">Build My Website <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" /></span>
                 </Link>
-                <Link to="/pricing" className="inline-flex items-center justify-center gap-2 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white/5 transition-colors duration-200 border border-white/15">
-                  See Pricing
+                <Link to="/pricing" className="inline-flex items-center justify-center gap-2 text-white px-7 py-4 rounded-2xl font-semibold text-[17px] border border-white/[0.12] hover:bg-white/[0.04] transition-colors duration-200">
+                  View Pricing
                 </Link>
               </div>
 
-              <div className="flex items-center gap-6 text-sm">
-                <span className="flex items-center gap-2 text-gray-500"><span className="w-2 h-2 rounded-full bg-green-400" />99.9% uptime</span>
-                <span className="flex items-center gap-2 text-gray-500"><span className="w-2 h-2 rounded-full bg-accent" />From R999</span>
-                <span className="flex items-center gap-2 text-gray-500"><span className="w-2 h-2 rounded-full bg-amber-400" />48h delivery</span>
+              {/* Social proof strip */}
+              <div className="flex items-center gap-4">
+                <div className="flex -space-x-2.5">
+                  {['T', 'J', 'N', 'S', 'M'].map((letter, i) => (
+                    <motion.div
+                      key={letter}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.5 + i * 0.08 }}
+                      className="w-9 h-9 rounded-full border-2 border-dark flex items-center justify-center text-xs font-bold"
+                      style={{ backgroundColor: ['#00D4FF', '#52B788', '#FB923C', '#A855F7', '#FB7185'][i], color: '#fff' }}
+                    >
+                      {letter}
+                    </motion.div>
+                  ))}
+                </div>
+                <div>
+                  <div className="flex gap-0.5 mb-0.5">
+                    {[1,2,3,4,5].map((s) => <Star key={s} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />)}
+                  </div>
+                  <span className="text-xs text-gray-500">Trusted by <strong className="text-gray-400">50+ businesses</strong> across SA</span>
+                </div>
               </div>
             </motion.div>
 
-            {/* Browser mockup */}
-            <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.2 }} className="hidden lg:block">
+            {/* Right — animated browser mockup */}
+            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.3 }} className="hidden lg:block">
               <div className="relative">
-                <div className="bg-[#0d1a2d] rounded-2xl border border-white/[0.08] shadow-2xl overflow-hidden">
+                {/* Glow behind */}
+                <div className="absolute -inset-4 bg-accent/[0.06] rounded-3xl blur-2xl" />
+
+                <div className="relative bg-[#0c1524] rounded-2xl border border-white/[0.08] shadow-2xl overflow-hidden">
+                  {/* Chrome */}
                   <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06] bg-white/[0.02]">
                     <div className="flex gap-1.5">
-                      <div className="w-3 h-3 rounded-full bg-[#ff5f57]" />
-                      <div className="w-3 h-3 rounded-full bg-[#febc2e]" />
-                      <div className="w-3 h-3 rounded-full bg-[#28c840]" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
                     </div>
-                    <div className="flex-1 mx-8">
-                      <div className="bg-white/[0.06] rounded-lg px-4 py-1.5 text-xs text-gray-500 flex items-center gap-2 max-w-xs mx-auto">
-                        <Shield className="w-3 h-3 text-green-400" />
-                        yourbusiness.co.za
+                    <div className="flex-1 mx-6">
+                      <div className="bg-white/[0.06] rounded-lg px-3 py-1.5 text-[11px] text-gray-500 flex items-center gap-2 max-w-[220px] mx-auto">
+                        <Shield className="w-3 h-3 text-green-400 shrink-0" />
+                        <span className="truncate">yourbusiness.co.za</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="p-6">
-                    {/* Mockup nav */}
-                    <div className="flex items-center justify-between mb-8">
-                      <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-lg bg-accent/30" />
-                        <div className="h-3 w-20 bg-white/15 rounded" />
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <div className="h-2.5 w-12 bg-white/10 rounded" />
-                        <div className="h-2.5 w-12 bg-white/10 rounded" />
-                        <div className="h-2.5 w-12 bg-white/10 rounded" />
-                        <div className="h-7 w-16 bg-accent/40 rounded-md" />
-                      </div>
-                    </div>
-
-                    {/* Mockup hero */}
-                    <div className="mb-6">
-                      <div className="h-5 w-32 bg-accent/20 rounded mb-3" />
-                      <div className="h-8 w-72 bg-white/15 rounded-lg mb-2" />
-                      <div className="h-8 w-56 bg-white/12 rounded-lg mb-4" />
-                      <div className="h-3 w-64 bg-white/[0.06] rounded mb-1.5" />
-                      <div className="h-3 w-48 bg-white/[0.06] rounded mb-5" />
-                      <div className="flex gap-3">
-                        <div className="h-10 w-28 bg-accent/50 rounded-lg" />
-                        <div className="h-10 w-28 bg-white/[0.06] rounded-lg border border-white/10" />
-                      </div>
-                    </div>
-
-                    {/* Mockup cards */}
-                    <div className="grid grid-cols-3 gap-3">
-                      {[1, 2, 3].map((n) => (
-                        <div key={n} className="bg-white/[0.03] rounded-xl p-4 border border-white/[0.06]">
-                          <div className="w-8 h-8 rounded-lg bg-accent/15 mb-3" />
-                          <div className="h-3 w-full bg-white/10 rounded mb-2" />
-                          <div className="h-2.5 w-3/4 bg-white/[0.06] rounded" />
+                  {/* Animated wireframe */}
+                  <div className="p-5 space-y-4">
+                    {[
+                      { delay: 0.5, children: (
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2"><div className="w-6 h-6 rounded-md bg-accent/30" /><div className="h-2.5 w-16 bg-white/15 rounded" /></div>
+                          <div className="flex gap-3">{[1,2,3].map(n => <div key={n} className="h-2 w-10 bg-white/8 rounded" />)}<div className="h-6 w-14 bg-accent/30 rounded-md" /></div>
                         </div>
-                      ))}
-                    </div>
+                      )},
+                      { delay: 0.8, children: (
+                        <div className="bg-gradient-to-r from-accent/10 to-accent/5 rounded-xl p-5 border border-accent/10">
+                          <div className="h-4 w-40 bg-white/15 rounded mb-2" />
+                          <div className="h-7 w-56 bg-white/10 rounded-lg mb-3" />
+                          <div className="h-2.5 w-48 bg-white/[0.06] rounded mb-4" />
+                          <div className="flex gap-2"><div className="h-8 w-24 bg-accent/40 rounded-lg" /><div className="h-8 w-24 bg-white/[0.06] rounded-lg" /></div>
+                        </div>
+                      )},
+                      { delay: 1.1, children: (
+                        <div className="grid grid-cols-3 gap-2.5">
+                          {[1,2,3].map(n => (
+                            <div key={n} className="bg-white/[0.03] rounded-xl p-3.5 border border-white/[0.06]">
+                              <div className="w-7 h-7 rounded-lg bg-accent/15 mb-2.5" />
+                              <div className="h-2.5 w-full bg-white/10 rounded mb-1.5" />
+                              <div className="h-2 w-3/4 bg-white/[0.05] rounded" />
+                            </div>
+                          ))}
+                        </div>
+                      )},
+                      { delay: 1.4, children: (
+                        <div className="flex items-center justify-between bg-white/[0.02] rounded-lg p-3 border border-white/[0.05]">
+                          <div className="space-y-1.5"><div className="h-2.5 w-32 bg-white/10 rounded" /><div className="h-2 w-24 bg-white/[0.05] rounded" /></div>
+                          <div className="h-7 w-20 bg-accent/25 rounded-md" />
+                        </div>
+                      )},
+                    ].map((block, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: block.delay, duration: 0.5, ease: [0.25, 0.4, 0.25, 1] as [number, number, number, number] }}
+                      >
+                        {block.children}
+                      </motion.div>
+                    ))}
                   </div>
                 </div>
 
-                <div className="absolute -top-3 -right-3 w-24 h-24 bg-accent/10 rounded-full blur-2xl" />
-                <div className="absolute -bottom-3 -left-3 w-32 h-32 bg-accent/[0.06] rounded-full blur-2xl" />
+                {/* Floating badges */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1.8, duration: 0.4 }}
+                  className="absolute -top-4 -right-4 bg-white shadow-lg shadow-black/10 text-gray-900 px-4 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2.5 border border-gray-100"
+                >
+                  <div className="w-8 h-8 bg-green-50 rounded-xl flex items-center justify-center"><CheckCircle2 className="w-4 h-4 text-green-500" /></div>
+                  Site Live!
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 2.0, duration: 0.4 }}
+                  className="absolute -bottom-4 -left-4 bg-white shadow-lg shadow-black/10 text-gray-900 px-4 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2.5 border border-gray-100"
+                >
+                  <div className="w-8 h-8 bg-accent/10 rounded-xl flex items-center justify-center"><Zap className="w-4 h-4 text-accent" /></div>
+                  Under 48h
+                </motion.div>
               </div>
             </motion.div>
           </div>
