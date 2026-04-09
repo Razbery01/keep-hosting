@@ -57,5 +57,35 @@ export function scanGeneratedHtml(html: string): HtmlScanResult {
     violations.push('Contains <iframe> tag')
   }
 
+  // 6. Viewport meta tag — mobile-responsive hard check (GEN-04)
+  const hasViewportMeta = /<meta[^>]+name\s*=\s*["']viewport["'][^>]*>/i.test(html)
+  if (!hasViewportMeta) {
+    violations.push('Missing <meta name="viewport"> tag (mobile-responsive requirement)')
+  }
+
   return { safe: violations.length === 0, violations }
+}
+
+export interface MobileWarnings {
+  hardcoded_widths: string[]
+}
+
+/**
+ * Soft-check for hardcoded px widths on container-level selectors.
+ * Does NOT flip safe=false — warnings are logged to build_events as 'mobile_warning'
+ * for future prompt tuning (GEN-04 soft layer).
+ *
+ * Only matches plain "width" — NOT "max-width" or "min-width".
+ * Only matches container-level selectors: body, main, .container, section.
+ */
+export function scanForMobileWarnings(html: string): MobileWarnings {
+  const hardcoded_widths: string[] = []
+  // Match: selector { ... width: NNNpx ... }
+  // Use negative lookbehind to exclude max-width and min-width
+  const widthPattern = /(body|main|\.container|section)\s*[^{]*\{[^}]*(?<![-a-z])width\s*:\s*(\d+)\s*px/gi
+  let match: RegExpExecArray | null
+  while ((match = widthPattern.exec(html)) !== null) {
+    hardcoded_widths.push(`${match[1]} has hardcoded width: ${match[2]}px`)
+  }
+  return { hardcoded_widths }
 }

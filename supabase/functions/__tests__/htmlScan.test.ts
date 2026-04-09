@@ -2,9 +2,10 @@ import { describe, it, expect } from 'vitest'
 import { scanGeneratedHtml } from '../_shared/html-scanner'
 
 describe('scanGeneratedHtml', () => {
-  it('passes clean semantic HTML', () => {
+  it('passes clean semantic HTML (with viewport meta — GEN-04 requires it)', () => {
     const clean = `<!doctype html><html><head>
       <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
       <link rel="stylesheet" href="/styles.css">
       <title>Acme Plumbing</title>
     </head><body><h1>Welcome</h1></body></html>`
