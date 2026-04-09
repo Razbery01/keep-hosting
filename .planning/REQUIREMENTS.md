@@ -29,7 +29,7 @@ Requirements for the first real, paid, end-to-end launch milestone. Each maps to
 
 - [ ] **GEN-01**: Claude output parsing uses `tool_choice: { type: 'tool', name: 'deliver_site_files' }` — no regex parsing
 - [x] **GEN-02**: Claude calls run inside a Supabase Edge Function with `ANTHROPIC_API_KEY` server-side only (never client-exposed)
-- [ ] **GEN-03**: Token budget enforced: max 4,096 output tokens per generation; hard cap on retries (max 2); never retry 4xx errors
+- [ ] **GEN-03**: Token budget enforced: max output tokens per package tier (Starter 12k, Professional 24k, Enterprise 48k); hard cap on retries (max 2); never retry 4xx errors
 - [x] **GEN-04**: Generated HTML is mobile-responsive (prompt enforces responsive layout + breakpoints; output scan checks for viewport meta)
 - [ ] **GEN-05**: Generation queue with rate limiting — distinguishes 429/529 (retry with backoff) from 400 (fail loudly)
 - [x] **GEN-06**: Industry-contextual prompting — business industry + SA location shape the generated copy and imagery choices
@@ -227,4 +227,4 @@ Populated during roadmap creation. Each requirement maps to exactly one phase.
 
 ---
 *Requirements defined: 2026-04-09*
-*Last updated: 2026-04-09 — SEC-05 descoped to v2*
+*Last updated: 2026-04-10 — GEN-03 wording updated to per-package caps (Phase 2 planning decision)*
