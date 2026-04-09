@@ -324,58 +324,63 @@ export default function HomePage() {
       </section>
 
       {/* ── Who We Serve ── */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-28 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-dark via-primary-dark to-primary" />
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,.2) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent/[0.06] rounded-full blur-[150px]" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
-            <SectionLabel variant="primary">Built for SMMEs</SectionLabel>
-            <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-5 tracking-tight">We Help Small Businesses Get Online</h2>
-            <p className="text-gray-500 max-w-2xl mx-auto text-lg leading-relaxed">
-              From bakeries to law firms, plumbers to beauty salons — if you're a South African SMME that needs a professional web presence without the agency price tag, we're for you.
+            <SectionLabel>Built for SMMEs</SectionLabel>
+            <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-5 tracking-tight">We Help Small Businesses Get Online</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed">
+              From bakeries to law firms, plumbers to beauty salons — if you're a South African SMME that needs a professional web presence, we're for you.
             </p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
             {INDUSTRIES.map(({ icon: Icon, label }, i) => (
               <motion.div key={label} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
-                className="bg-gray-50 rounded-2xl p-6 text-center hover:bg-white hover:shadow-xl hover:shadow-gray-200/50 hover:-translate-y-1 transition-all duration-300 group border border-transparent hover:border-gray-100">
-                <div className="w-14 h-14 mx-auto bg-white rounded-2xl flex items-center justify-center text-accent mb-4 shadow-sm group-hover:bg-accent group-hover:text-white group-hover:shadow-lg group-hover:shadow-accent/20 transition-all duration-300">
+                className="bg-white/[0.06] backdrop-blur-sm rounded-2xl p-6 text-center border border-white/[0.08] hover:bg-white/[0.12] hover:-translate-y-1 transition-all duration-300 group">
+                <div className="w-14 h-14 mx-auto bg-white/10 rounded-2xl flex items-center justify-center text-accent mb-4 group-hover:bg-accent group-hover:text-white group-hover:shadow-lg group-hover:shadow-accent/20 transition-all duration-300">
                   <Icon className="w-6 h-6" />
                 </div>
-                <span className="text-sm font-semibold text-gray-700">{label}</span>
+                <span className="text-sm font-semibold text-white/80">{label}</span>
               </motion.div>
             ))}
           </div>
-          <p className="text-center text-sm text-gray-400 mt-8">And many more — we build websites for any industry.</p>
+          <p className="text-center text-sm text-gray-500 mt-8">And many more — we build websites for any industry.</p>
         </div>
       </section>
 
       {/* ── How It Works ── */}
-      <section className="py-24 bg-surface relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-accent/[0.03] rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
+      <section className="py-28 bg-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-accent/[0.04] rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
             <SectionLabel>Simple Process</SectionLabel>
             <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-5 tracking-tight">Online in 3 Easy Steps</h2>
             <p className="text-gray-500 max-w-2xl mx-auto text-lg">No tech skills. No design skills. No stress.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {[
-              { step: '01', title: 'Tell Us About You', desc: 'Fill in a quick form with your business details, pick your colors, upload your logo — takes about 5 minutes.', icon: <Users className="w-7 h-7" /> },
-              { step: '02', title: 'We Build Your Preview', desc: 'Our team crafts a professional website tailored to your brand. You get a live preview link to review — no payment required yet.', icon: <Eye className="w-7 h-7" /> },
-              { step: '03', title: 'Approve, Pay & Go Live', desc: 'Happy with your preview? Approve it, pay once, and your site goes live with hosting, SSL, and your domain — all included.', icon: <Rocket className="w-7 h-7" /> },
+              { step: '1', title: 'Tell Us About You', desc: 'Fill in a quick form with your business details, pick your colors, upload your logo — takes about 5 minutes.', icon: <Users className="w-7 h-7" />, gradient: 'from-accent/10 to-cyan-500/5' },
+              { step: '2', title: 'We Build Your Preview', desc: 'We craft a professional website tailored to your brand. You get a live preview link to review — no payment required yet.', icon: <Eye className="w-7 h-7" />, gradient: 'from-purple-500/10 to-blue-500/5' },
+              { step: '3', title: 'Approve, Pay & Go Live', desc: 'Happy with your preview? Approve it, pay once, and your site goes live with hosting, SSL, and your domain — all included.', icon: <Rocket className="w-7 h-7" />, gradient: 'from-green-500/10 to-emerald-500/5' },
             ].map((item, i) => (
-              <motion.div key={item.step} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="relative text-center group">
-                {i < 2 && <div className="hidden md:block absolute top-10 left-[60%] w-[80%] border-t-2 border-dashed border-gray-200" />}
-                <div className="w-20 h-20 mx-auto bg-white rounded-3xl flex items-center justify-center text-accent mb-6 shadow-lg shadow-gray-200/50 group-hover:shadow-accent/10 transition-all duration-300 relative border border-gray-100">
-                  {item.icon}
-                  <span className="absolute -top-2.5 -right-2.5 w-8 h-8 bg-accent text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg shadow-accent/30">{item.step}</span>
+              <motion.div key={item.step} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
+                className={`relative bg-gradient-to-br ${item.gradient} rounded-3xl p-8 border border-gray-100 group hover:shadow-xl hover:shadow-gray-200/50 hover:-translate-y-1 transition-all duration-300`}>
+                <div className="flex items-center gap-4 mb-5">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-accent shadow-sm">
+                    {item.icon}
+                  </div>
+                  <span className="text-5xl font-extrabold text-gray-200/60">{item.step}</span>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-3">{item.title}</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
               </motion.div>
             ))}
           </div>
           <div className="text-center mt-14">
-            <Link to="/onboarding" className="group inline-flex items-center gap-2.5 bg-accent text-white px-10 py-4 rounded-2xl font-bold text-lg hover:shadow-lg hover:shadow-accent/25 hover:scale-[1.02] transition-all duration-300">
+            <Link to="/onboarding" className="group inline-flex items-center gap-2.5 bg-gray-900 text-white px-10 py-4 rounded-2xl font-bold text-lg hover:bg-gray-800 hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
               Start Now — It's Free to Preview <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
@@ -427,6 +432,43 @@ export default function HomePage() {
                 <Link to="/services" className="inline-flex items-center gap-1.5 text-accent text-sm font-semibold opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-300">
                   Learn more <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Portfolio Preview ── */}
+      <section className="py-28 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-dark via-primary-dark to-dark" />
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,.15) 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="text-center mb-16">
+            <SectionLabel>Our Work</SectionLabel>
+            <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-5 tracking-tight">Websites We've Built</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed">
+              Every site is custom-designed based on the client's brand. Here's a taste of what we deliver.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { name: 'Fresh Roots Catering', industry: 'Food & Hospitality', color: '#D97706', img: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80' },
+              { name: 'ProFix Plumbing', industry: 'Construction & Trades', color: '#2563EB', img: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80' },
+              { name: 'Lumina Beauty Studio', industry: 'Beauty & Wellness', color: '#DB2777', img: 'https://images.unsplash.com/photo-1560750588-73b555e41656?auto=format&fit=crop&w=600&q=80' },
+            ].map((project, i) => (
+              <motion.div key={project.name} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
+                className="group rounded-2xl overflow-hidden border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] transition-all duration-300">
+                <div className="aspect-[16/10] overflow-hidden relative">
+                  <img src={project.img} alt={project.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                </div>
+                <div className="p-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: project.color }} />
+                    <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">{project.industry}</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-white">{project.name}</h3>
+                </div>
               </motion.div>
             ))}
           </div>
@@ -492,8 +534,9 @@ export default function HomePage() {
       </section>
 
       {/* ── Testimonials ── */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-28 bg-surface relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-accent/[0.04] rounded-full -translate-y-1/2 -translate-x-1/3 blur-[150px]" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
             <SectionLabel>Testimonials</SectionLabel>
             <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-5 tracking-tight">Trusted by SMMEs Across South Africa</h2>
@@ -501,15 +544,17 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {TESTIMONIALS.map((t, i) => (
               <motion.div key={t.name} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
-                className="bg-gray-50 rounded-3xl p-8 hover:bg-white hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 border border-transparent hover:border-gray-100 group">
+                className="bg-white rounded-3xl p-8 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 border border-gray-100 hover:-translate-y-1 relative">
+                <div className="absolute top-6 right-6 text-6xl font-serif text-gray-100 leading-none select-none">"</div>
                 <div className="flex gap-1 mb-5">
                   {Array.from({ length: t.rating }).map((_, j) => (
                     <Star key={j} className="w-5 h-5 text-amber-400 fill-amber-400" />
                   ))}
                 </div>
-                <p className="text-gray-600 leading-relaxed mb-8 text-[15px]">"{t.text}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full bg-accent/10 flex items-center justify-center text-accent font-bold text-sm">
+                <p className="text-gray-600 leading-relaxed mb-8 text-[15px] relative">"{t.text}"</p>
+                <div className="flex items-center gap-3 pt-5 border-t border-gray-100">
+                  <div className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                    style={{ backgroundColor: ['#00D4FF', '#52B788', '#FB7185'][i] }}>
                     {t.name.charAt(0)}
                   </div>
                   <div>
