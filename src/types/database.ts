@@ -107,7 +107,7 @@ export interface Database {
           services_text: string | null
           custom_content: Json | null
           social_links: Json | null
-          build_status: string
+          build_status: 'pending' | 'generating' | 'generated' | 'retry' | 'failed' | 'pushing_github' | 'live' | 'deploy_failed' | 'suspended'
           build_log: string | null
           github_repo: string | null
           github_url: string | null
@@ -115,8 +115,12 @@ export interface Database {
           netlify_url: string | null
           live_url: string | null
           domain_status: string | null
-          generated_files: Record<string, string> | null
-          generation_cost: { input_tokens: number; output_tokens: number; cost_usd: number } | null
+          generated_files: Json | null
+          generation_cost: Json | null
+          // Migration 004 (Phase 2 GEN-05): queue state columns for retry tracking
+          retry_count: number
+          last_attempted_at: string | null
+          next_retry_at: string | null
           created_at: string
           updated_at: string
         }
@@ -139,13 +143,16 @@ export interface Database {
           services_text?: string | null
           custom_content?: Json | null
           social_links?: Json | null
-          build_status?: string
-          generated_files?: Record<string, string> | null
-          generation_cost?: { input_tokens: number; output_tokens: number; cost_usd: number } | null
+          build_status?: 'pending' | 'generating' | 'generated' | 'retry' | 'failed' | 'pushing_github' | 'live' | 'deploy_failed' | 'suspended'
+          generated_files?: Json | null
+          generation_cost?: Json | null
+          retry_count?: number
+          last_attempted_at?: string | null
+          next_retry_at?: string | null
         }
         Update: {
           business_name?: string
-          build_status?: string
+          build_status?: 'pending' | 'generating' | 'generated' | 'retry' | 'failed' | 'pushing_github' | 'live' | 'deploy_failed' | 'suspended'
           build_log?: string | null
           github_repo?: string | null
           github_url?: string | null
@@ -153,8 +160,11 @@ export interface Database {
           netlify_url?: string | null
           live_url?: string | null
           domain_status?: string | null
-          generated_files?: Record<string, string> | null
-          generation_cost?: { input_tokens: number; output_tokens: number; cost_usd: number } | null
+          generated_files?: Json | null
+          generation_cost?: Json | null
+          retry_count?: number
+          last_attempted_at?: string | null
+          next_retry_at?: string | null
           updated_at?: string
         }
       }
