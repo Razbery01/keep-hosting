@@ -42,7 +42,12 @@ Plans:
   3. A generation attempt that hits a Claude 429 or 529 response queues for retry with exponential backoff; a 400 response fails loudly without retry; no generation attempt retries more than twice
   4. Generated HTML includes a `<meta name="viewport">` tag and passes a visual mobile-responsive check — no hardcoded px layout widths
   5. Per-build Claude token counts (input and output) are recorded in `generation_cost` and visible in the admin dashboard; the Supabase Realtime channel replaces the 3-second polling interval for build status updates
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 02-01-PLAN.md — Wave 0: Create 11 Vitest stub files from 02-VALIDATION.md (test infra already installed in Phase 1)
+- [ ] 02-02-PLAN.md — Wave 1: Shared pure-TS modules (cost-calc, industry-hints, prompts, html-scanner viewport+mobile extensions) — covers GEN-04, GEN-06, GEN-07
+- [ ] 02-03-PLAN.md — Wave 1: Client-side fixes — CUST-05 setTimeout fix, useBuildStatus Realtime hook, DashboardPage wiring, browser-bundle scan test — covers CUST-05, GEN-02, GEN-09
+- [ ] 02-04-PLAN.md — Wave 2: Edge Function refactor (split build-site → generate-site + persist-files + build-orchestrator), migrate Claude to tool_choice, retry ladder + per-package caps, cost tracking, migration 004, pg_cron schedule, REQUIREMENTS.md GEN-03 correction — covers GEN-01, GEN-03, GEN-05, GEN-08 (includes human-verify checkpoint)
 
 ### Phase 3: Deployment Pipeline
 **Goal**: Customer sites are deployed directly to Netlify via zip-deploy API (no GitHub intermediary) with rate-limit awareness, idempotent retries, and the ability to suspend and reactivate sites programmatically
@@ -97,7 +102,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Security & Data Foundation | 3/3 | Complete    | 2026-04-09 |
-| 2. Generation Hardening | 0/TBD | Not started | - |
+| 2. Generation Hardening | 0/4 | Not started | - |
 | 3. Deployment Pipeline | 0/TBD | Not started | - |
 | 4. Payment Integration | 0/TBD | Not started | - |
 | 5. Domain Registration & Customer Lifecycle | 0/TBD | Not started | - |
