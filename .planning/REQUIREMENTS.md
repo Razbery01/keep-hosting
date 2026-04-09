@@ -13,7 +13,6 @@ Requirements for the first real, paid, end-to-end launch milestone. Each maps to
 - [x] **SEC-02**: Every admin-scoped Supabase query fails server-side for non-admin users (not just UI hidden)
 - [x] **SEC-03**: Logo/image uploads validate MIME type (jpeg, png, webp only), enforce 5MB max, and rename to UUID before storage (no raw filenames)
 - [x] **SEC-04**: Supabase URL and anon key moved fully to environment variables — no plaintext JWT fallback in source
-- [ ] **SEC-05**: RLS policies verified on every table holding customer PII; tested via integration test using non-admin user
 - [x] **SEC-06**: User-supplied text is sanitized before interpolation into Claude prompts (prompt injection prevention)
 - [x] **SEC-07**: Generated HTML is scanned for `<script>` tags, external JS sources, and suspicious link patterns before deploy
 
@@ -131,6 +130,10 @@ Deferred. Acknowledged but not in this milestone's roadmap.
 - **V2-GROW-03**: Social media post generation for customers
 - **V2-GROW-04**: Referral program
 
+### Security Hardening (Deferred)
+
+- **V2-SEC-01**: RLS policies verified on every table holding customer PII via automated integration test using non-admin user (descoped from v1 SEC-05 on 2026-04-09 — requires dedicated test Supabase project which user deferred). Manual RLS verification remains in place through migration 002's `is_admin()` policies + the SEC-01/02 RequireAdmin UI guard.
+
 ## Out of Scope
 
 Explicitly excluded from v1 and v2. Documented to prevent scope creep.
@@ -158,7 +161,6 @@ Populated during roadmap creation. Each requirement maps to exactly one phase.
 | SEC-02 | Phase 1 | Complete |
 | SEC-03 | Phase 1 | Complete |
 | SEC-04 | Phase 1 | Complete |
-| SEC-05 | Phase 1 | Pending |
 | SEC-06 | Phase 1 | Complete |
 | SEC-07 | Phase 1 | Complete |
 | DATA-01 | Phase 1 | Complete |
@@ -218,10 +220,11 @@ Populated during roadmap creation. Each requirement maps to exactly one phase.
 | OPS-04 | Phase 6 | Pending |
 
 **Coverage:**
-- v1 requirements: 62 total (recount from traceability rows — REQUIREMENTS.md header says 60; actual row count is 62)
-- Mapped to phases: 62
+- v1 requirements: 61 total
+- Mapped to phases: 61
 - Unmapped: 0
+- Descoped from v1: SEC-05 → V2-SEC-01 (2026-04-09, deferred test project provisioning)
 
 ---
 *Requirements defined: 2026-04-09*
-*Last updated: 2026-04-09 — traceability populated by roadmapper*
+*Last updated: 2026-04-09 — SEC-05 descoped to v2*

@@ -18,19 +18,19 @@ keep-hosting is a brownfield brownfield project that needs six phases to go from
 ### Phase 1: Security & Data Foundation
 **Goal**: All known security vulnerabilities are eliminated and the database schema fully supports the subscription, build, and cost-tracking data flows that every subsequent phase depends on
 **Depends on**: Nothing (first phase)
-**Requirements**: SEC-01, SEC-02, SEC-03, SEC-04, SEC-05, SEC-06, SEC-07, DATA-01, DATA-02, DATA-03, DATA-04, DATA-05, DATA-06
+**Requirements**: SEC-01, SEC-02, SEC-03, SEC-04, SEC-06, SEC-07, DATA-01, DATA-02, DATA-03, DATA-04, DATA-05, DATA-06
+**Descoped from this phase**: SEC-05 → V2-SEC-01 (2026-04-09, automated RLS integration test deferred — requires dedicated test Supabase project)
 **Success Criteria** (what must be TRUE):
   1. A non-admin authenticated user navigating to `/admin` or `/admin/orders` is redirected with a 403 — the admin UI does not render and no admin-scoped data is returned from Supabase
   2. Uploading a file with a non-image MIME type or a file over 5MB to the onboarding form is rejected server-side, and the storage path contains a UUID filename — not the original filename
   3. The Supabase anon key and URL are read exclusively from environment variables — no plaintext fallback exists anywhere in source
   4. The `subscriptions` table exists with all columns required for billing lifecycle (status, yoco_token_id, next_charge_at, grace_until, suspended_at); the `build_events` table records pipeline state transitions; the `generation_cost` column captures Claude token counts per build
-  5. RLS policies on every table containing customer PII pass an integration test using a non-admin user (non-admin reads only their own rows, admin reads all)
-**Plans**: 4 plans
+**Plans**: 3 plans
 Plans:
-- [ ] 01-01-PLAN.md — Wave 0 test infrastructure: install Vitest, wire vite.config.ts test block, create stub test files matching 01-VALIDATION.md paths
-- [ ] 01-02-PLAN.md — Migration 003: subscriptions table + RLS, generated_files/generation_cost, POPIA consent columns, suspended status, yoco_payment_id; update src/types/database.ts
-- [ ] 01-03-PLAN.md — Security code fixes: remove plaintext Supabase credential (SEC-04), RequireAdmin route guard (SEC-01/02), upload validator + UUID path (SEC-03), prompt sanitizer (SEC-06), HTML scanner (SEC-07) wired into build-site Edge Function
-- [ ] 01-04-PLAN.md — RLS integration test (SEC-05): dedicated test Supabase project, real non-admin + admin integration tests covering profiles, orders, client_sites, file_uploads, subscriptions
+- [x] 01-01-PLAN.md — Wave 0 test infrastructure: install Vitest, wire vite.config.ts test block, create stub test files matching 01-VALIDATION.md paths
+- [x] 01-02-PLAN.md — Migration 003: subscriptions table + RLS, generated_files/generation_cost, POPIA consent columns, suspended status, yoco_payment_id; update src/types/database.ts
+- [x] 01-03-PLAN.md — Security code fixes: remove plaintext Supabase credential (SEC-04), RequireAdmin route guard (SEC-01/02), upload validator + UUID path (SEC-03), prompt sanitizer (SEC-06), HTML scanner (SEC-07) wired into build-site Edge Function
+- ~~01-04-PLAN.md~~ — Descoped with SEC-05 on 2026-04-09. Plan removed; will be re-planned if V2-SEC-01 is promoted back to v1.
 
 ### Phase 2: Generation Hardening
 **Goal**: Claude site generation is reliable, server-side-only, cost-controlled, and produces mobile-responsive output — and the onboarding race condition that breaks submission is fixed
