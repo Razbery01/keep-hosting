@@ -6,7 +6,7 @@ keep-hosting is a brownfield brownfield project that needs six phases to go from
 
 ## Phases
 
-- [ ] **Phase 1: Security & Data Foundation** - Lock down known security holes and extend the schema to support subscriptions, build events, and cost tracking
+- [x] **Phase 1: Security & Data Foundation** - Lock down known security holes and extend the schema to support subscriptions, build events, and cost tracking (completed 2026-04-09)
 - [ ] **Phase 2: Generation Hardening** - Replace fragile Claude integration with structured output, server-side execution, rate limiting, and mobile-responsive output
 - [ ] **Phase 3: Deployment Pipeline** - Remove GitHub intermediary and deliver direct Netlify zip-deploy with quota management and suspension/reactivation
 - [ ] **Phase 4: Payment Integration** - Wire Yoco checkout, webhook handling, and full subscription lifecycle so payment becomes the master build trigger
@@ -96,7 +96,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Security & Data Foundation | 3/4 | In Progress|  |
+| 1. Security & Data Foundation | 3/3 | Complete    | 2026-04-09 |
 | 2. Generation Hardening | 0/TBD | Not started | - |
 | 3. Deployment Pipeline | 0/TBD | Not started | - |
 | 4. Payment Integration | 0/TBD | Not started | - |
