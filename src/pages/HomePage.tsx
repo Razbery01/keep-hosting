@@ -279,46 +279,59 @@ export default function HomePage() {
       </section>
 
       {/* ── What Makes Us Different ── */}
-      <section className="py-24 bg-surface">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <SectionLabel>Why We're Different</SectionLabel>
-            <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-5 tracking-tight">Not Another Hosting Company</h2>
-            <p className="text-gray-500 max-w-2xl mx-auto text-lg leading-relaxed">
-              Other providers give you a control panel and say "good luck." We actually <strong className="text-gray-900">build your website for you</strong> — professionally designed, fully hosted, ready to go.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            <div className="bg-white rounded-3xl p-8 border border-gray-200">
-              <h3 className="font-bold text-gray-400 mb-6 text-xs uppercase tracking-widest">Traditional Hosting</h3>
-              <ul className="space-y-4">
-                {['Buy hosting separately', 'Learn a website builder', 'Design it yourself', 'Figure out DNS & SSL', 'Handle your own SEO', 'No support for design'].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-sm text-gray-400">
-                    <span className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-                      <XIcon className="w-3.5 h-3.5 text-gray-400" />
-                    </span>
-                    <span className="line-through">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="bg-gradient-to-br from-accent/5 to-cyan-500/5 rounded-3xl p-8 border-2 border-accent/20 relative shadow-lg shadow-accent/5">
-              <div className="absolute -top-3.5 left-8">
-                <span className="bg-accent text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg shadow-accent/20">KEEP HOSTING</span>
+      <section className="py-28 bg-surface bg-dots-light relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-accent/[0.05] rounded-full -translate-y-1/2 -translate-x-1/3 blur-[120px]" />
+        <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-purple-500/[0.04] rounded-full translate-y-1/2 translate-x-1/3 blur-[100px]" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            {/* Left — image + text */}
+            <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+              <SectionLabel>Why We're Different</SectionLabel>
+              <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-5 tracking-tight">Not Another<br />Hosting Company</h2>
+              <p className="text-gray-500 text-lg leading-relaxed mb-8">
+                Other providers give you a control panel and say "good luck." We actually <strong className="text-gray-900">build your website for you</strong> — professionally designed, fully hosted, ready to go.
+              </p>
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-gray-300/40">
+                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=700&q=80" alt="Team collaborating on website design" className="w-full h-64 object-cover" loading="lazy" />
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent" />
+                <div className="absolute bottom-4 left-5 right-5">
+                  <p className="text-white text-sm font-semibold">We handle the design, code, and deployment — you focus on your business.</p>
+                </div>
               </div>
-              <h3 className="font-bold text-accent mb-6 text-xs uppercase tracking-widest">Our Turnkey Solution</h3>
-              <ul className="space-y-4">
-                {['Tell us about your business', 'We design & build everything', 'Hosting & SSL included', 'Domain setup handled', 'SEO optimized from day one', 'Preview before you pay'].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-sm text-gray-800 font-medium">
-                    <span className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
-                      <CheckCircle2 className="w-4 h-4 text-accent" />
-                    </span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            </motion.div>
+
+            {/* Right — comparison */}
+            <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.15 }} className="space-y-5">
+              <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm bg-diagonal">
+                <h3 className="font-bold text-gray-400 mb-6 text-xs uppercase tracking-widest">Traditional Hosting</h3>
+                <ul className="space-y-4">
+                  {['Buy hosting separately', 'Learn a website builder', 'Design it yourself', 'Figure out DNS & SSL', 'Handle your own SEO', 'No support for design'].map((item) => (
+                    <li key={item} className="flex items-center gap-3 text-sm text-gray-400">
+                      <span className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                        <XIcon className="w-3.5 h-3.5 text-gray-400" />
+                      </span>
+                      <span className="line-through">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="bg-gradient-to-br from-accent/5 via-white to-cyan-500/5 rounded-3xl p-8 border-2 border-accent/20 relative shadow-lg shadow-accent/5">
+                <div className="absolute -top-3.5 left-8">
+                  <span className="bg-accent text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg shadow-accent/20">KEEP HOSTING</span>
+                </div>
+                <h3 className="font-bold text-accent mb-6 text-xs uppercase tracking-widest">Our Turnkey Solution</h3>
+                <ul className="space-y-4">
+                  {['Tell us about your business', 'We design & build everything', 'Hosting & SSL included', 'Domain setup handled', 'SEO optimized from day one', 'Preview before you pay'].map((item) => (
+                    <li key={item} className="flex items-center gap-3 text-sm text-gray-800 font-medium">
+                      <span className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
+                        <CheckCircle2 className="w-4 h-4 text-accent" />
+                      </span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -352,7 +365,7 @@ export default function HomePage() {
       </section>
 
       {/* ── How It Works ── */}
-      <section className="py-28 bg-white relative overflow-hidden">
+      <section className="py-28 bg-white bg-grid relative overflow-hidden">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-accent/[0.04] rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
@@ -413,7 +426,8 @@ export default function HomePage() {
       </section>
 
       {/* ── Services ── */}
-      <section className="py-24 bg-white">
+      <section className="py-28 bg-surface bg-dots-light relative overflow-hidden">
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-accent/[0.04] rounded-full translate-y-1/2 -translate-x-1/3 blur-[120px]" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <SectionLabel variant="primary">Full-Service</SectionLabel>
@@ -476,8 +490,9 @@ export default function HomePage() {
       </section>
 
       {/* ── Pricing ── */}
-      <section className="py-24 bg-surface relative overflow-hidden">
+      <section className="py-28 bg-white bg-grid relative overflow-hidden">
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-accent/[0.04] rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl" />
+        <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-purple-500/[0.04] rounded-full -translate-y-1/2 translate-x-1/2 blur-[100px]" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
             <SectionLabel>Pricing</SectionLabel>
@@ -569,7 +584,8 @@ export default function HomePage() {
       </section>
 
       {/* ── FAQ ── */}
-      <section className="py-24 bg-surface">
+      <section className="py-28 bg-surface bg-dots-light relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/[0.03] rounded-full blur-[150px]" />
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <SectionLabel variant="primary">FAQ</SectionLabel>
