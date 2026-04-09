@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-generation-hardening 02-02-PLAN.md (4 shared modules + 50+ tests)
-last_updated: "2026-04-09T22:32:22.125Z"
+stopped_at: "Completed 02-04 Tasks 1-6, checkpoint at Task 7 (human-verify: deploy + e2e test)"
+last_updated: "2026-04-09T22:46:37.833Z"
 last_activity: 2026-04-09 — Completed 01-01 test infrastructure (vitest harness + 7 stub test files)
 progress:
   total_phases: 6
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 7
-  completed_plans: 6
+  completed_plans: 7
   percent: 25
 ---
 
@@ -82,6 +82,9 @@ Recent decisions affecting current work:
 - [Phase 02-generation-hardening]: ZAR exchange rate hardcoded at 18.85 per 02-CONTEXT.md — Phase 6 admin can swap for live feed
 - [Phase 02-generation-hardening]: CODE_AGENT_SYSTEM OUTPUT FORMAT JSON section removed — Plan 04 uses tool_choice deliver_site_files
 - [Phase 02-generation-hardening]: Viewport meta check added as hard violation #6 in scanGeneratedHtml() — missing viewport fails deploy
+- [Phase 02-generation-hardening]: tool_choice forced tool use replaces regex parsing for Claude agents — thinking param removed (API 400 when combined with forced tool_choice per 02-RESEARCH.md)
+- [Phase 02-generation-hardening]: build-site shim strategy chosen over updating OnboardingPage.tsx — client contract preserved until Phase 4 Yoco webhook becomes direct generate-site trigger
+- [Phase 02-generation-hardening]: getCuratedImages kept inline in generate-site/index.ts (not extracted to _shared/) — only one consumer, no cross-function sharing needed
 
 ### Pending Todos
 
@@ -95,6 +98,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T22:32:22.122Z
-Stopped at: Completed 02-generation-hardening 02-02-PLAN.md (4 shared modules + 50+ tests)
+Last session: 2026-04-09T22:46:26.412Z
+Stopped at: Completed 02-04 Tasks 1-6, checkpoint at Task 7 (human-verify: deploy + e2e test)
 Resume file: None
