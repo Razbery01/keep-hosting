@@ -1,6 +1,8 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { corsHeaders, corsResponse, jsonResponse } from '../_shared/cors.ts'
 import { getSupabaseAdmin } from '../_shared/supabase-admin.ts'
+import { sanitizeForPrompt } from '../_shared/sanitize.ts'
+import { scanGeneratedHtml } from '../_shared/html-scanner.ts'
 import Anthropic from 'npm:@anthropic-ai/sdk'
 
 const anthropic = new Anthropic({
@@ -291,6 +293,16 @@ Deno.serve(async (req: Request) => {
     // ── AGENT 2: Code Agent ──
     await logEvent(supabase, siteId, 'code_agent_start', 'info', 'Code Agent: generating website...')
 
+    // Sanitize all user-supplied text fields before interpolating into the Claude prompt (SEC-06)
+    const safe = {
+      business_name: sanitizeForPrompt(site.business_name ?? '', 'business_name'),
+      tagline: sanitizeForPrompt(site.tagline ?? '', 'tagline'),
+      description: sanitizeForPrompt(site.description ?? '', 'description'),
+      about_text: sanitizeForPrompt(site.about_text ?? '', 'about_text'),
+      services_text: sanitizeForPrompt(site.services_text ?? '', 'services_text'),
+      goals: sanitizeForPrompt(site.goals ?? '', 'goals'),
+    }
+
     const socialEntries = Object.entries(site.social_links || {}).filter(([, v]) => v)
     const socialSummary = socialEntries.length > 0
       ? socialEntries.map(([k, v]) => `${k}: ${v}`).join('\n')
@@ -299,11 +311,11 @@ Deno.serve(async (req: Request) => {
     const userPrompt = `Build a ${isMultiPage ? 'multi-page' : 'single-page'} website for the following business.
 
 ═══ BUSINESS ═══
-Name: ${site.business_name}
+Name: ${safe.business_name}
 Industry: ${site.industry}
-Tagline: ${site.tagline || ''}
-Description: ${site.description || ''}
-Goals: ${site.goals || ''}
+Tagline: ${safe.tagline}
+Description: ${safe.description}
+Goals: ${safe.goals}
 
 ═══ CONTACT ═══
 Email: ${site.contact_email}
@@ -319,10 +331,10 @@ ${logoUrl ? `Logo: ${logoUrl}` : 'Logo: None — create a clean text-based wordm
 ${imageBlock}
 
 ═══ CONTENT ═══
-About: ${site.about_text || site.description || ''}
-Services/Products: ${site.services_text || ''}
+About: ${safe.about_text || safe.description || ''}
+Services/Products: ${safe.services_text || ''}
 
-If the about or services content above is empty or very brief, write compelling, realistic copy for a ${site.industry.toLowerCase()} business called "${site.business_name}". Make it sound authentic and professional — not generic.
+If the about or services content above is empty or very brief, write compelling, realistic copy for a ${site.industry.toLowerCase()} business called "${safe.business_name}". Make it sound authentic and professional — not generic.
 
 ═══ SOCIAL ═══
 ${socialSummary}
@@ -362,6 +374,21 @@ Return the JSON object now.`
 
     if (!files || files.length === 0) {
       throw new Error('No files generated')
+    }
+
+    // ── Scan generated HTML for unsafe content (SEC-07) ──
+    for (const file of files) {
+      if (file.path.endsWith('.html')) {
+        const scanResult = scanGeneratedHtml(file.content)
+        if (!scanResult.safe) {
+          await logEvent(supabase, siteId, 'html_scan', 'error',
+            `Generated HTML failed security scan: ${scanResult.violations.join(', ')}`)
+          await supabase.from('client_sites')
+            .update({ build_status: 'failed' })
+            .eq('id', siteId)
+          throw new Error('Generated HTML contains unsafe content: ' + scanResult.violations.join(', '))
+        }
+      }
     }
 
     await logEvent(supabase, siteId, 'code_agent_done', 'success', `Code Agent: ${files.length} file(s) generated`)
