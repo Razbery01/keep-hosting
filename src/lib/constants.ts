@@ -132,3 +132,12 @@ export const FONT_OPTIONS = [
   'Lato',
   'DM Sans',
 ] as const
+
+/** Business line (E.164 digits only, no +) — used for wa.me / tel links */
+export const SITE_PHONE_E164 = '27683044916'
+
+export const SITE_PHONE_DISPLAY = '+27 68 304 4916'
+
+export const SITE_TEL_HREF = `tel:+${SITE_PHONE_E164}`
+
+export const SITE_WHATSAPP_URL = `https://wa.me/${SITE_PHONE_E164}`

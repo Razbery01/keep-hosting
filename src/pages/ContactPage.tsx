@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin, Send, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { SITE_PHONE_DISPLAY, SITE_TEL_HREF, SITE_WHATSAPP_URL } from '../lib/constants'
 
 export default function ContactPage() {
   const [sending, setSending] = useState(false)
@@ -44,8 +45,8 @@ export default function ContactPage() {
               <h2 className="text-2xl font-extrabold text-gray-900 mb-8 tracking-tight">Contact Info</h2>
               <div className="space-y-6">
                 {[
-                  { icon: <Mail className="w-5 h-5" />, label: 'Email', value: 'hello@keephosting.co.za' },
-                  { icon: <Phone className="w-5 h-5" />, label: 'Phone', value: '+27 XX XXX XXXX' },
+                  { icon: <Mail className="w-5 h-5" />, label: 'Email', value: 'hello@keephosting.co.za', href: 'mailto:hello@keephosting.co.za' },
+                  { icon: <Phone className="w-5 h-5" />, label: 'Phone', value: SITE_PHONE_DISPLAY, href: SITE_TEL_HREF },
                   { icon: <MapPin className="w-5 h-5" />, label: 'Location', value: 'Durban, South Africa' },
                 ].map((item) => (
                   <div key={item.label} className="flex items-start gap-4 group">
@@ -54,7 +55,25 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h4 className="font-semibold text-gray-900 text-sm">{item.label}</h4>
-                      <p className="text-gray-500">{item.value}</p>
+                      {'href' in item ? (
+                        <p className="text-gray-500">
+                          <a href={item.href} className="hover:text-accent transition-colors">
+                            {item.value}
+                          </a>
+                          {item.label === 'Phone' && (
+                            <a
+                              href={SITE_WHATSAPP_URL}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block text-sm text-accent font-medium mt-1 hover:underline"
+                            >
+                              Message on WhatsApp
+                            </a>
+                          )}
+                        </p>
+                      ) : (
+                        <p className="text-gray-500">{item.value}</p>
+                      )}
                     </div>
                   </div>
                 ))}

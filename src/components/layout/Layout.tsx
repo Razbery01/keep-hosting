@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import Navbar from './Navbar'
 import Footer from './Footer'
+import WhatsAppChatButton from './WhatsAppChatButton'
 import { Toaster } from 'sonner'
 
 export default function Layout() {
@@ -11,6 +12,7 @@ export default function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <WhatsAppChatButton />
       <Toaster position="top-right" richColors />
     </div>
   )

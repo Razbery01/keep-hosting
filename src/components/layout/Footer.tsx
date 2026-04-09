@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Globe, Mail, Phone, MapPin, ArrowUpRight, Heart } from 'lucide-react'
+import { SITE_PHONE_DISPLAY, SITE_TEL_HREF, SITE_WHATSAPP_URL } from '../../lib/constants'
 
 export default function Footer() {
   return (
@@ -112,7 +113,19 @@ export default function Footer() {
                 <div className="w-9 h-9 bg-accent/10 rounded-lg flex items-center justify-center shrink-0">
                   <Phone className="w-4 h-4 text-accent" />
                 </div>
-                +27 XX XXX XXXX
+                <span>
+                  <a href={SITE_TEL_HREF} className="text-gray-400 hover:text-white transition-colors">
+                    {SITE_PHONE_DISPLAY}
+                  </a>
+                  <a
+                    href={SITE_WHATSAPP_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-xs text-accent hover:text-white mt-1 transition-colors"
+                  >
+                    WhatsApp
+                  </a>
+                </span>
               </li>
               <li className="flex items-start gap-3">
                 <div className="w-9 h-9 bg-accent/10 rounded-lg flex items-center justify-center shrink-0">
