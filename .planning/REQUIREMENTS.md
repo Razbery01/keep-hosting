@@ -30,10 +30,10 @@ Requirements for the first real, paid, end-to-end launch milestone. Each maps to
 - [ ] **GEN-01**: Claude output parsing uses `tool_choice: { type: 'tool', name: 'deliver_site_files' }` — no regex parsing
 - [x] **GEN-02**: Claude calls run inside a Supabase Edge Function with `ANTHROPIC_API_KEY` server-side only (never client-exposed)
 - [ ] **GEN-03**: Token budget enforced: max 4,096 output tokens per generation; hard cap on retries (max 2); never retry 4xx errors
-- [ ] **GEN-04**: Generated HTML is mobile-responsive (prompt enforces responsive layout + breakpoints; output scan checks for viewport meta)
+- [x] **GEN-04**: Generated HTML is mobile-responsive (prompt enforces responsive layout + breakpoints; output scan checks for viewport meta)
 - [ ] **GEN-05**: Generation queue with rate limiting — distinguishes 429/529 (retry with backoff) from 400 (fail loudly)
-- [ ] **GEN-06**: Industry-contextual prompting — business industry + SA location shape the generated copy and imagery choices
-- [ ] **GEN-07**: Per-build Claude cost logged (input tokens + output tokens + ZAR cost); visible in admin dashboard
+- [x] **GEN-06**: Industry-contextual prompting — business industry + SA location shape the generated copy and imagery choices
+- [x] **GEN-07**: Per-build Claude cost logged (input tokens + output tokens + ZAR cost); visible in admin dashboard
 - [ ] **GEN-08**: Build pipeline split across Edge Functions to stay under 150s wall-clock limits; state transitions recorded in `build_events`
 - [x] **GEN-09**: Supabase Realtime replaces `setInterval` polling for build status updates on customer dashboard
 
@@ -172,10 +172,10 @@ Populated during roadmap creation. Each requirement maps to exactly one phase.
 | GEN-01 | Phase 2 | Pending |
 | GEN-02 | Phase 2 | Complete |
 | GEN-03 | Phase 2 | Pending |
-| GEN-04 | Phase 2 | Pending |
+| GEN-04 | Phase 2 | Complete |
 | GEN-05 | Phase 2 | Pending |
-| GEN-06 | Phase 2 | Pending |
-| GEN-07 | Phase 2 | Pending |
+| GEN-06 | Phase 2 | Complete |
+| GEN-07 | Phase 2 | Complete |
 | GEN-08 | Phase 2 | Pending |
 | GEN-09 | Phase 2 | Complete |
 | CUST-05 | Phase 2 | Complete |

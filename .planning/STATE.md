@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-generation-hardening 02-03-PLAN.md (CUST-05 fix, useBuildStatus hook, GEN-02 bundle scan)
-last_updated: "2026-04-09T22:30:07.199Z"
+stopped_at: Completed 02-generation-hardening 02-02-PLAN.md (4 shared modules + 50+ tests)
+last_updated: "2026-04-09T22:32:22.125Z"
 last_activity: 2026-04-09 — Completed 01-01 test infrastructure (vitest harness + 7 stub test files)
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 7
-  completed_plans: 5
+  completed_plans: 6
   percent: 25
 ---
 
@@ -54,6 +54,7 @@ Progress: [███░░░░░░░] 25%
 | Phase 01-security-data-foundation P02 | 10min | 3 tasks | 3 files |
 | Phase 02-generation-hardening P01 | 2min | 3 tasks | 11 files |
 | Phase 02-generation-hardening P03 | 2min | 4 tasks | 6 files |
+| Phase 02-generation-hardening P02 | 7min | 5 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -78,6 +79,9 @@ Recent decisions affecting current work:
 - [Phase 02-generation-hardening]: CUST-05: await handleSubmit() replaces setTimeout — safe because handleSubmit re-fetches user via supabase.auth.getUser() at its first line
 - [Phase 02-generation-hardening]: GEN-09: useBuildStatus hook uses 10s polling fallback only on CHANNEL_ERROR/TIMED_OUT — Realtime is primary; admin setInterval(fetchOrders,3000) preserved as out-of-scope
 - [Phase 02-generation-hardening]: GEN-02: bundle scan test excludes src/test/ directory to prevent self-referential false positives
+- [Phase 02-generation-hardening]: ZAR exchange rate hardcoded at 18.85 per 02-CONTEXT.md — Phase 6 admin can swap for live feed
+- [Phase 02-generation-hardening]: CODE_AGENT_SYSTEM OUTPUT FORMAT JSON section removed — Plan 04 uses tool_choice deliver_site_files
+- [Phase 02-generation-hardening]: Viewport meta check added as hard violation #6 in scanGeneratedHtml() — missing viewport fails deploy
 
 ### Pending Todos
 
@@ -91,6 +95,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T22:30:07.197Z
-Stopped at: Completed 02-generation-hardening 02-03-PLAN.md (CUST-05 fix, useBuildStatus hook, GEN-02 bundle scan)
+Last session: 2026-04-09T22:32:22.122Z
+Stopped at: Completed 02-generation-hardening 02-02-PLAN.md (4 shared modules + 50+ tests)
 Resume file: None
