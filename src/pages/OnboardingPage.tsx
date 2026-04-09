@@ -10,6 +10,7 @@ import {
 import { toast } from 'sonner'
 import { PACKAGES, FONT_OPTIONS } from '../lib/constants'
 import { supabase } from '../lib/supabase'
+import { validateFile, buildStoragePath } from '../lib/uploadValidation'
 import { useAuth } from '../hooks/useAuth'
 import { useDomainSearch } from '../hooks/useDomainSearch'
 import type { OnboardingData, Package as PackageType } from '../types'
@@ -174,8 +175,18 @@ export default function OnboardingPage() {
         .single()
       if (siteErr) throw siteErr
 
+      // Validate files before any async upload (SEC-03)
       if (data.logoFile) {
-        const path = `${currentUser.id}/${site.id}/logo-${data.logoFile.name}`
+        const err = validateFile(data.logoFile)
+        if (err) { toast.error(err); return }
+      }
+      if (data.heroFile) {
+        const err = validateFile(data.heroFile)
+        if (err) { toast.error(err); return }
+      }
+
+      if (data.logoFile) {
+        const path = buildStoragePath(currentUser.id, site.id, data.logoFile, { prefix: 'logo' })
         await supabase.storage.from('client-assets').upload(path, data.logoFile)
         await supabase.from('file_uploads').insert({
           site_id: site.id, user_id: currentUser.id, file_type: 'logo',
@@ -184,7 +195,7 @@ export default function OnboardingPage() {
         })
       }
       if (data.heroFile) {
-        const path = `${currentUser.id}/${site.id}/hero-${data.heroFile.name}`
+        const path = buildStoragePath(currentUser.id, site.id, data.heroFile, { prefix: 'hero' })
         await supabase.storage.from('client-assets').upload(path, data.heroFile)
         await supabase.from('file_uploads').insert({
           site_id: site.id, user_id: currentUser.id, file_type: 'hero_image',
