@@ -99,18 +99,18 @@ export default function HomePage() {
                 initial={{ opacity: 0, width: 0 }}
                 animate={{ opacity: 1, width: 'auto' }}
                 transition={{ delay: 0.3, duration: 0.5 }}
-                className="inline-flex items-center gap-2.5 bg-white/[0.06] backdrop-blur-sm border border-white/[0.08] text-accent px-4 py-2 rounded-full text-sm font-medium mb-8 overflow-hidden"
+                className="inline-flex items-center gap-2.5 bg-white/[0.06] backdrop-blur-sm border border-white/[0.08] text-white/80 px-4 py-2 rounded-full text-sm font-medium mb-8 overflow-hidden"
               >
-                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-white/50 animate-pulse" />
                 Now serving South African SMMEs
               </motion.div>
 
               <h1 className="text-[2.75rem] leading-[1.08] md:text-6xl lg:text-[4.25rem] font-extrabold tracking-tight text-white mb-6">
                 Your business<br className="hidden sm:block" /> deserves a website<br className="hidden sm:block" />
                 {' '}<span className="relative inline-block">
-                  <span className="text-accent">that works.</span>
+                  <span className="text-white/95">that works.</span>
                   <motion.span
-                    className="absolute -bottom-1.5 left-0 h-[3px] bg-accent/40 rounded-full"
+                    className="absolute -bottom-1.5 left-0 h-[3px] bg-white/30 rounded-full"
                     initial={{ width: 0 }}
                     animate={{ width: '100%' }}
                     transition={{ delay: 0.8, duration: 0.6, ease: [0.25, 0.4, 0.25, 1] as [number, number, number, number] }}
@@ -123,7 +123,7 @@ export default function HomePage() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 mb-10">
-                <Link to="/onboarding" className="group relative inline-flex items-center justify-center gap-2.5 bg-accent text-white pl-7 pr-5 py-4 rounded-2xl font-bold text-[17px] overflow-hidden transition-all duration-200 hover:shadow-[0_0_40px_rgba(0,212,255,0.25)]">
+                <Link to="/onboarding" className="group relative inline-flex items-center justify-center gap-2.5 bg-accent text-white pl-7 pr-5 py-4 rounded-2xl font-bold text-[17px] overflow-hidden transition-all duration-200 hover:shadow-lg hover:shadow-primary/20">
                   <span className="relative z-10 flex items-center gap-2.5">Build My Website <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" /></span>
                 </Link>
                 <Link to="/pricing" className="inline-flex items-center justify-center gap-2 text-white px-7 py-4 rounded-2xl font-semibold text-[17px] border border-white/[0.12] hover:bg-white/[0.04] transition-colors duration-200">
@@ -141,7 +141,7 @@ export default function HomePage() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.5 + i * 0.08 }}
                       className="w-9 h-9 rounded-full border-2 border-dark flex items-center justify-center text-xs font-bold"
-                      style={{ backgroundColor: ['#00D4FF', '#52B788', '#FB923C', '#A855F7', '#FB7185'][i], color: '#fff' }}
+                      style={{ backgroundColor: ['#2A4F7F', '#3d5a73', '#1E3A5F', '#4a6680', '#2f4a63'][i], color: '#fff' }}
                     >
                       {letter}
                     </motion.div>
@@ -149,7 +149,7 @@ export default function HomePage() {
                 </div>
                 <div>
                   <div className="flex gap-0.5 mb-0.5">
-                    {[1,2,3,4,5].map((s) => <Star key={s} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />)}
+                    {[1,2,3,4,5].map((s) => <Star key={s} className="w-3.5 h-3.5 text-gray-500 fill-gray-400" />)}
                   </div>
                   <span className="text-xs text-gray-500">Trusted by <strong className="text-gray-400">50+ businesses</strong> across SA</span>
                 </div>
@@ -172,7 +172,7 @@ export default function HomePage() {
                     </div>
                     <div className="flex-1 mx-6">
                       <div className="bg-white/[0.06] rounded-lg px-3 py-1.5 text-[11px] text-gray-500 flex items-center gap-2 max-w-[220px] mx-auto">
-                        <Shield className="w-3 h-3 text-green-400 shrink-0" />
+                        <Shield className="w-3 h-3 text-white/50 shrink-0" />
                         <span className="truncate">yourbusiness.co.za</span>
                       </div>
                     </div>
@@ -232,7 +232,7 @@ export default function HomePage() {
                   transition={{ delay: 1.8, duration: 0.4 }}
                   className="absolute -top-4 -right-4 bg-white shadow-lg shadow-black/10 text-gray-900 px-4 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2.5 border border-gray-100"
                 >
-                  <div className="w-8 h-8 bg-green-50 rounded-xl flex items-center justify-center"><CheckCircle2 className="w-4 h-4 text-green-500" /></div>
+                  <div className="w-8 h-8 bg-gray-100 rounded-xl flex items-center justify-center"><CheckCircle2 className="w-4 h-4 text-primary" /></div>
                   Site Live!
                 </motion.div>
                 <motion.div
@@ -241,7 +241,7 @@ export default function HomePage() {
                   transition={{ delay: 2.0, duration: 0.4 }}
                   className="absolute -bottom-4 -left-4 bg-white shadow-lg shadow-black/10 text-gray-900 px-4 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2.5 border border-gray-100"
                 >
-                  <div className="w-8 h-8 bg-accent/10 rounded-xl flex items-center justify-center"><Zap className="w-4 h-4 text-accent" /></div>
+                  <div className="w-8 h-8 bg-gray-100 rounded-xl flex items-center justify-center"><Zap className="w-4 h-4 text-primary" /></div>
                   Under 48h
                 </motion.div>
               </div>
@@ -257,10 +257,10 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/60 border border-gray-100 grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-100">
             {[
-              { value: '50+', label: 'Sites Delivered', accent: 'text-accent' },
-              { value: '99.9%', label: 'Uptime SLA', accent: 'text-green-500' },
-              { value: '<48h', label: 'Turnaround', accent: 'text-purple-500' },
-              { value: 'R0', label: 'Upfront Cost', accent: 'text-amber-500' },
+              { value: '50+', label: 'Sites Delivered' },
+              { value: '99.9%', label: 'Uptime SLA' },
+              { value: '<48h', label: 'Turnaround' },
+              { value: 'R0', label: 'Upfront Cost' },
             ].map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -270,7 +270,7 @@ export default function HomePage() {
                 transition={{ delay: i * 0.1, duration: 0.5 }}
                 className="py-8 px-4 text-center"
               >
-                <div className={`text-3xl md:text-4xl font-extrabold tracking-tight ${stat.accent}`}>{stat.value}</div>
+                <div className="text-3xl md:text-4xl font-extrabold tracking-tight text-primary">{stat.value}</div>
                 <div className="text-xs text-gray-500 mt-1.5 font-semibold uppercase tracking-wider">{stat.label}</div>
               </motion.div>
             ))}
@@ -281,7 +281,7 @@ export default function HomePage() {
       {/* ── What Makes Us Different ── */}
       <section className="py-28 bg-surface bg-dots-light relative overflow-hidden">
         <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-accent/[0.05] rounded-full -translate-y-1/2 -translate-x-1/3 blur-[120px]" />
-        <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-purple-500/[0.04] rounded-full translate-y-1/2 translate-x-1/3 blur-[100px]" />
+        <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-primary/[0.06] rounded-full translate-y-1/2 translate-x-1/3 blur-[100px]" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Left — image + text */}
@@ -315,16 +315,16 @@ export default function HomePage() {
                   ))}
                 </ul>
               </div>
-              <div className="bg-gradient-to-br from-accent/5 via-white to-cyan-500/5 rounded-3xl p-8 border-2 border-accent/20 relative shadow-lg shadow-accent/5">
+              <div className="bg-white rounded-3xl p-8 border border-gray-200 relative shadow-md shadow-gray-200/40 ring-1 ring-primary/5">
                 <div className="absolute -top-3.5 left-8">
-                  <span className="bg-accent text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg shadow-accent/20">KEEP HOSTING</span>
+                  <span className="bg-primary text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-sm">KEEP HOSTING</span>
                 </div>
-                <h3 className="font-bold text-accent mb-6 text-xs uppercase tracking-widest">Our Turnkey Solution</h3>
+                <h3 className="font-bold text-primary mb-6 text-xs uppercase tracking-widest">Our Turnkey Solution</h3>
                 <ul className="space-y-4">
                   {['Tell us about your business', 'We design & build everything', 'Hosting & SSL included', 'Domain setup handled', 'SEO optimized from day one', 'Preview before you pay'].map((item) => (
                     <li key={item} className="flex items-center gap-3 text-sm text-gray-800 font-medium">
-                      <span className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
-                        <CheckCircle2 className="w-4 h-4 text-accent" />
+                      <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        <CheckCircle2 className="w-4 h-4 text-primary" />
                       </span>
                       {item}
                     </li>
@@ -353,7 +353,7 @@ export default function HomePage() {
             {INDUSTRIES.map(({ icon: Icon, label }, i) => (
               <motion.div key={label} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
                 className="bg-white/[0.06] backdrop-blur-sm rounded-2xl p-6 text-center border border-white/[0.08] hover:bg-white/[0.12] hover:-translate-y-1 transition-all duration-300 group">
-                <div className="w-14 h-14 mx-auto bg-white/10 rounded-2xl flex items-center justify-center text-accent mb-4 group-hover:bg-accent group-hover:text-white group-hover:shadow-lg group-hover:shadow-accent/20 transition-all duration-300">
+                <div className="w-14 h-14 mx-auto bg-white/10 rounded-2xl flex items-center justify-center text-white/90 mb-4 group-hover:bg-white/20 group-hover:text-white transition-all duration-300">
                   <Icon className="w-6 h-6" />
                 </div>
                 <span className="text-sm font-semibold text-white/80">{label}</span>
@@ -375,14 +375,14 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {[
-              { step: '1', title: 'Tell Us About You', desc: 'Fill in a quick form with your business details, pick your colors, upload your logo — takes about 5 minutes.', icon: <Users className="w-7 h-7" />, gradient: 'from-accent/10 to-cyan-500/5' },
-              { step: '2', title: 'We Build Your Preview', desc: 'We craft a professional website tailored to your brand. You get a live preview link to review — no payment required yet.', icon: <Eye className="w-7 h-7" />, gradient: 'from-purple-500/10 to-blue-500/5' },
-              { step: '3', title: 'Approve, Pay & Go Live', desc: 'Happy with your preview? Approve it, pay once, and your site goes live with hosting, SSL, and your domain — all included.', icon: <Rocket className="w-7 h-7" />, gradient: 'from-green-500/10 to-emerald-500/5' },
+              { step: '1', title: 'Tell Us About You', desc: 'Fill in a quick form with your business details, pick your colors, upload your logo — takes about 5 minutes.', icon: <Users className="w-7 h-7" />, gradient: 'from-slate-50 to-gray-50/80' },
+              { step: '2', title: 'We Build Your Preview', desc: 'We craft a professional website tailored to your brand. You get a live preview link to review — no payment required yet.', icon: <Eye className="w-7 h-7" />, gradient: 'from-gray-50 to-slate-50/90' },
+              { step: '3', title: 'Approve, Pay & Go Live', desc: 'Happy with your preview? Approve it, pay once, and your site goes live with hosting, SSL, and your domain — all included.', icon: <Rocket className="w-7 h-7" />, gradient: 'from-slate-50/90 to-gray-50' },
             ].map((item, i) => (
               <motion.div key={item.step} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
                 className={`relative bg-gradient-to-br ${item.gradient} rounded-3xl p-8 border border-gray-100 group hover:shadow-xl hover:shadow-gray-200/50 hover:-translate-y-1 transition-all duration-300`}>
                 <div className="flex items-center gap-4 mb-5">
-                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-accent shadow-sm">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-primary shadow-sm border border-gray-100">
                     {item.icon}
                   </div>
                   <span className="text-5xl font-extrabold text-gray-200/60">{item.step}</span>
@@ -412,7 +412,7 @@ export default function HomePage() {
               { icon: <CreditCard className="w-6 h-6" />, title: 'No Hidden Fees', desc: 'One price. Design, hosting, SSL — all included.' },
             ].map((item) => (
               <div key={item.title} className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center text-accent shrink-0 border border-white/5">
+                <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center text-white/90 shrink-0 border border-white/10">
                   {item.icon}
                 </div>
                 <div>
@@ -438,12 +438,12 @@ export default function HomePage() {
             {SERVICES.map((service, i) => (
               <motion.div key={service.id} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
                 className="group bg-gray-50 rounded-2xl p-7 hover:bg-white hover:shadow-xl hover:shadow-gray-200/50 hover:-translate-y-1 transition-all duration-300 border border-transparent hover:border-gray-100">
-                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-accent mb-5 shadow-sm group-hover:bg-accent group-hover:text-white group-hover:shadow-lg group-hover:shadow-accent/20 transition-all duration-300">
+                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-primary mb-5 shadow-sm border border-gray-100 group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all duration-300">
                   {iconMap[service.icon]}
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2 text-lg">{service.title}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed mb-4">{service.description}</p>
-                <Link to="/services" className="inline-flex items-center gap-1.5 text-accent text-sm font-semibold opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-300">
+                <Link to="/services" className="inline-flex items-center gap-1.5 text-primary text-sm font-semibold opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-300">
                   Learn more <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </motion.div>
@@ -466,9 +466,9 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { name: 'Fresh Roots Catering', industry: 'Food & Hospitality', color: '#D97706', img: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80' },
-              { name: 'ProFix Plumbing', industry: 'Construction & Trades', color: '#2563EB', img: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80' },
-              { name: 'Lumina Beauty Studio', industry: 'Beauty & Wellness', color: '#DB2777', img: 'https://images.unsplash.com/photo-1560750588-73b555e41656?auto=format&fit=crop&w=600&q=80' },
+              { name: 'Fresh Roots Catering', industry: 'Food & Hospitality', color: '#57534e', img: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80' },
+              { name: 'ProFix Plumbing', industry: 'Construction & Trades', color: '#44403c', img: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80' },
+              { name: 'Lumina Beauty Studio', industry: 'Beauty & Wellness', color: '#78716c', img: 'https://images.unsplash.com/photo-1560750588-73b555e41656?auto=format&fit=crop&w=600&q=80' },
             ].map((project, i) => (
               <motion.div key={project.name} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
                 className="group rounded-2xl overflow-hidden border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] transition-all duration-300">
@@ -492,7 +492,7 @@ export default function HomePage() {
       {/* ── Pricing ── */}
       <section className="py-28 bg-white bg-grid relative overflow-hidden">
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-accent/[0.04] rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl" />
-        <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-purple-500/[0.04] rounded-full -translate-y-1/2 translate-x-1/2 blur-[100px]" />
+        <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-primary/[0.05] rounded-full -translate-y-1/2 translate-x-1/2 blur-[100px]" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
             <SectionLabel>Pricing</SectionLabel>
@@ -510,10 +510,10 @@ export default function HomePage() {
                 {pkg.highlighted && (
                   <>
                     <div className="absolute inset-0 rounded-3xl overflow-hidden">
-                      <div className="absolute top-0 right-0 w-40 h-40 bg-accent/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
+                      <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
                     </div>
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                      <span className="bg-accent text-white text-xs font-bold px-5 py-2 rounded-full shadow-lg shadow-accent/30 flex items-center gap-1.5 whitespace-nowrap">
+                      <span className="bg-white/15 text-white text-xs font-bold px-5 py-2 rounded-full border border-white/20 flex items-center gap-1.5 whitespace-nowrap">
                         <Star className="w-3.5 h-3.5 fill-current" /> Most Popular
                       </span>
                     </div>
@@ -529,14 +529,14 @@ export default function HomePage() {
                   <ul className="space-y-3.5 mb-8">
                     {pkg.features.slice(0, 6).map((f) => (
                       <li key={f} className={`flex items-start gap-3 text-sm ${pkg.highlighted ? 'text-gray-300' : 'text-gray-600'}`}>
-                        <CheckCircle2 className={`w-5 h-5 shrink-0 ${pkg.highlighted ? 'text-accent' : 'text-accent/70'}`} /> {f}
+                        <CheckCircle2 className={`w-5 h-5 shrink-0 ${pkg.highlighted ? 'text-white/90' : 'text-primary/80'}`} /> {f}
                       </li>
                     ))}
                   </ul>
                   <Link to={`/onboarding?package=${pkg.id}`}
                     className={`flex items-center justify-center gap-2 w-full py-4 rounded-2xl font-bold text-sm transition-all duration-300 ${
                       pkg.highlighted
-                        ? 'bg-accent text-white hover:shadow-lg hover:shadow-accent/30 hover:scale-[1.02]'
+                        ? 'bg-white text-primary hover:bg-white/95 hover:shadow-lg'
                         : 'bg-gray-900 text-white hover:bg-gray-800 hover:shadow-lg'
                     }`}>
                     Get Started <ArrowRight className="w-4 h-4" />
@@ -563,13 +563,13 @@ export default function HomePage() {
                 <div className="absolute top-6 right-6 text-6xl font-serif text-gray-100 leading-none select-none">"</div>
                 <div className="flex gap-1 mb-5">
                   {Array.from({ length: t.rating }).map((_, j) => (
-                    <Star key={j} className="w-5 h-5 text-amber-400 fill-amber-400" />
+                    <Star key={j} className="w-5 h-5 text-gray-400 fill-gray-300" />
                   ))}
                 </div>
                 <p className="text-gray-600 leading-relaxed mb-8 text-[15px] relative">"{t.text}"</p>
                 <div className="flex items-center gap-3 pt-5 border-t border-gray-100">
                   <div className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-sm"
-                    style={{ backgroundColor: ['#00D4FF', '#52B788', '#FB7185'][i] }}>
+                    style={{ backgroundColor: ['#1E3A5F', '#2A4F7F', '#3d5a73'][i] }}>
                     {t.name.charAt(0)}
                   </div>
                   <div>

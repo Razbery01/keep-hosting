@@ -9,7 +9,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           <div>
             <div className="flex items-center gap-2.5 text-white font-extrabold text-xl mb-5">
-              <div className="w-9 h-9 bg-gradient-to-br from-accent to-cyan-400 rounded-xl flex items-center justify-center">
+              <div className="w-9 h-9 bg-gradient-to-br from-primary-light to-primary-dark rounded-xl flex items-center justify-center">
                 <Globe className="w-5 h-5 text-white" />
               </div>
               Keep Hosting

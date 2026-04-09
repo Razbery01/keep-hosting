@@ -44,7 +44,7 @@ const BUILD_STEPS = [
 
 const statusConfig: Record<string, { bg: string; text: string; icon: React.ReactNode; label: string }> = {
   pending: { bg: 'bg-yellow-50', text: 'text-yellow-700', icon: <Clock className="w-4 h-4" />, label: 'In Progress' },
-  building: { bg: 'bg-purple-50', text: 'text-purple-700', icon: <Loader2 className="w-4 h-4 animate-spin" />, label: 'Building' },
+  building: { bg: 'bg-slate-50', text: 'text-slate-700', icon: <Loader2 className="w-4 h-4 animate-spin" />, label: 'Building' },
   preview_ready: { bg: 'bg-blue-50', text: 'text-blue-700', icon: <Eye className="w-4 h-4" />, label: 'Preview Ready' },
   paid: { bg: 'bg-emerald-50', text: 'text-emerald-700', icon: <CheckCircle2 className="w-4 h-4" />, label: 'Paid' },
   deployed: { bg: 'bg-green-50', text: 'text-green-700', icon: <CheckCircle2 className="w-4 h-4" />, label: 'Deployed' },
@@ -84,7 +84,7 @@ function BuildProgress({ buildStatus, siteId }: { buildStatus: string; siteId: s
   const statusIcon = (s: string) =>
     s === 'success' ? '✓' : s === 'error' ? '✕' : s === 'warning' ? '⚠' : '→'
   const statusColor = (s: string) =>
-    s === 'success' ? 'text-green-400' : s === 'error' ? 'text-red-400' : s === 'warning' ? 'text-yellow-400' : 'text-cyan-400'
+    s === 'success' ? 'text-emerald-600' : s === 'error' ? 'text-red-500' : s === 'warning' ? 'text-amber-700' : 'text-slate-600'
 
   return (
     <div className="mt-5 bg-white border border-gray-200 rounded-xl overflow-hidden">
@@ -104,7 +104,7 @@ function BuildProgress({ buildStatus, siteId }: { buildStatus: string; siteId: s
 
         <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden mb-4">
           <motion.div
-            className={`h-full rounded-full ${isFailed ? 'bg-red-400' : 'bg-gradient-to-r from-accent to-cyan-400'}`}
+            className={`h-full rounded-full ${isFailed ? 'bg-red-400' : 'bg-gradient-to-r from-accent to-primary'}`}
             initial={{ width: 0 }}
             animate={{ width: `${isFailed ? 100 : pct}%` }}
             transition={{ type: 'spring', stiffness: 100, damping: 20 }}

@@ -30,12 +30,12 @@ const INDUSTRY_TILES = [
 ]
 
 const COLOR_PRESETS = [
-  { name: 'Ocean', primary: '#1E3A5F', secondary: '#00D4FF' },
-  { name: 'Forest', primary: '#1B4332', secondary: '#52B788' },
-  { name: 'Sunset', primary: '#7C2D12', secondary: '#FB923C' },
-  { name: 'Royal', primary: '#3B0764', secondary: '#A855F7' },
+  { name: 'Ocean', primary: '#1E3A5F', secondary: '#5f7389' },
+  { name: 'Forest', primary: '#1B4332', secondary: '#3d6b5c' },
+  { name: 'Sunset', primary: '#7C2D12', secondary: '#b45309' },
+  { name: 'Navy', primary: '#0f172a', secondary: '#64748b' },
   { name: 'Slate', primary: '#1E293B', secondary: '#64748B' },
-  { name: 'Rose', primary: '#881337', secondary: '#FB7185' },
+  { name: 'Wine', primary: '#4c0519', secondary: '#9f1239' },
 ]
 
 const STEP_LABELS = ['Your Business', 'Your Style', 'Final Details']
@@ -52,7 +52,7 @@ const initialData: OnboardingData = {
   contactPhone: '',
   contactAddress: '',
   primaryColor: '#1E3A5F',
-  secondaryColor: '#00D4FF',
+  secondaryColor: '#5f7389',
   fontPreference: 'Inter',
   aboutText: '',
   servicesText: '',
@@ -231,7 +231,7 @@ export default function OnboardingPage() {
           </div>
           <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-gradient-to-r from-accent to-cyan-400 rounded-full"
+              className="h-full bg-gradient-to-r from-accent to-primary rounded-full"
               animate={{ width: `${((step + 1) / 3) * 100}%` }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             />
@@ -707,7 +707,7 @@ function LivePreview({ data, logoPreview, heroPreview }: {
         <div className="flex gap-1">
           <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
           <div className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
-          <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
+          <div className="w-2.5 h-2.5 rounded-full bg-primary/70" />
         </div>
         <div className="flex-1 mx-2">
           <div className="bg-white border border-gray-200 rounded-md px-3 py-1 text-[10px] text-gray-400 flex items-center gap-1.5 truncate">

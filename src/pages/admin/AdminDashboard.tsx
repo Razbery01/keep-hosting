@@ -114,7 +114,7 @@ export default function AdminDashboard() {
                     </span>
                     <span className={`text-xs font-medium px-2.5 py-1 rounded-full capitalize ${
                       order.status === 'live' ? 'bg-green-100 text-green-700' :
-                      order.status === 'building' ? 'bg-purple-100 text-purple-700' :
+                      order.status === 'building' ? 'bg-slate-100 text-slate-700' :
                       'bg-gray-100 text-gray-600'
                     }`}>
                       {order.status.replace('_', ' ')}
