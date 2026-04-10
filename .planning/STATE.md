@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 03-02 (core deploy pipeline: deploy-site, suspend-site, reactivate-site, test bodies)"
-last_updated: "2026-04-10T10:26:04.132Z"
+stopped_at: "Completed 03-03 (deploy pipeline verification: migration 005, 5 Edge Functions deployed, NETLIFY_PAT configured, real deploy/suspend/reactivate verified)"
+last_updated: "2026-04-10T11:27:23.784Z"
 last_activity: 2026-04-09 — Completed 01-01 test infrastructure (vitest harness + 7 stub test files)
 progress:
   total_phases: 6
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 10
-  completed_plans: 9
+  completed_plans: 10
   percent: 25
 ---
 
@@ -57,6 +57,7 @@ Progress: [███░░░░░░░] 25%
 | Phase 02-generation-hardening P02 | 7min | 5 tasks | 9 files |
 | Phase 03-deployment-pipeline P01 | 2min | 3 tasks | 9 files |
 | Phase 03-deployment-pipeline P02 | 5min | 2 tasks | 13 files |
+| Phase 03-deployment-pipeline P03 | 15min | 2 tasks | 0 files |
 
 ## Accumulated Context
 
@@ -92,6 +93,9 @@ Recent decisions affecting current work:
 - [Phase 03-deployment-pipeline]: idx_client_sites_queue rebuilt (DROP+CREATE) to add deploy_failed — idempotent pattern from migration 004
 - [Phase 03-deployment-pipeline]: netlify_site_id written to DB immediately after Netlify site creation, before zip deploy — prevents orphan sites on retry
 - [Phase 03-deployment-pipeline]: build-orchestrator routes deploy_failed rows to deploy-site, generation retries to generate-site
+- [Phase 03-deployment-pipeline]: Netlify pricing tier confirmed acceptable — credit budget acceptable for launch volume
+- [Phase 03-deployment-pipeline]: GITHUB_PAT permanently removed — Netlify zip-deploy approach supersedes GitHub-based deploy
+- [Phase 03-deployment-pipeline]: Suspension placeholder-deploy confirmed: branded UX trade-off accepted over Netlify disable endpoint
 
 ### Pending Todos
 
@@ -105,6 +109,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-10T10:26:04.130Z
-Stopped at: Completed 03-02 (core deploy pipeline: deploy-site, suspend-site, reactivate-site, test bodies)
+Last session: 2026-04-10T11:27:23.780Z
+Stopped at: Completed 03-03 (deploy pipeline verification: migration 005, 5 Edge Functions deployed, NETLIFY_PAT configured, real deploy/suspend/reactivate verified)
 Resume file: None
