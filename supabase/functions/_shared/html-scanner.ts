@@ -7,9 +7,15 @@ export interface HtmlScanResult {
 }
 
 const ALLOWED_EXTERNAL_SCRIPT_HOSTS = [
+  // CSS / fonts
   'cdn.tailwindcss.com',
   'fonts.googleapis.com',
   'fonts.gstatic.com',
+  // JS CDNs — vetted public mirrors of npm packages (Alpine.js, htmx, lucide, etc.)
+  'unpkg.com',
+  'cdn.jsdelivr.net',
+  'cdnjs.cloudflare.com',
+  'esm.sh',
 ]
 
 export function scanGeneratedHtml(html: string): HtmlScanResult {
