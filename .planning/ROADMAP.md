@@ -107,7 +107,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Security & Data Foundation | 3/3 | Complete    | 2026-04-09 |
 | 2. Generation Hardening | 4/4 | Complete   | 2026-04-09 |
-| 3. Deployment Pipeline | 0/3 | Planning complete | - |
+| 3. Deployment Pipeline | 2/3 | In Progress|  |
 | 4. Payment Integration | 0/TBD | Not started | - |
 | 5. Domain Registration & Customer Lifecycle | 0/TBD | Not started | - |
 | 6. Compliance, Tests & Operations | 0/TBD | Not started | - |
