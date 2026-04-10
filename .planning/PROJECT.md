@@ -30,7 +30,7 @@ An SA small business can go from "I need a website" to "my site is live on my ow
 
 - [ ] **Real domain search + registration** via ZADOMAINS API (replace Google DNS placeholder)
 - [ ] **Netlify deployment pipeline** — programmatically create site, deploy generated files, attach custom domain via Netlify API
-- [ ] **Yoco payment integration** — collect one-time setup fee and R49/mo recurring hosting subscription
+- [ ] **PayFast payment integration** — collect one-time setup fee and R49/mo recurring hosting subscription
 - [ ] **Subscription lifecycle** — on failed payment: grace period, suspend site (Netlify unpublish), reactivate on payment
 - [ ] **Claude generation hardening** — improve consistency, reliability, output quality; structured prompt pipeline
 - [ ] **AI regeneration flow** — customer describes a change, AI regenerates affected sections without losing context
@@ -66,9 +66,9 @@ An SA small business can go from "I need a website" to "my site is live on my ow
 - **Generation engine (locked):** Claude via Anthropic API. No switching to other LLMs for v1.
 - **Hosting (locked):** Netlify for customer sites, driven programmatically via Netlify API.
 - **Domains (locked):** ZADOMAINS API for `.co.za` registration and management.
-- **Payments (locked):** Yoco for SA-native card + EFT, supporting recurring billing for the R49/mo subscription.
+- **Payments (locked):** PayFast for SA-native card + EFT, supporting recurring billing for the R49/mo subscription. Switched from Yoco on 2026-04-10 because PayFast has documented recurring billing (native subscriptions), well-documented ITN webhooks, and a full sandbox environment — removing the PAY-01 vendor-contact blocker.
 - **Currency:** ZAR only. No multi-currency support.
-- **Budget / infra:** Unit economics depend on Claude API cost per site + Netlify free/paid tiers + ZADOMAINS wholesale domain cost + Yoco fees all staying below the setup fee. Generation cost needs monitoring from day one.
+- **Budget / infra:** Unit economics depend on Claude API cost per site + Netlify free/paid tiers + ZADOMAINS wholesale domain cost + PayFast fees all staying below the setup fee. Generation cost needs monitoring from day one.
 - **Compliance:** POPIA (SA's privacy law) applies to customer PII collected during onboarding. Privacy policy + lawful basis required before launch.
 
 ## Key Decisions
@@ -82,7 +82,7 @@ An SA small business can go from "I need a website" to "my site is live on my ow
 | Setup fee + R49/mo hosting | Covers Claude API cost at signup; recurring covers ongoing hosting/domain renewal | — Pending |
 | Netlify for customer site hosting | Programmatic API, fast CDN, custom domain attachment built-in | — Pending |
 | ZADOMAINS for `.co.za` registration | SA-native registrar with API access — avoids upstream GoDaddy/Namecheap complexity | — Pending |
-| Yoco for payments | SA-native, supports recurring tokens, simpler compliance than Stripe ZA | — Pending |
+| PayFast for payments | SA-native, documented recurring subscriptions + ITN webhooks + sandbox. Switched from Yoco 2026-04-10 to remove PAY-01 vendor-contact blocker | — Pending |
 | Brownfield build-on-existing (no rewrite) | Existing scaffold is sound; rewriting loses sunk work and shipped learnings | — Pending |
 
 ---

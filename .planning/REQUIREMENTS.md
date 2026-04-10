@@ -46,17 +46,17 @@ Requirements for the first real, paid, end-to-end launch milestone. Each maps to
 - [x] **DEPLOY-05**: Site reactivation — on successful payment after suspension, republish the Netlify site (redeploy from persisted files in Supabase Storage)
 - [x] **DEPLOY-06**: Deploy failure triggers retry with idempotency; persisted files in Storage eliminate need to re-call Claude
 
-### Payments (Yoco)
+### Payments (PayFast)
 
-- [ ] **PAY-01**: Vendor validation completed — Yoco recurring billing capability confirmed, card tokenization + webhook HMAC format documented (blocks PAY-02 onwards)
-- [ ] **PAY-02**: `yoco-checkout` Edge Function creates Yoco checkout session for setup fee; returns checkout URL
-- [ ] **PAY-03**: `yoco-webhook` Edge Function verifies HMAC signature on every webhook; rejects invalid signatures
-- [ ] **PAY-04**: Webhook handler is idempotent — duplicate event delivery does not double-charge or double-create subscriptions
-- [ ] **PAY-05**: On `payment.succeeded` for setup fee, subscription row inserted; site build is triggered (payment is the master trigger — no build starts without it)
-- [ ] **PAY-06**: Recurring R49/mo charge attempted on `subscriptions.next_charge_at`; stored token used via server-side charge API
-- [ ] **PAY-07**: Failed payment retry ladder — retry at 24h, 7d, 14d; customer email sent on each failure; site suspended at 14d
-- [ ] **PAY-08**: Customer can update card via a "Update payment method" page (Yoco tokenize flow); failed subscriptions reactivate on next successful charge
-- [ ] **PAY-09**: All Yoco API calls happen inside Edge Functions — `YOCO_SECRET_KEY` never exposed client-side
+- [ ] **PAY-01**: PayFast merchant account configured with sandbox + production credentials; subscription feature enabled (documented — no vendor contact blocker)
+- [ ] **PAY-02**: OnboardingPage redirects to PayFast checkout with setup fee + R49/mo subscription; `custom_str1` carries siteId through the flow
+- [ ] **PAY-03**: `payfast-itn` Edge Function verifies ITN signature (MD5 hash of sorted params + passphrase); rejects invalid signatures
+- [ ] **PAY-04**: ITN handler is idempotent — duplicate notifications do not double-create subscriptions or double-trigger builds (`m_payment_id` dedup)
+- [ ] **PAY-05**: On initial payment COMPLETE, subscription row inserted; site build triggered via `generate-site` (payment is the master trigger — no build starts without it)
+- [ ] **PAY-06**: Recurring R49/mo handled by PayFast native subscriptions; ITN notifications on each charge update `subscriptions.next_charge_at`
+- [ ] **PAY-07**: Failed payment retry handled by PayFast (3 attempts over 10 days); on final failure + CANCELLED ITN, site suspended via `suspend-site`
+- [ ] **PAY-08**: Customer can resubscribe via new PayFast checkout after cancellation/suspension; `reactivate-site` fires on new subscription COMPLETE
+- [ ] **PAY-09**: All PayFast API calls and ITN verification happen inside Edge Functions — `PAYFAST_PASSPHRASE` never exposed client-side
 
 ### Domain Registration (ZADOMAINS)
 
@@ -87,7 +87,7 @@ Requirements for the first real, paid, end-to-end launch milestone. Each maps to
 ### Test Infrastructure
 
 - [ ] **TEST-01**: Vitest + jsdom + @testing-library/react + @testing-library/jest-dom configured; `npm test` and `npm run test:watch` scripts added
-- [ ] **TEST-02**: Smoke tests cover: admin 403 for non-admin user, file upload MIME rejection, Yoco webhook idempotency, build state machine transitions
+- [ ] **TEST-02**: Smoke tests cover: admin 403 for non-admin user, file upload MIME rejection, PayFast ITN idempotency, build state machine transitions
 - [ ] **TEST-03**: Integration test suite runs against a dedicated Supabase test project (not mocks) to catch RLS regressions
 - [ ] **TEST-04**: CI runs tests on every push (GitHub Actions or equivalent); failing tests block merge
 
@@ -112,7 +112,7 @@ Deferred. Acknowledged but not in this milestone's roadmap.
 ### Commerce
 
 - **V2-COMM-01**: E-commerce on generated sites (cart, inventory, VAT handling)
-- **V2-COMM-02**: Integrated Yoco payments on generated customer sites
+- **V2-COMM-02**: Integrated PayFast payments on generated customer sites
 - **V2-COMM-03**: Booking/appointment functionality for service businesses
 
 ### Platform
