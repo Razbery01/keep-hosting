@@ -5,7 +5,7 @@
 set -e
 
 KEY=$(grep VITE_SUPABASE_ANON_KEY .env | cut -d= -f2)
-SITE_ID="d6c5bf87-2ac4-4cfd-a92c-6f0cdb9995a5"
+SITE_ID="4a73eb66-7044-4ae3-a501-3a78e6a79007"
 URL="https://wozonryvuvbxxfdykzne.supabase.co/functions/v1/generate-site"
 
 echo "Calling generate-site for site $SITE_ID..."
