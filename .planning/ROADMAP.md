@@ -58,7 +58,11 @@ Plans:
   2. Each customer site gets a UUID-based Netlify site name (e.g. `kh-{uuid}.netlify.app`) inside a dedicated Netlify team account — no name collisions, no personal-account accumulation
   3. A deploy queue enforces the 3-deploys-per-minute Netlify rate limit and tracks daily deploy count; an alert fires when the count reaches 80
   4. When a subscription is suspended, the Netlify site is programmatically unpublished; when a subscription is reactivated, the site is republished from the files already persisted in Supabase Storage — Claude is not called again
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 03-01-PLAN.md — Wave 1: Test stubs (6 DEPLOY test files with it.todo), migration 005 (extend build_status CHECK + deploy indexes), update TypeScript types, update DashboardPage status rendering
+- [ ] 03-02-PLAN.md — Wave 2: Core implementation — deploy-site + suspend-site + reactivate-site Edge Functions, suspended-page.ts template, wire persist-files chain with EdgeRuntime.waitUntil, extend build-orchestrator for deploy_failed retry, fill all 6 test bodies
+- [ ] 03-03-PLAN.md — Wave 3: Apply migration 005 + deploy Edge Functions + human-verify checkpoint (create Netlify team account, set secrets, test real deploy/suspend/reactivate cycle, confirm pricing tier)
 
 ### Phase 4: Payment Integration
 **Goal**: Yoco checkout collects the setup fee, recurring billing charges monthly via stored token, and payment success is the exclusive trigger that starts site generation — no build starts without confirmed payment
@@ -103,7 +107,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Security & Data Foundation | 3/3 | Complete    | 2026-04-09 |
 | 2. Generation Hardening | 4/4 | Complete   | 2026-04-09 |
-| 3. Deployment Pipeline | 0/TBD | Not started | - |
+| 3. Deployment Pipeline | 0/3 | Planning complete | - |
 | 4. Payment Integration | 0/TBD | Not started | - |
 | 5. Domain Registration & Customer Lifecycle | 0/TBD | Not started | - |
 | 6. Compliance, Tests & Operations | 0/TBD | Not started | - |
