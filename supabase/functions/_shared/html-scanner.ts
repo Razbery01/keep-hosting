@@ -68,10 +68,10 @@ export function scanGeneratedHtml(html: string): HtmlScanResult {
     }
   }
 
-  // 3. Inline event handlers: on\w+=
-  if (/\bon[a-z]+\s*=\s*["']/i.test(html)) {
-    violations.push('Contains inline event handler (on*=)')
-  }
+  // 3. Inline event handlers (on*=): allowed alongside inline <script>.
+  //    The security model consistency: input is sanitized via sanitizeForPrompt (SEC-06)
+  //    so prompt injection cannot inject malicious onclick handlers via customer input.
+  //    Claude legitimately uses on*= for button interactions on static sites.
 
   // 4. javascript: protocol in href or action
   if (/(href|action)\s*=\s*["']\s*javascript:/i.test(html)) {

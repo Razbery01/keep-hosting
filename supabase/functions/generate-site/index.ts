@@ -13,10 +13,15 @@ const anthropic = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY')! })
 // Per-package Claude output token caps (GEN-03 / 02-CONTEXT.md)
 // Starter: single-page site; Professional: 4 pages; Enterprise: 6+ pages
 // ─────────────────────────────────────────────
+// Free tier accommodation: SDK rejects non-streaming messages.create() when max_tokens
+// crosses an internal threshold (~8k+) with "Streaming is required for operations that may
+// take longer than 10 minutes". Streaming has its own bug where input_json_delta events
+// are dropped on long runs (toolBlock.input ends up {}). Lower caps fit non-streaming AND
+// the 50s Edge Function wall clock. Promote when on Pro tier with manual delta accumulation.
 const PACKAGE_MAX_TOKENS: Record<string, number> = {
-  starter:      12000,
-  professional: 24000,
-  enterprise:   48000,
+  starter:       4096,
+  professional:  6000,
+  enterprise:    8000,
 }
 
 // ─────────────────────────────────────────────
