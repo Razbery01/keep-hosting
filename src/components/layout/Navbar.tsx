@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, Globe } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 
 const NAV_LINKS = [
@@ -25,10 +25,10 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-gray-200/80 bg-white/90 backdrop-blur-xl text-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2.5 font-extrabold text-xl text-primary transition-colors">
-            <div className="w-9 h-9 bg-gradient-to-br from-primary-light to-primary-dark rounded-xl flex items-center justify-center shadow-lg shadow-primary/15">
-              <Globe className="w-5 h-5 text-white" />
-            </div>
+          <Link
+            to="/"
+            className="font-extrabold text-lg sm:text-xl text-primary tracking-[0.12em] uppercase transition-colors hover:text-primary-dark"
+          >
             Keep Hosting
           </Link>
 
