@@ -468,7 +468,7 @@ export default function HomePage() {
             {[
               { name: 'Fresh Roots Catering', industry: 'Food & Hospitality', color: '#57534e', img: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80' },
               { name: 'ProFix Plumbing', industry: 'Construction & Trades', color: '#44403c', img: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80' },
-              { name: 'Lumina Beauty Studio', industry: 'Beauty & Wellness', color: '#78716c', img: 'https://images.unsplash.com/photo-1560750588-73b555e41656?auto=format&fit=crop&w=600&q=80' },
+              { name: 'Lumina Beauty Studio', industry: 'Beauty & Wellness', color: '#78716c', img: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=600&q=80' },
             ].map((project, i) => (
               <motion.div key={project.name} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
                 className="group rounded-2xl overflow-hidden border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] transition-all duration-300">
