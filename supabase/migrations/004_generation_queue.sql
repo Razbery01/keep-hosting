@@ -58,7 +58,7 @@ COMMIT;
 --   '*/2 * * * *',
 --   $$
 --   SELECT net.http_post(
---     url := 'https://wozonryvuvbxxfdykzne.supabase.co/functions/v1/build-orchestrator',
+--     url := 'https://<YOUR_PROJECT_REF>.supabase.co/functions/v1/build-orchestrator',
 --     headers := jsonb_build_object(
 --       'Authorization', 'Bearer ' || current_setting('app.service_role_key'),
 --       'Content-Type', 'application/json'

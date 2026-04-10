@@ -1,6 +1,13 @@
+# Supabase anon key + project URL are public client config (RLS-enforced). Vite inlines
+# VITE_* into dist/, which triggers Netlify secret scanning if those vars are marked “secret”.
+# Omit them from leak detection — they are not server-only secrets.
+# If the scanner still fails, add the same key in Netlify UI → Site env (scoped to Builds).
 [build]
   command = "npm run build"
   publish = "dist"
+
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY"
 
 [[redirects]]
   from = "/*"

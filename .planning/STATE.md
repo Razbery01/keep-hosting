@@ -73,7 +73,7 @@ Recent decisions affecting current work:
 - [Phase 01-security-data-foundation]: sanitize.ts and html-scanner.ts use no Deno.* imports — pure TS testable in Node Vitest AND importable from Deno Edge Functions
 - [Phase 01-security-data-foundation]: scanGeneratedHtml is intentionally strict: <script> tag detection fires even for allowlisted hosts — conservative by design
 - [Phase 01-security-data-foundation]: Storage bucket MIME config deliberately excluded from migration 003 — handled via Supabase Dashboard (research marked SQL bucket config LOW confidence for managed projects)
-- [Phase 01-security-data-foundation]: Migration 003 applied via supabase db push from freshly linked local project (ref wozonryvuvbxxfdykzne); local .env created with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
+- [Phase 01-security-data-foundation]: Migration 003 applied via supabase db push from freshly linked local project (ref YOUR_PROJECT_REF); local .env created with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 - [Phase 02-generation-hardening]: it.todo() stubs only — no production imports in Phase 2 scaffolding to prevent import-resolution failures on not-yet-created modules
 - [Phase 02-generation-hardening]: Nyquist stub pattern: create it.todo() stubs before Wave 1 tasks to satisfy automated verify requirements across all Phase 2 plans
 - [Phase 02-generation-hardening]: CUST-05: await handleSubmit() replaces setTimeout — safe because handleSubmit re-fetches user via supabase.auth.getUser() at its first line

@@ -24,7 +24,7 @@ re_verification: false
 | 1 | A non-admin user navigating to `/admin` or `/admin/orders` is redirected with a 403 — the admin UI does not render and no admin-scoped data is returned from Supabase | VERIFIED | `RequireAdmin.tsx` wraps both admin routes in `router.tsx`; checks `profile.role !== 'admin'` via `useAuth()` and calls `<Navigate to="/" replace />`; 5 passing tests in `adminGuard.test.tsx` covering non-admin, unauthenticated, and admin cases |
 | 2 | Uploading a file with a non-image MIME type or a file over 5MB to the onboarding form is rejected server-side, and the storage path contains a UUID filename — not the original filename | VERIFIED | `uploadValidation.ts` exports `validateFile` (MIME allow-list + 5 MB cap) and `buildStoragePath` (uses `crypto.randomUUID()`); `OnboardingPage.tsx` calls both before any network call; storage bucket `client-assets` configured with MIME restrictions + 5 MB limit via Supabase Dashboard; 12 passing tests in `uploadValidation.test.ts` |
 | 3 | The Supabase anon key and URL are read exclusively from environment variables — no plaintext fallback exists anywhere in source | VERIFIED | `src/lib/supabase.ts` throws `new Error('Missing VITE_SUPABASE_URL...')` and `new Error('Missing VITE_SUPABASE_ANON_KEY...')` if either env var is absent; no hardcoded JWT found in source (`grep` returns empty); 3 passing tests in `supabaseClient.test.ts` |
-| 4 | The `subscriptions` table exists with all columns required for billing lifecycle (status, yoco_token_id, next_charge_at, grace_until, suspended_at); the `build_events` table records pipeline state transitions; the `generation_cost` column captures Claude token counts per build | VERIFIED | Migration 003 creates `subscriptions` with all billing lifecycle columns (12 total confirmed by Dashboard query); `build_events` table pre-existed in migration 001; `generation_cost` JSONB column added to `client_sites` in migration 003; all verified via Supabase SQL editor on production project wozonryvuvbxxfdykzne |
+| 4 | The `subscriptions` table exists with all columns required for billing lifecycle (status, yoco_token_id, next_charge_at, grace_until, suspended_at); the `build_events` table records pipeline state transitions; the `generation_cost` column captures Claude token counts per build | VERIFIED | Migration 003 creates `subscriptions` with all billing lifecycle columns (12 total confirmed by Dashboard query); `build_events` table pre-existed in migration 001; `generation_cost` JSONB column added to `client_sites` in migration 003; all verified via Supabase SQL editor on production project YOUR_PROJECT_REF |
 
 **Score:** 4/4 truths verified
 
@@ -107,7 +107,7 @@ The following were verified by human checkpoint during plan execution and cannot
 
 **1. Supabase Schema Applied to Production**
 
-- **Test:** Run SQL queries against project `wozonryvuvbxxfdykzne` — `SELECT column_name FROM information_schema.columns WHERE table_name = 'subscriptions'`
+- **Test:** Run SQL queries against project `YOUR_PROJECT_REF` — `SELECT column_name FROM information_schema.columns WHERE table_name = 'subscriptions'`
 - **Expected:** 12 columns including billing lifecycle columns
 - **Why human:** Cannot query remote Supabase from local verification; results were documented in 01-02-SUMMARY.md with Dashboard output: subscription_cols=12, client_sites_cols=2, popia_cols=2, yoco_col=1
 - **Verified by:** Human checkpoint in plan 01-02 Task 3

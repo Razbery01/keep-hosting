@@ -42,7 +42,7 @@ key-decisions:
   - "generation_cost placed on client_sites (not orders) — a single order can have multiple build attempts; cost belongs on the build record"
   - "Subscription status uses TEXT + CHECK not ENUM — matches existing orders.status pattern in the codebase"
   - "Subscriptions RLS admin policies use public.is_admin() — never inline subselects on profiles (avoids infinite recursion)"
-  - "Migration applied via supabase db push from a freshly linked local project (ref wozonryvuvbxxfdykzne) after creating local .env with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY"
+  - "Migration applied via supabase db push from a freshly linked local project (ref YOUR_PROJECT_REF) after creating local .env with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY"
 
 patterns-established:
   - "RLS admin helper: All admin policies must call public.is_admin() from migration 002, never subselect on profiles"
@@ -57,7 +57,7 @@ completed: 2026-04-09
 
 # Phase 1 Plan 02: Schema Migration & TypeScript Types Summary
 
-**Single idempotent SQL migration (003) adding subscriptions table with RLS, POPIA consent columns, yoco_payment_id, generated_files/generation_cost JSONB, and suspended order status — applied to Supabase (ref wozonryvuvbxxfdykzne) and verified via Dashboard SQL editor; client-assets bucket hardened to jpeg/png/webp + 5 MB limit**
+**Single idempotent SQL migration (003) adding subscriptions table with RLS, POPIA consent columns, yoco_payment_id, generated_files/generation_cost JSONB, and suspended order status — applied to Supabase (ref YOUR_PROJECT_REF) and verified via Dashboard SQL editor; client-assets bucket hardened to jpeg/png/webp + 5 MB limit**
 
 ## Performance
 
@@ -88,7 +88,7 @@ completed: 2026-04-09
 
 ## Schema Verification Results (Task 3)
 
-Human verified via Supabase Dashboard SQL Editor against project ref `wozonryvuvbxxfdykzne`:
+Human verified via Supabase Dashboard SQL Editor against project ref `YOUR_PROJECT_REF`:
 
 | Query | Expected | Actual |
 |-------|----------|--------|
@@ -117,7 +117,7 @@ All six DATA-xx schema changes confirmed present.
 - `generation_cost` placed on `client_sites`, not `orders`. A single order may trigger multiple build attempts; the cost belongs on the build record, not the order.
 - Subscription status as `TEXT + CHECK` (not ENUM). Matches the existing `orders.status` pattern — easier to extend without `ALTER TYPE`.
 - Admin RLS on subscriptions calls `public.is_admin()`. Never inline `SELECT role FROM profiles WHERE id = auth.uid()` — that would trigger RLS on profiles recursively.
-- Migration applied via `supabase db push` after freshly linking the local project (ref wozonryvuvbxxfdykzne). A local `.env` was created with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` matching previously-hardcoded credentials.
+- Migration applied via `supabase db push` after freshly linking the local project (ref YOUR_PROJECT_REF). A local `.env` was created with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` matching previously-hardcoded credentials.
 
 ## Deviations from Plan
 
@@ -138,7 +138,7 @@ No further setup required for Phase 1 Plan 02.
 
 ## Next Phase Readiness
 
-- Migration 003 is applied and verified on the production-linked Supabase project (ref wozonryvuvbxxfdykzne)
+- Migration 003 is applied and verified on the production-linked Supabase project (ref YOUR_PROJECT_REF)
 - All 6 DATA-xx requirements confirmed via Dashboard query output
 - TypeScript types are complete and `tsc -b` passes
 - Phase 2 (generation) can write to `generation_cost` and `generated_files` columns

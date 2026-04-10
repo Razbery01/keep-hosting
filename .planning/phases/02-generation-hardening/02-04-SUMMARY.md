@@ -113,7 +113,7 @@ None of the other plan tasks required deviation.
 
 ## Manual Steps Required (Task 7 Checkpoint)
 
-The following steps are blocked on human action and require the live Supabase project `wozonryvuvbxxfdykzne`:
+The following steps are blocked on human action and require the live Supabase project `YOUR_PROJECT_REF`:
 
 1. `supabase db push` — applies migration 004
 2. Enable `pg_cron` and `pg_net` extensions via Dashboard → Database → Extensions
