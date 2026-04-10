@@ -10,9 +10,10 @@ describe('GEN-03 — per-package token caps', () => {
   it('defines PACKAGE_MAX_TOKENS map', () => {
     expect(src).toMatch(/PACKAGE_MAX_TOKENS/)
   })
-  it('starter = 12000', () => { expect(src).toMatch(/starter\s*:\s*12000/) })
-  it('professional = 24000', () => { expect(src).toMatch(/professional\s*:\s*24000/) })
-  it('enterprise = 48000', () => { expect(src).toMatch(/enterprise\s*:\s*48000/) })
+  // Caps sized for Edge runtime / Haiku; see 02-CONTEXT.md (upgrade with Pro + Sonnet)
+  it('starter = 4096', () => { expect(src).toMatch(/starter\s*:\s*4096/) })
+  it('professional = 6000', () => { expect(src).toMatch(/professional\s*:\s*6000/) })
+  it('enterprise = 8000', () => { expect(src).toMatch(/enterprise\s*:\s*8000/) })
 })
 
 describe('GEN-03 — retry ladder', () => {

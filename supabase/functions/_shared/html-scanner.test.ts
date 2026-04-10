@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { scanGeneratedHtml, scanForMobileWarnings } from './html-scanner'
 
-// Note: existing htmlScan.test.ts in supabase/functions/__tests__/ continues to cover the SEC-07 baseline checks.
-// This file extends with GEN-04 behaviors added in Plan 02.
+// htmlScan.test.ts covers allowlists + GEN-04 viewport. Phase 2 relaxes blanket blocks on inline
+// <script> and on* handlers (see html-scanner.ts comments); regression tests reflect that model.
 
 describe('html-scanner — GEN-04 viewport meta', () => {
   it('fails when <meta name="viewport"> is missing', () => {
@@ -32,11 +32,11 @@ describe('html-scanner — GEN-04 viewport meta', () => {
     expect(result.violations.some(v => v.includes('viewport'))).toBe(false)
   })
 
-  it('regression: existing SEC-07 script check still rejects <script>alert(1)</script>', () => {
+  it('Phase 2: inline <script> is allowed when viewport is present (external src still allowlist-only)', () => {
     const html = '<html><head><meta name="viewport" content="width=device-width"></head><body><script>alert(1)</script></body></html>'
     const result = scanGeneratedHtml(html)
-    expect(result.safe).toBe(false)
-    expect(result.violations.some(v => v.includes('script'))).toBe(true)
+    expect(result.safe).toBe(true)
+    expect(result.violations).toHaveLength(0)
   })
 })
 
