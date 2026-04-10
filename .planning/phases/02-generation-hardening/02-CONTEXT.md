@@ -223,6 +223,8 @@ These are flexible — planner and executor decide during implementation:
 <deferred>
 ## Deferred Ideas
 
+- **Promote Code Agent back to Sonnet 4.6** — Free tier Supabase has a 50s Edge Function wall clock. Sonnet 4.6 generating 12k tokens of HTML/CSS takes ~120-150s, which doesn't fit. Code Agent was switched to `claude-haiku-4-5-20251001` on 2026-04-09 to make Phase 2 land on Free tier. When upgrading to Supabase Pro (150s window), revert one line in `supabase/functions/generate-site/index.ts` to use `claude-sonnet-4-6` and re-run cost calibration. The Image Agent already uses Sonnet 4.6 — only the Code Agent was downgraded.
+- **Refine cost-calc.ts for multi-model pricing** — Currently hardcodes Sonnet 4.6 pricing. With Code Agent on Haiku, the per-build cost will over-report by ~5×. After Pro upgrade and Sonnet promotion, this auto-corrects. If staying on Haiku longer, refactor `calcCostUsd()` to accept a model parameter.
 - **Playwright visual mobile-responsive QA** — too slow for the generation path. Revisit as a post-build admin QA job or a weekly batch.
 - **Alternative models (Opus for Enterprise tier)** — could be a pricing lever. Not for launch; Sonnet 4.6 for everyone.
 - **Prompt caching across customers** — Anthropic's cache could cut costs on the system prompt portion. Worth ~30% cost reduction but adds complexity. Defer to post-launch optimization.

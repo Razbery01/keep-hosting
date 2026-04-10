@@ -1,0 +1,5 @@
+# Supabase project config for keep-hosting
+# This file only marks this directory as a Supabase project root for CLI commands.
+# Production config is managed via the Supabase Dashboard for project wozonryvuvbxxfdykzne.
+
+project_id = "keep-hosting"

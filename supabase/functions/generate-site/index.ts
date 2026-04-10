@@ -398,9 +398,17 @@ Deliver all files via the deliver_site_files tool now.`
     // Per-package token cap (GEN-03)
     const maxOutputTokens = PACKAGE_MAX_TOKENS[pkg] ?? PACKAGE_MAX_TOKENS.starter
 
-    const codeStream = await callClaudeWithRetry(
-      () => anthropic.messages.stream({
-        model: 'claude-sonnet-4-6',
+    // NOTE: Use non-streaming messages.create() instead of messages.stream() for the Code Agent.
+    // Streaming + forced tool_choice on long max_tokens (12k+) intermittently leaves
+    // toolBlock.input as {} after finalMessage() resolves — the SDK fails to merge
+    // input_json_delta events for long streams. Diagnosed via build_events
+    // (event_type='code_agent_input_shape') showing keys=, has_files=false. The Image Agent
+    // (max_tokens=1024) keeps streaming because its input is small enough to accumulate cleanly.
+    // Code Agent model: Haiku 4.5 on Free tier (50s wall clock can't fit Sonnet 4.6 generating 12k tokens of HTML/CSS).
+    // Haiku 4.5 generates ~3-4x faster, fits within 50s. Promote to Sonnet 4.6 once on Supabase Pro (150s window).
+    const codeResponse = await callClaudeWithRetry(
+      () => anthropic.messages.create({
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: maxOutputTokens,
         // DO NOT pass `thinking` — API 400 if combined with forced tool_choice (02-RESEARCH.md Critical Finding)
         system: buildCodeAgentPrompt({ industry: site.industry }),
@@ -432,7 +440,6 @@ Deliver all files via the deliver_site_files tool now.`
       supabase,
     )
 
-    const codeResponse = await codeStream.finalMessage()
     const codeUsage: ClaudeUsage = codeResponse.usage
 
     const toolBlock = codeResponse.content.find((b: any) => b.type === 'tool_use')
@@ -440,8 +447,44 @@ Deliver all files via the deliver_site_files tool now.`
       throw new Error('No tool_use block in Code Agent response — unexpected with forced tool_choice')
     }
 
-    // Extract files; validate paths (permissive but no traversal or absolute paths)
-    const rawFiles = (toolBlock.input as { files: Array<{ path: string; content: string }> }).files
+    // Diagnostic: log the shape of toolBlock.input so we can see what Claude actually returned.
+    // Streaming + tool_use sometimes returns input as raw JSON string instead of parsed object
+    // depending on SDK version and whether deltas were accumulated. Be defensive.
+    const rawInput: any = toolBlock.input
+    await logEvent(
+      supabase,
+      siteId,
+      'code_agent_input_shape',
+      'info',
+      `tool_use input: type=${typeof rawInput}, keys=${rawInput && typeof rawInput === 'object' ? Object.keys(rawInput).join(',') : 'n/a'}, has_files=${!!rawInput?.files}, files_count=${Array.isArray(rawInput?.files) ? rawInput.files.length : 'not-array'}`,
+    )
+
+    // Tolerate the SDK returning input as a JSON string instead of a parsed object
+    let parsedInput: any = rawInput
+    if (typeof rawInput === 'string') {
+      try { parsedInput = JSON.parse(rawInput) } catch { parsedInput = {} }
+    }
+
+    // Tolerate alternative field names the model might emit under schema validation slack
+    const candidateArrays = [
+      parsedInput?.files,
+      parsedInput?.site_files,
+      parsedInput?.pages,
+      parsedInput?.output,
+    ].filter(Array.isArray)
+    const rawFiles: Array<{ path: string; content: string }> = candidateArrays[0] ?? []
+
+    if (rawFiles.length === 0) {
+      await logEvent(
+        supabase,
+        siteId,
+        'code_agent_empty',
+        'error',
+        `tool_use returned no files. Full input: ${JSON.stringify(parsedInput).slice(0, 1000)}`,
+      )
+      throw new Error('Code Agent tool_use returned no files (input shape logged to build_events)')
+    }
+
     const files = rawFiles.filter(f => {
       const p = f.path
       if (p.includes('..') || p.startsWith('/')) {
