@@ -447,6 +447,15 @@ Deliver all files via the deliver_site_files tool now.`
 
     const codeUsage: ClaudeUsage = codeResponse.usage
 
+    // Diagnostic: log the FULL response shape so we can see what Claude actually returned.
+    await logEvent(
+      supabase,
+      siteId,
+      'code_agent_response_meta',
+      'info',
+      `stop_reason=${codeResponse.stop_reason}, content_blocks=${codeResponse.content.length}, types=${codeResponse.content.map((b: any) => b.type).join(',')}, usage=${JSON.stringify(codeResponse.usage)}`,
+    )
+
     const toolBlock = codeResponse.content.find((b: any) => b.type === 'tool_use')
     if (!toolBlock || toolBlock.type !== 'tool_use') {
       throw new Error('No tool_use block in Code Agent response — unexpected with forced tool_choice')
