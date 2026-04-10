@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 02-04 Tasks 1-6, checkpoint at Task 7 (human-verify: deploy + e2e test)"
-last_updated: "2026-04-09T22:46:37.833Z"
+stopped_at: "Completed 03-01 (Wave 0 foundations: test stubs, migration 005, types + DashboardPage)"
+last_updated: "2026-04-10T10:17:39.857Z"
 last_activity: 2026-04-09 — Completed 01-01 test infrastructure (vitest harness + 7 stub test files)
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 10
+  completed_plans: 8
   percent: 25
 ---
 
@@ -55,6 +55,7 @@ Progress: [███░░░░░░░] 25%
 | Phase 02-generation-hardening P01 | 2min | 3 tasks | 11 files |
 | Phase 02-generation-hardening P03 | 2min | 4 tasks | 6 files |
 | Phase 02-generation-hardening P02 | 7min | 5 tasks | 9 files |
+| Phase 03-deployment-pipeline P01 | 2min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -85,6 +86,9 @@ Recent decisions affecting current work:
 - [Phase 02-generation-hardening]: tool_choice forced tool use replaces regex parsing for Claude agents — thinking param removed (API 400 when combined with forced tool_choice per 02-RESEARCH.md)
 - [Phase 02-generation-hardening]: build-site shim strategy chosen over updating OnboardingPage.tsx — client contract preserved until Phase 4 Yoco webhook becomes direct generate-site trigger
 - [Phase 02-generation-hardening]: getCuratedImages kept inline in generate-site/index.ts (not extracted to _shared/) — only one consumer, no cross-function sharing needed
+- [Phase 03-deployment-pipeline]: Migration 005 adds deploying and deployed as new states; deploy_failed and suspended were already in migration 004 CHECK
+- [Phase 03-deployment-pipeline]: BUILD_STEPS replaces pushing_github+deploying_netlify with deploying+deployed — no GitHub step in Phase 3 deploy pipeline
+- [Phase 03-deployment-pipeline]: idx_client_sites_queue rebuilt (DROP+CREATE) to add deploy_failed — idempotent pattern from migration 004
 
 ### Pending Todos
 
@@ -98,6 +102,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T22:46:26.412Z
-Stopped at: Completed 02-04 Tasks 1-6, checkpoint at Task 7 (human-verify: deploy + e2e test)
+Last session: 2026-04-10T10:17:39.855Z
+Stopped at: Completed 03-01 (Wave 0 foundations: test stubs, migration 005, types + DashboardPage)
 Resume file: None

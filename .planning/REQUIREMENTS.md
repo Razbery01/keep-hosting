@@ -39,9 +39,9 @@ Requirements for the first real, paid, end-to-end launch milestone. Each maps to
 
 ### Deployment (Netlify)
 
-- [ ] **DEPLOY-01**: Remove GitHub-intermediated deployment; use Netlify direct zip-deploy API (`POST /api/v1/sites/{id}/deploys` with zip body)
+- [x] **DEPLOY-01**: Remove GitHub-intermediated deployment; use Netlify direct zip-deploy API (`POST /api/v1/sites/{id}/deploys` with zip body)
 - [ ] **DEPLOY-02**: Each customer site gets a unique site name (UUID-based) inside a single Netlify team account
-- [ ] **DEPLOY-03**: Deploy queue enforces Netlify rate limits (3/min, 100/day) with token-bucket limiter; alerts at 80/day
+- [x] **DEPLOY-03**: Deploy queue enforces Netlify rate limits (3/min, 100/day) with token-bucket limiter; alerts at 80/day
 - [ ] **DEPLOY-04**: Site suspension — on payment failure (after grace period), programmatically unpublish the Netlify site
 - [ ] **DEPLOY-05**: Site reactivation — on successful payment after suspension, republish the Netlify site (redeploy from persisted files in Supabase Storage)
 - [ ] **DEPLOY-06**: Deploy failure triggers retry with idempotency; persisted files in Storage eliminate need to re-call Claude
@@ -179,9 +179,9 @@ Populated during roadmap creation. Each requirement maps to exactly one phase.
 | GEN-08 | Phase 2 | Complete |
 | GEN-09 | Phase 2 | Complete |
 | CUST-05 | Phase 2 | Complete |
-| DEPLOY-01 | Phase 3 | Pending |
+| DEPLOY-01 | Phase 3 | Complete |
 | DEPLOY-02 | Phase 3 | Pending |
-| DEPLOY-03 | Phase 3 | Pending |
+| DEPLOY-03 | Phase 3 | Complete |
 | DEPLOY-04 | Phase 3 | Pending |
 | DEPLOY-05 | Phase 3 | Pending |
 | DEPLOY-06 | Phase 3 | Pending |
