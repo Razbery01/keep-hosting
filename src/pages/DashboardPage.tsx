@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import {
   Globe, ExternalLink, Clock, CheckCircle2, Loader2, AlertCircle,
   Plus, CreditCard, Eye, Sparkles, Code2, GitBranch, Rocket,
-  Check, X, AlertTriangle, ArrowRight,
+  Check, X, AlertTriangle, ArrowRight, Trash2,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { supabase } from '../lib/supabase'
@@ -177,6 +177,7 @@ export default function DashboardPage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [payingId, setPayingId] = useState<string | null>(null)
+  const [removingId, setRemovingId] = useState<string | null>(null)
 
   const fetchOrders = useCallback(async () => {
     if (!user) return
@@ -201,6 +202,31 @@ export default function DashboardPage() {
     const interval = setInterval(fetchOrders, 3000)
     return () => clearInterval(interval)
   }, [orders, fetchOrders])
+
+  function orderStatusLocksDelete(status: string) {
+    return status === 'paid' || status === 'live' || status === 'deployed'
+  }
+
+  async function handleRemoveOrder(orderId: string) {
+    if (
+      !window.confirm(
+        'Remove this website order and all build logs? This cannot be undone. Use this for test or stuck builds you no longer need.'
+      )
+    ) {
+      return
+    }
+    setRemovingId(orderId)
+    try {
+      const { error } = await supabase.from('orders').delete().eq('id', orderId)
+      if (error) throw error
+      setOrders((prev) => prev.filter((o) => o.id !== orderId))
+      toast.success('Order removed')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not remove order')
+    } finally {
+      setRemovingId(null)
+    }
+  }
 
   async function handlePay(orderId: string) {
     setPayingId(orderId)
@@ -265,6 +291,7 @@ export default function DashboardPage() {
               const previewUrl = site?.netlify_url || site?.live_url
               const isPreviewReady = order.status === 'preview_ready' && previewUrl
               const isPaid = order.status === 'paid' || order.status === 'live' || order.status === 'deployed'
+              const canRemoveOrder = !orderStatusLocksDelete(order.status)
               const buildStatus = site?.build_status || 'pending'
               const buildStarted = buildStatus !== 'pending'
               const isWaiting = (order.status === 'pending') && !buildStarted && !isPreviewReady && !isPaid
@@ -293,10 +320,27 @@ export default function DashboardPage() {
                           )}
                         </div>
                       </div>
-                      <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium shrink-0 ${style.bg} ${style.text}`}>
-                        {style.icon}
-                        {style.label}
-                      </span>
+                      <div className="flex flex-wrap items-center gap-2 shrink-0">
+                        {canRemoveOrder && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveOrder(order.id)}
+                            disabled={removingId === order.id}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors disabled:opacity-50"
+                          >
+                            {removingId === order.id ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-3.5 h-3.5" />
+                            )}
+                            Remove
+                          </button>
+                        )}
+                        <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${style.bg} ${style.text}`}>
+                          {style.icon}
+                          {style.label}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Waiting: build is starting up */}
