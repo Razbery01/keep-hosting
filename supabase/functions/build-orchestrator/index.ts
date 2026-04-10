@@ -19,7 +19,7 @@ Deno.serve(async (req: Request) => {
     const { data: candidates, error } = await supabase
       .from('client_sites')
       .select('id, build_status, retry_count, next_retry_at, created_at')
-      .in('build_status', ['pending', 'retry'])
+      .in('build_status', ['pending', 'retry', 'deploy_failed'])
       .or(`next_retry_at.is.null,next_retry_at.lte.${new Date().toISOString()}`)
       .order('created_at', { ascending: true })
       .limit(CONCURRENCY_CAP)
@@ -41,14 +41,15 @@ Deno.serve(async (req: Request) => {
         await supabase.from('client_sites').update({
           retry_count: (row.retry_count ?? 0) + 1,
           last_attempted_at: new Date().toISOString(),
-          build_status: 'generating',
+          build_status: row.build_status === 'deploy_failed' ? 'deploying' : 'generating',
         }).eq('id', row.id)
 
         await logEvent(supabase, row.id, 'orchestrator_pick', 'info',
           `Orchestrator claimed site (attempt ${(row.retry_count ?? 0) + 1})`)
 
-        // Fire-and-forget invoke of generate-site
-        supabase.functions.invoke('generate-site', { body: { siteId: row.id } })
+        // Route to correct function based on current status
+        const fn = row.build_status === 'deploy_failed' ? 'deploy-site' : 'generate-site'
+        supabase.functions.invoke(fn, { body: { siteId: row.id } })
           .catch(async (err: Error) => {
             await logEvent(supabase, row.id, 'orchestrator_invoke_error', 'error', err.message)
           })

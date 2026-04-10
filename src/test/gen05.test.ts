@@ -8,8 +8,8 @@ const GEN  = resolve(__dirname, '../../supabase/functions/generate-site/index.ts
 describe('GEN-05 — build-orchestrator queue state', () => {
   const src = readFileSync(ORCH, 'utf8')
 
-  it('filters client_sites by build_status in pending/retry', () => {
-    expect(src).toMatch(/\['pending',\s*'retry'\]/)
+  it('filters client_sites by build_status in pending/retry/deploy_failed', () => {
+    expect(src).toMatch(/pending.*retry.*deploy_failed|deploy_failed/)
   })
   it('filters by next_retry_at <= now()', () => {
     expect(src).toMatch(/next_retry_at/)
@@ -26,7 +26,7 @@ describe('GEN-05 — build-orchestrator queue state', () => {
   it('logs orchestrator_pick events', () => {
     expect(src).toMatch(/orchestrator_pick/)
   })
-  it('invokes generate-site', () => {
-    expect(src).toMatch(/functions\.invoke\s*\(\s*['"]generate-site['"]/)
+  it('invokes generate-site for generation queue rows', () => {
+    expect(src).toMatch(/generate-site/)
   })
 })

@@ -61,6 +61,14 @@ Deno.serve(async (req: Request) => {
     await logEvent(supabase, siteId, 'persist_done', 'success',
       `Persisted ${persisted.length}/${files.length} file(s) to Storage`)
 
+    // Chain to deploy-site — fire-and-forget via EdgeRuntime.waitUntil
+    EdgeRuntime.waitUntil(
+      supabase.functions.invoke('deploy-site', { body: { siteId } })
+        .catch(async (err: Error) => {
+          await logEvent(supabase, siteId, 'deploy_invoke_error', 'error', err.message)
+        })
+    )
+
     return jsonResponse({ success: true, persisted_count: persisted.length })
   } catch (err) {
     const msg = (err as Error).message
