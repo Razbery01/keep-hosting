@@ -15,25 +15,45 @@ const ALLOWED_EXTERNAL_SCRIPT_HOSTS = [
 export function scanGeneratedHtml(html: string): HtmlScanResult {
   const violations: string[] = []
 
-  // 1. Any <script> tag (inline or external)
-  if (/<script[\s>]/i.test(html)) {
-    violations.push('Contains <script> tag')
-  }
-
-  // 2. External src= attributes not on allowlist (scan JS specifically)
-  const srcMatches = Array.from(html.matchAll(/src\s*=\s*["']([^"']+)["']/gi))
-  for (const match of srcMatches) {
-    const url = match[1]
-    // data: URIs in src
+  // 1. <script src="..."> external scripts must be on allowlist.
+  //    Inline <script>...</script> is allowed — input is already sanitized via sanitizeForPrompt
+  //    (SEC-06) and inline JS is required for legitimate site features (mobile menu toggle, smooth
+  //    scroll, form validation). Phase 1 blanket block was too strict and rejected all builds.
+  const scriptTags = Array.from(html.matchAll(/<script\b([^>]*)>/gi))
+  for (const tag of scriptTags) {
+    const attrs = tag[1] || ''
+    const srcMatch = attrs.match(/\bsrc\s*=\s*["']([^"']+)["']/i)
+    if (!srcMatch) continue  // inline script — allowed
+    const url = srcMatch[1]
     if (url.toLowerCase().startsWith('data:')) {
-      violations.push('Contains data: URI in src attribute')
+      violations.push('Contains data: URI in <script src>')
       continue
     }
-    // absolute URLs → check host against allowlist for .js endings
     if (/^https?:\/\//i.test(url)) {
       try {
         const host = new URL(url).hostname
-        if (/\.js(\?|$)/i.test(url) && !ALLOWED_EXTERNAL_SCRIPT_HOSTS.includes(host)) {
+        if (!ALLOWED_EXTERNAL_SCRIPT_HOSTS.includes(host)) {
+          violations.push(`External script from untrusted host: ${host}`)
+        }
+      } catch {
+        violations.push(`Malformed URL in <script src>: ${url}`)
+      }
+    }
+  }
+
+  // 2. Other src= attributes (img, iframe, etc.) — block data: URIs and untrusted external JS
+  const srcMatches = Array.from(html.matchAll(/src\s*=\s*["']([^"']+)["']/gi))
+  for (const match of srcMatches) {
+    const url = match[1]
+    if (url.toLowerCase().startsWith('data:') && url.length > 200) {
+      // Allow short data: URIs (small SVG icons) but block large embedded payloads
+      violations.push('Contains large data: URI in src attribute')
+      continue
+    }
+    if (/^https?:\/\//i.test(url) && /\.js(\?|$)/i.test(url)) {
+      try {
+        const host = new URL(url).hostname
+        if (!ALLOWED_EXTERNAL_SCRIPT_HOSTS.includes(host)) {
           violations.push(`External JS from untrusted host: ${host}`)
         }
       } catch {
