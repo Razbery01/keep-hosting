@@ -107,7 +107,7 @@ export interface Database {
           services_text: string | null
           custom_content: Json | null
           social_links: Json | null
-          build_status: 'pending' | 'generating' | 'generated' | 'retry' | 'failed' | 'pushing_github' | 'live' | 'deploy_failed' | 'suspended'
+          build_status: 'pending' | 'generating' | 'generated' | 'retry' | 'failed' | 'pushing_github' | 'deploying' | 'deployed' | 'deploy_failed' | 'live' | 'suspended'
           build_log: string | null
           github_repo: string | null
           github_url: string | null
@@ -143,7 +143,7 @@ export interface Database {
           services_text?: string | null
           custom_content?: Json | null
           social_links?: Json | null
-          build_status?: 'pending' | 'generating' | 'generated' | 'retry' | 'failed' | 'pushing_github' | 'live' | 'deploy_failed' | 'suspended'
+          build_status?: 'pending' | 'generating' | 'generated' | 'retry' | 'failed' | 'pushing_github' | 'deploying' | 'deployed' | 'deploy_failed' | 'live' | 'suspended'
           generated_files?: Json | null
           generation_cost?: Json | null
           retry_count?: number
@@ -152,7 +152,7 @@ export interface Database {
         }
         Update: {
           business_name?: string
-          build_status?: 'pending' | 'generating' | 'generated' | 'retry' | 'failed' | 'pushing_github' | 'live' | 'deploy_failed' | 'suspended'
+          build_status?: 'pending' | 'generating' | 'generated' | 'retry' | 'failed' | 'pushing_github' | 'deploying' | 'deployed' | 'deploy_failed' | 'live' | 'suspended'
           build_log?: string | null
           github_repo?: string | null
           github_url?: string | null

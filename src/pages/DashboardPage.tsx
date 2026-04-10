@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   Globe, ExternalLink, Clock, CheckCircle2, Loader2, AlertCircle,
-  Plus, CreditCard, Eye, Sparkles, Code2, GitBranch, Rocket,
+  Plus, CreditCard, Eye, Sparkles, Code2, Rocket,
   Check, X, AlertTriangle, ArrowRight, Trash2,
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -31,9 +31,9 @@ const BUILD_STEPS = [
   { key: 'pending', label: 'Queued', icon: Clock, pct: 5 },
   { key: 'generating', label: 'Designing your site', icon: Sparkles, pct: 30 },
   { key: 'generated', label: 'Code generated', icon: Code2, pct: 55 },
-  { key: 'pushing_github', label: 'Saving files', icon: GitBranch, pct: 70 },
-  { key: 'deploying_netlify', label: 'Deploying preview', icon: Rocket, pct: 85 },
-  { key: 'live', label: 'Preview ready!', icon: CheckCircle2, pct: 100 },
+  { key: 'deploying', label: 'Deploying site', icon: Rocket, pct: 75 },
+  { key: 'deployed', label: 'Site deployed', icon: CheckCircle2, pct: 90 },
+  { key: 'live', label: 'Live!', icon: Globe, pct: 100 },
 ]
 
 const statusConfig: Record<string, { bg: string; text: string; icon: React.ReactNode; label: string }> = {
@@ -44,6 +44,8 @@ const statusConfig: Record<string, { bg: string; text: string; icon: React.React
   deployed: { bg: 'bg-green-50', text: 'text-green-700', icon: <CheckCircle2 className="w-4 h-4" />, label: 'Deployed' },
   live: { bg: 'bg-green-50', text: 'text-green-700', icon: <Globe className="w-4 h-4" />, label: 'Live' },
   failed: { bg: 'bg-red-50', text: 'text-red-700', icon: <AlertCircle className="w-4 h-4" />, label: 'Failed' },
+  deploy_failed: { bg: 'bg-orange-50', text: 'text-orange-700', icon: <AlertCircle className="w-4 h-4" />, label: 'Deploy Failed' },
+  suspended: { bg: 'bg-red-50', text: 'text-red-700', icon: <AlertCircle className="w-4 h-4" />, label: 'Suspended' },
 }
 
 function BuildProgress({ buildStatus, siteId }: { buildStatus: string; siteId: string }) {
@@ -195,7 +197,7 @@ export default function DashboardPage() {
   // Poll for updates when any order is pending or actively building
   useEffect(() => {
     const needsPolling = orders.some((o) => {
-      return o.status === 'pending' || o.status === 'building'
+      return o.status === 'pending' || o.status === 'building' || o.status === 'deployed'
     })
     if (!needsPolling) return
 
