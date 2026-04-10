@@ -82,13 +82,8 @@ export default function HomePage() {
   return (
     <>
       {/* ── Hero ── */}
-      <section className="relative min-h-[100dvh] flex items-center overflow-hidden bg-dark">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-dark to-dark" />
-          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-accent/[0.07] rounded-full blur-[200px] -translate-y-1/4 translate-x-1/4" />
-          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accent/[0.04] rounded-full blur-[150px] translate-y-1/3 -translate-x-1/4" />
-          <div className="absolute inset-0 opacity-[0.025]" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,.15) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
-        </div>
+      <section className="relative min-h-[100dvh] flex items-center overflow-hidden bg-primary-dark">
+        <div className="absolute inset-0 bg-grid-dark pointer-events-none" aria-hidden />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-28 lg:py-0 w-full">
           <div className="max-w-3xl lg:max-w-none lg:grid lg:grid-cols-2 gap-16 items-center">
@@ -249,7 +244,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent" />
       </section>
 
       {/* ── Stats ── */}
