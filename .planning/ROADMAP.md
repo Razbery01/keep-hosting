@@ -9,7 +9,7 @@ keep-hosting is a brownfield brownfield project that needs six phases to go from
 - [x] **Phase 1: Security & Data Foundation** - Lock down known security holes and extend the schema to support subscriptions, build events, and cost tracking (completed 2026-04-09)
 - [x] **Phase 2: Generation Hardening** - Replace fragile Claude integration with structured output, server-side execution, rate limiting, and mobile-responsive output (completed 2026-04-09)
 - [x] **Phase 3: Deployment Pipeline** - Remove GitHub intermediary and deliver direct Netlify zip-deploy with quota management and suspension/reactivation (completed 2026-04-10)
-- [ ] **Phase 4: Payment Integration** - Wire Yoco checkout, webhook handling, and full subscription lifecycle so payment becomes the master build trigger
+- [ ] **Phase 4: Payment Integration** - Wire PayFast checkout, ITN webhook handling, and full subscription lifecycle so payment becomes the master build trigger
 - [ ] **Phase 5: Domain Registration & Customer Lifecycle** - Replace DNS placeholder with ZADOMAINS API, wire domain-to-Netlify attachment, and complete the customer dashboard
 - [ ] **Phase 6: Compliance, Tests & Operations** - POPIA-compliant legal pages, Vitest test suite with CI, and admin observability tooling for launch readiness
 
@@ -65,16 +65,20 @@ Plans:
 - [ ] 03-03-PLAN.md — Wave 3: Apply migration 005 + deploy Edge Functions + human-verify checkpoint (create Netlify team account, set secrets, test real deploy/suspend/reactivate cycle, confirm pricing tier)
 
 ### Phase 4: Payment Integration
-**Goal**: Yoco checkout collects the setup fee, recurring billing charges monthly via stored token, and payment success is the exclusive trigger that starts site generation — no build starts without confirmed payment
+**Goal**: PayFast checkout collects the setup fee, PayFast native subscriptions handle R49/mo recurring billing, ITN webhook drives the subscription lifecycle, and payment success is the exclusive trigger that starts site generation — no build starts without confirmed payment
 **Depends on**: Phase 3
 **Requirements**: PAY-01, PAY-02, PAY-03, PAY-04, PAY-05, PAY-06, PAY-07, PAY-08, PAY-09
 **Success Criteria** (what must be TRUE):
-  1. Vendor validation is documented: Yoco recurring billing capability confirmed, card tokenization format and webhook HMAC header name documented before any code is written
-  2. A customer completing onboarding is redirected to a Yoco checkout session; on `payment.succeeded` webhook, a subscription row is inserted and site generation starts — the build does not start if the webhook has not fired
-  3. Duplicate Yoco webhook delivery (same payment ID fired twice) results in exactly one subscription row and one build trigger — no double-processing
-  4. A failed recurring charge triggers the retry ladder: customer receives a payment-failed email at 24 hours, 7 days, and 14 days; at 14 days the Netlify site is suspended
-  5. A customer can navigate to "Update payment method," enter new card details via Yoco tokenization, and have their suspended subscription reactivate on the next successful charge
-**Plans**: TBD
+  1. PayFast recurring billing confirmed — subscription feature is functional
+  2. Payment success is the exclusive build trigger; no build starts from client-side submission
+  3. Duplicate webhook delivery produces exactly one subscription and one build
+  4. Failed-charge retry handled by PayFast; site suspended after final cancellation
+  5. Customer can resubscribe; suspended subscription reactivates on next successful charge
+**Plans**: 3 plans
+Plans:
+- [ ] 04-01-PLAN.md — Wave 1: Foundation — test stubs (8 PAY files with it.todo), migration 007 (rename yoco columns to PayFast), config.toml verify_jwt=false, database.ts types, shared payfast.ts signature module
+- [ ] 04-02-PLAN.md — Wave 2: Core implementation — create-payfast-order + payfast-itn + cancel-subscription Edge Functions, OnboardingPage PayFast redirect, DashboardPage subscription UI, fill all 8 test bodies
+- [ ] 04-03-PLAN.md — Wave 3: Deploy + human-verify — apply migration 007, deploy Edge Functions (payfast-itn with --no-verify-jwt), configure PayFast sandbox secrets, test real sandbox checkout flow end-to-end
 
 ### Phase 5: Domain Registration & Customer Lifecycle
 **Goal**: Real `.co.za` domain availability checks and registration via ZADOMAINS replace the Google DNS placeholder, domains are attached to Netlify sites with SSL, and the customer dashboard gives full lifecycle visibility and self-service control
@@ -96,7 +100,7 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. `/privacy` and `/terms` pages exist on the keep-hosting marketing site; every generated customer site automatically includes a footer link to templated privacy and T&Cs; the onboarding form has a mandatory POPIA consent checkbox that records consent timestamp and IP before signup is allowed
   2. The privacy policy explicitly discloses that customer PII is sent to Anthropic (USA) for site generation, with a POPIA Section 72 cross-border transfer disclosure visible at the point of Claude submission — not buried in the footer
-  3. `npm test` runs the Vitest suite and exits non-zero on failure; the suite includes smoke tests for: non-admin user hitting admin route returns 403, MIME-rejected file upload, Yoco webhook idempotency, and build state machine transitions
+  3. `npm test` runs the Vitest suite and exits non-zero on failure; the suite includes smoke tests for: non-admin user hitting admin route returns 403, MIME-rejected file upload, PayFast ITN idempotency, and build state machine transitions
   4. GitHub Actions (or equivalent) runs the test suite on every push to `main`; a failing test blocks the merge
   5. The admin dashboard shows pending builds, failed builds, failed payments, Claude cost trend (daily/weekly), and current Netlify deploy count vs. daily quota; the admin can manually trigger a re-deploy or re-generate for any stuck order
 **Plans**: TBD
@@ -108,6 +112,6 @@ Plans:
 | 1. Security & Data Foundation | 3/3 | Complete    | 2026-04-09 |
 | 2. Generation Hardening | 4/4 | Complete   | 2026-04-09 |
 | 3. Deployment Pipeline | 3/3 | Complete    | 2026-04-10 |
-| 4. Payment Integration | 0/TBD | Not started | - |
+| 4. Payment Integration | 0/3 | Not started | - |
 | 5. Domain Registration & Customer Lifecycle | 0/TBD | Not started | - |
 | 6. Compliance, Tests & Operations | 0/TBD | Not started | - |
