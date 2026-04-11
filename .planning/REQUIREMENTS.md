@@ -18,11 +18,11 @@ Requirements for the first real, paid, end-to-end launch milestone. Each maps to
 
 ### Data Model
 
-- [x] **DATA-01**: `subscriptions` table added (user_id, plan, status, yoco_token_id, next_charge_at, grace_until, suspended_at)
+- [x] **DATA-01**: `subscriptions` table added (user_id, plan, status, payfast_subscription_id, payfast_token, next_charge_at, grace_until, suspended_at, current_period_end, failed_charge_count)
 - [x] **DATA-02**: `client_sites.generated_files` JSONB column added; generation pipeline persists files to Supabase Storage before any deploy attempt
 - [x] **DATA-03**: `profiles.popia_consent_at` and `profiles.popia_consent_ip` columns added; recorded at signup and at payment
 - [x] **DATA-04**: `orders.status` enum extended to include `suspended`; state-machine transitions documented
-- [x] **DATA-05**: `yoco_payment_id` column on `orders`; `build_events` table for pipeline observability
+- [x] **DATA-05**: `payment_id` column on `orders` (renamed from yoco_payment_id); `build_events` table for pipeline observability
 - [x] **DATA-06**: `generation_cost` column captures Claude input/output tokens per build (cost monitoring from day one)
 
 ### Generation Pipeline

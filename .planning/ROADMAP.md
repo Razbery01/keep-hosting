@@ -24,11 +24,11 @@ keep-hosting is a brownfield brownfield project that needs six phases to go from
   1. A non-admin authenticated user navigating to `/admin` or `/admin/orders` is redirected with a 403 — the admin UI does not render and no admin-scoped data is returned from Supabase
   2. Uploading a file with a non-image MIME type or a file over 5MB to the onboarding form is rejected server-side, and the storage path contains a UUID filename — not the original filename
   3. The Supabase anon key and URL are read exclusively from environment variables — no plaintext fallback exists anywhere in source
-  4. The `subscriptions` table exists with all columns required for billing lifecycle (status, yoco_token_id, next_charge_at, grace_until, suspended_at); the `build_events` table records pipeline state transitions; the `generation_cost` column captures Claude token counts per build
+  4. The `subscriptions` table exists with all columns required for billing lifecycle (status, payfast_subscription_id, payfast_token, next_charge_at, grace_until, suspended_at, current_period_end, failed_charge_count); the `build_events` table records pipeline state transitions; the `generation_cost` column captures Claude token counts per build
 **Plans**: 3 plans
 Plans:
 - [x] 01-01-PLAN.md — Wave 0 test infrastructure: install Vitest, wire vite.config.ts test block, create stub test files matching 01-VALIDATION.md paths
-- [x] 01-02-PLAN.md — Migration 003: subscriptions table + RLS, generated_files/generation_cost, POPIA consent columns, suspended status, yoco_payment_id; update src/types/database.ts
+- [x] 01-02-PLAN.md — Migration 003: subscriptions table + RLS, generated_files/generation_cost, POPIA consent columns, suspended status, payment_id; update src/types/database.ts
 - [x] 01-03-PLAN.md — Security code fixes: remove plaintext Supabase credential (SEC-04), RequireAdmin route guard (SEC-01/02), upload validator + UUID path (SEC-03), prompt sanitizer (SEC-06), HTML scanner (SEC-07) wired into build-site Edge Function
 - ~~01-04-PLAN.md~~ — Descoped with SEC-05 on 2026-04-09. Plan removed; will be re-planned if V2-SEC-01 is promoted back to v1.
 
@@ -76,9 +76,9 @@ Plans:
   5. Customer can resubscribe; suspended subscription reactivates on next successful charge
 **Plans**: 3 plans
 Plans:
-- [ ] 04-01-PLAN.md — Wave 1: Foundation — test stubs (8 PAY files with it.todo), migration 007 (rename yoco columns to PayFast), config.toml verify_jwt=false, database.ts types, shared payfast.ts signature module
-- [ ] 04-02-PLAN.md — Wave 2: Core implementation — create-payfast-order + payfast-itn + cancel-subscription Edge Functions, OnboardingPage PayFast redirect, DashboardPage subscription UI, fill all 8 test bodies
-- [ ] 04-03-PLAN.md — Wave 3: Deploy + human-verify — apply migration 007, deploy Edge Functions (payfast-itn with --no-verify-jwt), configure PayFast sandbox secrets, test real sandbox checkout flow end-to-end
+- [x] 04-01-PLAN.md — Wave 1: Foundation — test stubs (8 PAY files with it.todo), migration 007 (rename yoco columns to PayFast), config.toml verify_jwt=false, database.ts types, shared payfast.ts signature module
+- [x] 04-02-PLAN.md — Wave 2: Core implementation — create-payfast-order + payfast-itn + cancel-subscription Edge Functions, OnboardingPage PayFast redirect, DashboardPage subscription UI, fill all 8 test bodies
+- [ ] 04-03-PLAN.md — Wave 3: Deploy + human-verify — apply migration 007, deploy Edge Functions (payfast-itn with --no-verify-jwt), configure PayFast sandbox secrets, test real sandbox checkout flow end-to-end (Task 1 complete; awaiting Task 2 human verification)
 
 ### Phase 5: Domain Registration & Customer Lifecycle
 **Goal**: Real `.co.za` domain availability checks and registration via ZADOMAINS replace the Google DNS placeholder, domains are attached to Netlify sites with SSL, and the customer dashboard gives full lifecycle visibility and self-service control

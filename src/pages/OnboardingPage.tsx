@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ArrowRight, ArrowLeft, Loader2, Upload, CheckCircle2, Globe,
@@ -65,7 +65,6 @@ const initialData: OnboardingData = {
 
 export default function OnboardingPage() {
   const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
   const { user, signUp, signIn } = useAuth()
   const [step, setStep] = useState(0)
   const [submitting, setSubmitting] = useState(false)
