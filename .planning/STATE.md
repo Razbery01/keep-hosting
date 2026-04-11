@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 03-03 (deploy pipeline verification: migration 005, 5 Edge Functions deployed, NETLIFY_PAT configured, real deploy/suspend/reactivate verified)"
-last_updated: "2026-04-10T18:18:14.134Z"
+stopped_at: "Completed 04-01 (PayFast foundation: 8 test stubs, migration 007, config.toml JWT bypass, types updated, shared payfast.ts signature module)"
+last_updated: "2026-04-11T14:29:26.449Z"
 last_activity: 2026-04-09 — Completed 01-01 test infrastructure (vitest harness + 7 stub test files)
 progress:
   total_phases: 6
   completed_phases: 3
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 13
+  completed_plans: 11
   percent: 25
 ---
 
@@ -58,6 +58,7 @@ Progress: [███░░░░░░░] 25%
 | Phase 03-deployment-pipeline P01 | 2min | 3 tasks | 9 files |
 | Phase 03-deployment-pipeline P02 | 5min | 2 tasks | 13 files |
 | Phase 03-deployment-pipeline P03 | 15min | 2 tasks | 0 files |
+| Phase 04-payment-integration P01 | 3 | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,8 @@ Recent decisions affecting current work:
 - [Phase 03-deployment-pipeline]: Netlify pricing tier confirmed acceptable — credit budget acceptable for launch volume
 - [Phase 03-deployment-pipeline]: GITHUB_PAT permanently removed — Netlify zip-deploy approach supersedes GitHub-based deploy
 - [Phase 03-deployment-pipeline]: Suspension placeholder-deploy confirmed: branded UX trade-off accepted over Netlify disable endpoint
+- [Phase 04-payment-integration]: Source-scan TDD for Deno modules: pay03 tests use fs.readFileSync to assert payfast.ts structural patterns — same deploy01.test.ts pattern — because npm:md5 Deno imports are not resolvable in Node/Vitest
+- [Phase 04-payment-integration]: npm:md5 chosen for PayFast signature (crypto.subtle does not support MD5); payment_id is provider-agnostic column name; cancelling added to subscriptions.status for customer-initiated cancel grace period
 
 ### Pending Todos
 
@@ -109,6 +112,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-10T11:27:23.780Z
-Stopped at: Completed 03-03 (deploy pipeline verification: migration 005, 5 Edge Functions deployed, NETLIFY_PAT configured, real deploy/suspend/reactivate verified)
+Last session: 2026-04-11T14:29:26.447Z
+Stopped at: Completed 04-01 (PayFast foundation: 8 test stubs, migration 007, config.toml JWT bypass, types updated, shared payfast.ts signature module)
 Resume file: None

@@ -48,7 +48,7 @@ Requirements for the first real, paid, end-to-end launch milestone. Each maps to
 
 ### Payments (PayFast)
 
-- [ ] **PAY-01**: PayFast merchant account configured with sandbox + production credentials; subscription feature enabled (documented — no vendor contact blocker)
+- [x] **PAY-01**: PayFast merchant account configured with sandbox + production credentials; subscription feature enabled (documented — no vendor contact blocker)
 - [ ] **PAY-02**: OnboardingPage redirects to PayFast checkout with setup fee + R49/mo subscription; `custom_str1` carries siteId through the flow
 - [ ] **PAY-03**: `payfast-itn` Edge Function verifies ITN signature (MD5 hash of sorted params + passphrase); rejects invalid signatures
 - [ ] **PAY-04**: ITN handler is idempotent — duplicate notifications do not double-create subscriptions or double-trigger builds (`m_payment_id` dedup)
@@ -56,7 +56,7 @@ Requirements for the first real, paid, end-to-end launch milestone. Each maps to
 - [ ] **PAY-06**: Recurring R49/mo handled by PayFast native subscriptions; ITN notifications on each charge update `subscriptions.next_charge_at`
 - [ ] **PAY-07**: Failed payment retry handled by PayFast (3 attempts over 10 days); on final failure + CANCELLED ITN, site suspended via `suspend-site`
 - [ ] **PAY-08**: Customer can resubscribe via new PayFast checkout after cancellation/suspension; `reactivate-site` fires on new subscription COMPLETE
-- [ ] **PAY-09**: All PayFast API calls and ITN verification happen inside Edge Functions — `PAYFAST_PASSPHRASE` never exposed client-side
+- [x] **PAY-09**: All PayFast API calls and ITN verification happen inside Edge Functions — `PAYFAST_PASSPHRASE` never exposed client-side
 
 ### Domain Registration (ZADOMAINS)
 
@@ -185,7 +185,7 @@ Populated during roadmap creation. Each requirement maps to exactly one phase.
 | DEPLOY-04 | Phase 3 | Complete |
 | DEPLOY-05 | Phase 3 | Complete |
 | DEPLOY-06 | Phase 3 | Complete |
-| PAY-01 | Phase 4 | Pending |
+| PAY-01 | Phase 4 | Complete |
 | PAY-02 | Phase 4 | Pending |
 | PAY-03 | Phase 4 | Pending |
 | PAY-04 | Phase 4 | Pending |
@@ -193,7 +193,7 @@ Populated during roadmap creation. Each requirement maps to exactly one phase.
 | PAY-06 | Phase 4 | Pending |
 | PAY-07 | Phase 4 | Pending |
 | PAY-08 | Phase 4 | Pending |
-| PAY-09 | Phase 4 | Pending |
+| PAY-09 | Phase 4 | Complete |
 | DOM-01 | Phase 5 | Pending |
 | DOM-02 | Phase 5 | Pending |
 | DOM-03 | Phase 5 | Pending |
