@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 04-01 (PayFast foundation: 8 test stubs, migration 007, config.toml JWT bypass, types updated, shared payfast.ts signature module)"
-last_updated: "2026-04-11T14:29:26.449Z"
+stopped_at: Completed 04-02 (create-payfast-order, payfast-itn, cancel-subscription Edge Functions; OnboardingPage PayFast redirect; DashboardPage subscription UI; all 8 PAY tests green)
+last_updated: "2026-04-11T14:37:13.538Z"
 last_activity: 2026-04-09 — Completed 01-01 test infrastructure (vitest harness + 7 stub test files)
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 13
-  completed_plans: 11
+  completed_plans: 12
   percent: 25
 ---
 
@@ -59,6 +59,7 @@ Progress: [███░░░░░░░] 25%
 | Phase 03-deployment-pipeline P02 | 5min | 2 tasks | 13 files |
 | Phase 03-deployment-pipeline P03 | 15min | 2 tasks | 0 files |
 | Phase 04-payment-integration P01 | 3 | 2 tasks | 12 files |
+| Phase 04-payment-integration P02 | 15min | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -99,6 +100,8 @@ Recent decisions affecting current work:
 - [Phase 03-deployment-pipeline]: Suspension placeholder-deploy confirmed: branded UX trade-off accepted over Netlify disable endpoint
 - [Phase 04-payment-integration]: Source-scan TDD for Deno modules: pay03 tests use fs.readFileSync to assert payfast.ts structural patterns — same deploy01.test.ts pattern — because npm:md5 Deno imports are not resolvable in Node/Vitest
 - [Phase 04-payment-integration]: npm:md5 chosen for PayFast signature (crypto.subtle does not support MD5); payment_id is provider-agnostic column name; cancelling added to subscriptions.status for customer-initiated cancel grace period
+- [Phase 04-payment-integration]: OnboardingPage order status changed from 'pending' to 'payment_pending' to align with PayFast redirect flow
+- [Phase 04-payment-integration]: pay09 secrets scan excludes src/test/ to prevent self-referential false positives — same pattern as deploy01 bundle scan
 
 ### Pending Todos
 
@@ -112,6 +115,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-11T14:29:26.447Z
-Stopped at: Completed 04-01 (PayFast foundation: 8 test stubs, migration 007, config.toml JWT bypass, types updated, shared payfast.ts signature module)
+Last session: 2026-04-11T14:37:13.536Z
+Stopped at: Completed 04-02 (create-payfast-order, payfast-itn, cancel-subscription Edge Functions; OnboardingPage PayFast redirect; DashboardPage subscription UI; all 8 PAY tests green)
 Resume file: None
