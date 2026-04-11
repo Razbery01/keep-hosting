@@ -1,15 +1,16 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   Globe, ExternalLink, Clock, CheckCircle2, Loader2, AlertCircle,
   Plus, CreditCard, Eye, Sparkles, Code2, Rocket,
-  Check, X, AlertTriangle, ArrowRight, Trash2,
+  Check, X, AlertTriangle, ArrowRight, Trash2, RefreshCw,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
 import { useBuildStatus } from '../hooks/useBuildStatus'
+import type { Subscription } from '../types/database'
 
 interface Order {
   id: string
@@ -176,10 +177,13 @@ function BuildProgress({ buildStatus, siteId }: { buildStatus: string; siteId: s
 
 export default function DashboardPage() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [orders, setOrders] = useState<Order[]>([])
+  const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [loading, setLoading] = useState(true)
   const [payingId, setPayingId] = useState<string | null>(null)
   const [removingId, setRemovingId] = useState<string | null>(null)
+  const [cancellingSubscription, setCancellingSubscription] = useState(false)
 
   const fetchOrders = useCallback(async () => {
     if (!user) return
@@ -192,7 +196,22 @@ export default function DashboardPage() {
     setLoading(false)
   }, [user])
 
-  useEffect(() => { fetchOrders() }, [fetchOrders])
+  const fetchSubscription = useCallback(async () => {
+    if (!user) return
+    const { data } = await supabase
+      .from('subscriptions')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+    setSubscription(data as Subscription | null)
+  }, [user])
+
+  useEffect(() => {
+    fetchOrders()
+    fetchSubscription()
+  }, [fetchOrders, fetchSubscription])
 
   // Poll for updates when any order is pending or actively building
   useEffect(() => {
@@ -247,6 +266,33 @@ export default function DashboardPage() {
     } finally {
       setPayingId(null)
     }
+  }
+
+  async function handleCancelSubscription() {
+    if (!subscription) return
+    if (
+      !window.confirm(
+        'Cancel your subscription? Your site will remain live until the end of your current billing period, then be suspended.'
+      )
+    ) return
+
+    setCancellingSubscription(true)
+    try {
+      const { error } = await supabase.functions.invoke('cancel-subscription', {
+        body: { subscriptionId: subscription.id },
+      })
+      if (error) throw error
+      toast.success('Subscription cancellation requested. Your site stays live until end of billing period.')
+      await fetchSubscription()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not cancel subscription')
+    } finally {
+      setCancellingSubscription(false)
+    }
+  }
+
+  function handleReactivate(siteId: string) {
+    navigate(`/onboarding?reactivate=${siteId}`)
   }
 
   if (loading) {
@@ -407,6 +453,76 @@ export default function DashboardPage() {
                         >
                           Visit Site <ExternalLink className="w-3.5 h-3.5" />
                         </a>
+                      </div>
+                    )}
+
+                    {/* Subscription management — only shown for the most recent active order */}
+                    {isPaid && subscription && (
+                      <div className="mt-4 pt-4 border-t border-gray-100">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="text-sm text-gray-600">
+                            <span className="font-medium">Subscription: </span>
+                            {subscription.status === 'active' && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">
+                                <CheckCircle2 className="w-3 h-3" /> Active — R49/mo
+                              </span>
+                            )}
+                            {subscription.status === 'cancelling' && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700">
+                                <Clock className="w-3 h-3" /> Cancelling
+                              </span>
+                            )}
+                            {subscription.status === 'grace_period' && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-orange-50 text-orange-700">
+                                <AlertTriangle className="w-3 h-3" /> Payment failed — retrying
+                              </span>
+                            )}
+                            {subscription.status === 'suspended' && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700">
+                                <AlertCircle className="w-3 h-3" /> Suspended
+                              </span>
+                            )}
+                            {subscription.status === 'cancelled' && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                                <X className="w-3 h-3" /> Cancelled
+                              </span>
+                            )}
+                            {subscription.next_charge_at && subscription.status === 'active' && (
+                              <span className="ml-2 text-xs text-gray-400">
+                                Next charge: {new Date(subscription.next_charge_at).toLocaleDateString('en-ZA')}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {/* Cancel Subscription button — visible when active */}
+                            {subscription.status === 'active' && (
+                              <button
+                                type="button"
+                                onClick={handleCancelSubscription}
+                                disabled={cancellingSubscription}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors disabled:opacity-50"
+                              >
+                                {cancellingSubscription ? (
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                ) : (
+                                  <X className="w-3.5 h-3.5" />
+                                )}
+                                Cancel Subscription
+                              </button>
+                            )}
+                            {/* Reactivate button — visible when suspended or cancelled */}
+                            {(subscription.status === 'suspended' || subscription.status === 'cancelled') && site && (
+                              <button
+                                type="button"
+                                onClick={() => handleReactivate(site.id)}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition-colors"
+                              >
+                                <RefreshCw className="w-3.5 h-3.5" />
+                                Reactivate
+                              </button>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>

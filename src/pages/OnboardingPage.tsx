@@ -143,7 +143,7 @@ export default function OnboardingPage() {
         .insert({
           user_id: currentUser.id,
           package: data.package,
-          status: 'pending',
+          status: 'payment_pending',
           amount_cents: pkg.price * 100,
           domain_name: data.domainName || null,
         })
@@ -204,13 +204,35 @@ export default function OnboardingPage() {
         })
       }
 
-      // Auto-trigger the build — no admin approval needed
-      supabase.functions.invoke('build-site', { body: { siteId: site.id } }).catch(() => {
-        // Build runs in background; errors are logged in build_events
+      // Invoke create-payfast-order Edge Function to generate signed checkout params server-side
+      // (passphrase must never be on the client — server generates the signature)
+      const { data: payfast, error: pfErr } = await supabase.functions.invoke('create-payfast-order', {
+        body: {
+          orderId: order.id,
+          siteId: site.id,
+          packageId: data.package,
+          userEmail: currentUser.email,
+          userFirstName: data.businessName.split(' ')[0] || data.businessName,
+          userLastName: data.businessName.split(' ').slice(1).join(' ') || 'Customer',
+        },
       })
+      if (pfErr) throw pfErr
 
-      toast.success('Building your preview now!')
-      navigate('/dashboard')
+      // Auto-submit hidden form to redirect browser to PayFast checkout
+      // PayFast return_url brings the customer back to /dashboard after payment
+      const form = document.createElement('form')
+      form.method = 'POST'
+      form.action = payfast.payfast_url
+      for (const [key, value] of Object.entries(payfast.params)) {
+        const input = document.createElement('input')
+        input.type = 'hidden'
+        input.name = key
+        input.value = value as string
+        form.appendChild(input)
+      }
+      document.body.appendChild(form)
+      form.submit()
+      // Note: form.submit() redirects — no navigate('/dashboard') needed here
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Something went wrong')
     } finally {

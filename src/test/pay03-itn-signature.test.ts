@@ -6,6 +6,10 @@ describe('PAY-03 — payfast-itn Edge Function verifies ITN signature', () => {
     ? fs.readFileSync('supabase/functions/_shared/payfast.ts', 'utf8')
     : ''
 
+  const itnSource = fs.existsSync('supabase/functions/payfast-itn/index.ts')
+    ? fs.readFileSync('supabase/functions/payfast-itn/index.ts', 'utf8')
+    : ''
+
   it('verifyPayFastSignature returns true for valid signature', () => {
     expect(payfastSharedSource).toMatch(/verifyPayFastSignature/)
   })
@@ -23,5 +27,13 @@ describe('PAY-03 — payfast-itn Edge Function verifies ITN signature', () => {
   it('signature uses + for spaces, not %20', () => {
     // Implementation must replace %20 with +
     expect(payfastSharedSource).toMatch(/%20.*\+|\+.*%20|replace.*%20.*\+/)
+  })
+
+  it('payfast.ts imports md5 for signature hashing', () => {
+    expect(payfastSharedSource).toMatch(/md5/)
+  })
+
+  it('payfast-itn calls verifyPayFastSignature', () => {
+    expect(itnSource).toMatch(/verifyPayFastSignature/)
   })
 })
