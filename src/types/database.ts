@@ -6,12 +6,15 @@ export interface Subscription {
   user_id: string
   order_id: string
   plan: string
-  status: 'active' | 'grace_period' | 'suspended' | 'cancelled'
-  yoco_token_id: string | null
+  status: 'active' | 'grace_period' | 'suspended' | 'cancelled' | 'cancelling'
+  payfast_subscription_id: string | null
+  payfast_token: string | null
+  current_period_end: string | null
   next_charge_at: string | null
   grace_until: string | null
   suspended_at: string | null
   amount_cents: number
+  failed_charge_count: number
   created_at: string
   updated_at: string
 }
@@ -63,7 +66,7 @@ export interface Database {
           domain_name: string | null
           payment_method: string | null
           payment_reference: string | null
-          yoco_payment_id: string | null
+          payment_id: string | null
           created_at: string
           updated_at: string
         }
@@ -76,14 +79,14 @@ export interface Database {
           domain_name?: string | null
           payment_method?: string | null
           payment_reference?: string | null
-          yoco_payment_id?: string | null
+          payment_id?: string | null
         }
         Update: {
           status?: 'pending' | 'payment_pending' | 'paid' | 'building' | 'preview_ready' | 'deployed' | 'live' | 'suspended' | 'cancelled'
           domain_name?: string | null
           payment_method?: string | null
           payment_reference?: string | null
-          yoco_payment_id?: string | null
+          payment_id?: string | null
           updated_at?: string
         }
       }
@@ -218,12 +221,15 @@ export interface Database {
           user_id: string
           order_id: string
           plan: string
-          status: 'active' | 'grace_period' | 'suspended' | 'cancelled'
-          yoco_token_id: string | null
+          status: 'active' | 'grace_period' | 'suspended' | 'cancelled' | 'cancelling'
+          payfast_subscription_id: string | null
+          payfast_token: string | null
+          current_period_end: string | null
           next_charge_at: string | null
           grace_until: string | null
           suspended_at: string | null
           amount_cents: number
+          failed_charge_count: number
           created_at: string
           updated_at: string
         }
@@ -232,23 +238,29 @@ export interface Database {
           user_id: string
           order_id: string
           plan?: string
-          status?: 'active' | 'grace_period' | 'suspended' | 'cancelled'
-          yoco_token_id?: string | null
+          status?: 'active' | 'grace_period' | 'suspended' | 'cancelled' | 'cancelling'
+          payfast_subscription_id?: string | null
+          payfast_token?: string | null
+          current_period_end?: string | null
           next_charge_at?: string | null
           grace_until?: string | null
           suspended_at?: string | null
           amount_cents?: number
+          failed_charge_count?: number
           created_at?: string
           updated_at?: string
         }
         Update: {
           plan?: string
-          status?: 'active' | 'grace_period' | 'suspended' | 'cancelled'
-          yoco_token_id?: string | null
+          status?: 'active' | 'grace_period' | 'suspended' | 'cancelled' | 'cancelling'
+          payfast_subscription_id?: string | null
+          payfast_token?: string | null
+          current_period_end?: string | null
           next_charge_at?: string | null
           grace_until?: string | null
           suspended_at?: string | null
           amount_cents?: number
+          failed_charge_count?: number
           updated_at?: string
         }
       }

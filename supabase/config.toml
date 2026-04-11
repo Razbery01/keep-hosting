@@ -3,3 +3,6 @@
 # Production config is managed via the Supabase Dashboard for your linked project.
 
 project_id = "keep-hosting"
+
+[functions.payfast-itn]
+verify_jwt = false
